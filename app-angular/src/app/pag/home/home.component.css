@@ -1,0 +1,8 @@
+#frameHome{
+  display: grid;
+  grid-template-columns: 300px 300px;
+  padding: 20px;
+  column-gap: 10px;
+  row-gap: 15px;
+  align-items: center;
+}

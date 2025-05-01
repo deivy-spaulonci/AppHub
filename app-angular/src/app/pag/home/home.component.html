@@ -1,0 +1,43 @@
+<div id="frameHome">
+
+
+  <p-fieldset legend="Contas">
+    <p-card header="Total" [style]="{ width: '250px'}">
+      <p-message severity="info" icon="pi pi-money-bill" styleClass="h-full">
+        {{totalConta$ | currency}}
+      </p-message>
+    </p-card>
+
+    <p-card header="Pagas" [style]="{ width: '250px'}">
+      <p-message severity="info" icon="pi pi-money-bill" styleClass="h-full">
+        {{totalContaAvencer$ | currency}}&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;
+        {{((totalContaAvencer$/totalConta$)*100).toFixed(2)}}%
+      </p-message>
+    </p-card>
+
+    <p-card header="Abertas" [style]="{ width: '250px'}">
+      <p-message severity="success" icon="pi pi-money-bill" styleClass="h-full">
+        {{totalContaAberto$+totalContaHoje$ | currency}}&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;
+        {{(((totalContaAberto$+totalContaHoje$)/totalConta$)*100).toFixed(2)}}%
+      </p-message>
+    </p-card>
+
+    <p-card header="Atrasadas" [style]="{ width: '250px'}">
+      <p-message severity="error" icon="pi pi-money-bill" styleClass="h-full">
+        {{totalContaAtradado$ | currency}}&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;
+        {{((totalContaAtradado$/totalConta$)*100).toFixed(2)}}%
+      </p-message>
+    </p-card>
+
+  </p-fieldset>
+
+  <p-fieldset legend="Despesas">
+    <p-card header="Total" [style]="{ width: '250px '}">
+      <p-message severity="info" icon="pi pi-money-bill" styleClass="h-full">
+        {{totalDespesa$ | currency}}
+      </p-message>
+    </p-card>
+  </p-fieldset>
+
+
+</div>

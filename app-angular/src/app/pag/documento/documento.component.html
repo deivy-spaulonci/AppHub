@@ -1,0 +1,16 @@
+<p-panel header="Documentos" [style]="{width: '900px', margin: '0 auto'}" [toggleable]="false">
+
+
+    <p-button icon="pi pi-plus" label="Expand all" (click)="expandAll()" /> -
+    <p-button icon="pi pi-minus" label="Collapse all" (click)="collapseAll()" />
+
+  <p-tree [value]="files" styleClass="w-full md:w-[30rem]" scrollHeight="600px" (onNodeSelect)="nodeSelect($event)"
+          [loading]="loading" selectionMode="single" [(selection)]="selectedFile"/>
+
+</p-panel>
+
+<p-blockui [blocked]="loading" class="flex justify-center">
+  <p-progress-spinner ariaLabel="loading"/>
+</p-blockui>
+
+<p-toast/>

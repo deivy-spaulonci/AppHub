@@ -1,0 +1,144 @@
+<p-panel header="Contas" [toggleable]="false" [style]="{width: '1000px', margin: '0 auto'}">
+  <p-contextmenu #cm [model]="items"></p-contextmenu>
+  <p-table #dt
+           [value]="contas"
+           [size]="'small'"
+           [lazy]="true"
+           [loading]="loading"
+           [totalRecords]="totalElements"
+           [sortOrder]="-1"
+           [sortField]="sortField"
+           [paginator]="true"
+           [rows]="pageSize"
+           [rowsPerPageOptions]="[15, 20, 25]"
+           [(selection)]="contaSelecinada"
+           (onLazyLoad)="loadData($event)"
+           [(contextMenuSelection)]="contaSelecinada"
+           [contextMenu]="cm"
+           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+           dataKey="id"
+           editMode="row"
+           scrollHeight="flex"
+           responsiveLayout="stack"
+           selectionMode="single"
+           showGridlines
+           stripedRows>
+    <ng-template pTemplate="caption">
+      <p-toolbar [style]="{padding:'0px'}">
+        <ng-template #start>
+          <p-button icon="pi pi-plus" size="small" label="Cadastro" [routerLink]="'/conta-form'"/>
+        </ng-template>
+        <ng-template #center>
+          <p-message severity="info">Valor Total: {{valorTotal | currency}}</p-message>
+          <p-message severity="info">Registros: {{totalElements}}</p-message>
+        </ng-template>
+        <ng-template #end>
+          <p-button icon="pi pi-filter" size="small" (click)="filtersIsVisible = true"/>
+        </ng-template>
+      </p-toolbar>
+    </ng-template>
+    <ng-template #header>
+      <tr>
+        <th pSortableColumn="id">Id<p-sortIcon field="id"/></th>
+        <th pSortableColumn="tipoConta">Conta<p-sortIcon field="tipoConta"/></th>
+        <th pSortableColumn="emissao">Emissão<p-sortIcon field="emissao"/></th>
+        <th pSortableColumn="vencimento">Vencimento<p-sortIcon field="vencimento"/></th>
+        <th pSortableColumn="parcela">Parcelas</th>
+        <th pSortableColumn="valor">Valor<p-sortIcon field="valor"/></th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-conta>
+      <tr [pTooltip]="conta.obs" [pSelectableRow]="conta" [pContextMenuRow]="conta">
+        <td>{{ conta.id }}</td>
+        <td>
+          {{ conta.tipoConta.nome }}
+          <i *ngIf="!conta.tipoConta.ativo" class="pi pi-times-circle" [style]="{float:'right'}" style="color: red"
+             pTooltip="Conta Cancelada"></i>
+        </td>
+        <td class="text-center">{{ conta.emissao | date: 'dd/MM/yyyy' }}</td>
+        <td class="text-center">{{ conta.vencimento | date: 'dd/MM/yyyy' }}</td>
+        <td class="text-center">{{ conta.parcela +"/"+ conta.totalParcela }}</td>
+        <td class="text-right">{{ conta.valor | currency }}</td>
+        <td class="text-center" style="padding: 0">
+          <p-message size="small" *ngIf="conta.status=='Em Aberto'" icon="pi pi-calendar-clock" severity="success" [style]="{margin:0,padding:0}">{{ conta.status}}</p-message>
+          <p-message size="small" *ngIf="conta.status=='Pago'" icon="pi pi-check-square" severity="info" [style]="{margin:0,padding:0}">{{ conta.status}}</p-message>
+          <p-message size="small" *ngIf="conta.status=='Atrasado'" icon="pi pi-exclamation-circle" severity="error" [style]="{margin:0,padding:0}">{{ conta.status}}</p-message>
+          <p-message size="small" *ngIf="conta.status=='Vencimento Hoje'" icon="pi pi-bell" severity="warn" [style]="{margin:0,padding:0}">{{ conta.status}}</p-message>
+        </td>
+        <td>
+          <div style="display: grid; grid-template-columns: repeat(4, 28px); text-align: center; align-content: center">
+            <i class="pi pi-pencil" [pTooltip]="'Editar'" style="color: blue" (click)="editConta(conta.id)"></i>
+            <i class="pi pi-search-plus" [pTooltip]="'Detalhes'" style="color: green" [routerLink]="'/conta-detail/'+conta.id"></i>
+            <i class="pi pi-trash" [pTooltip]="'Excluir'" style="color: red" (click)="delConta($event, conta.id)"></i>
+            <i class="pi pi-check-circle" [pTooltip]="'Pagar'" style="color: green" (click)="setPago($event, conta)"
+               *ngIf="conta.status!='Pago'"></i>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+
+</p-panel>
+
+
+
+<p-confirmdialog message="Confirma a exclusão da conta" header="Confirmação" closable="true"
+                 icon="pi pi-exclamation-triangle" closeOnEscape="true">
+
+</p-confirmdialog>
+
+<p-dialog #frameSetPago header="Pagar conta" [modal]="true" [(visible)]="setContaPagaVisible"
+          [style]="{ width: '40rem', height: '25rem' }" >
+  <div style="display: grid; grid-template-columns: 80px 1fr; column-gap: 15px; row-gap: 15px; align-items: center;">
+    <label>Data Pgto: </label>
+    <p-inputmask mask="99/99/9999" [style]="{width: '80px'}"  placeholder="99/99/9999" size="small" [(ngModel)]="contaPagaDataPgto"/>
+    <label>Forma Pgto: </label>
+    <p-select [options]="formasPgto" [loading]="loading" optionLabel="nome" size="small"
+              [style]="{width: '300px'}" scrollHeight="350px" appendTo="body" [(ngModel)]="contaPagaFormaPgto"
+              [filter]="true" filterBy="nome" [showClear]="true"/>
+    <label>Valor Pgto: </label>
+    <input pSize="small" type="text" (keyup)="maskaraMoeda($event)" [style]="{width: '100px'}"
+           pInputText style="width: 100%" [(ngModel)]="contaPagaValor"/>
+  </div>
+
+  <ng-template #footer>
+    <p-button label="Cancelar" severity="secondary" (click)="setContaPagaVisible = false" />
+    <p-button label="Salvar" (click)="pagarConta()" />
+  </ng-template>
+</p-dialog>
+
+
+<p-drawer header="Filtros" [(visible)]="filtersIsVisible" position="right" [style]="{width: '400px'}">
+  <div style="display: grid; gap: 10px;">
+
+    <p-inputmask mask="999999999" [(ngModel)]="idFilter" [autoClear]="false" placeholder="Id"
+                 [slotChar]="''" [style]="{width: '100%'}" [showClear]="true"></p-inputmask>
+
+    <p-select [options]="tiposConta" optionLabel="nome" placeholder="Tipo Conta" [scrollHeight]="'500px'"
+              [filter]="true" filterBy="nome" [showClear]="true" [(ngModel)]="tipoContaFilter"/>
+
+    <p-select [options]="status" [(ngModel)]="statusFilter" optionLabel="name" placeholder="Status conta" [showClear]="true"/>
+
+    <p>Emissão: </p>
+    <div style="display: grid; grid-template-columns: 100px 100px; align-items: center">
+      <p-inputmask mask="99/99/9999" placeholder="99/99/9999" [showClear]="true" [(ngModel)]="emissaoInicialFilter" [style]="{width:'95%'}" />
+      <p-inputmask mask="99/99/9999" placeholder="99/99/9999" [showClear]="true" [(ngModel)]="emissaoFinalFilter" [style]="{width:'95%'}" />
+    </div>
+
+    <p>Vencimento: </p>
+    <div style="display: grid; grid-template-columns: 100px 100px; align-items: center">
+      <p-inputmask mask="99/99/9999" placeholder="99/99/9999" [showClear]="true" [(ngModel)]="vencimentoInicialFilter"  [style]="{width:'95%'}"/>
+      <p-inputmask mask="99/99/9999" placeholder="99/99/9999" [showClear]="true" [(ngModel)]="vencimentoFinalFilter"  [style]="{width:'95%'}"/>
+    </div>
+
+    <p class="text-center" style="display: grid; grid-template-columns: 1fr 1fr">
+      <p-button icon="pi pi-filter" label="Filtrar" [raised]="true" size="large" (onClick)="dt._filter()"/>
+      <p-button icon="pi pi-filter-slash" severity="secondary" label="Limpar" [raised]="true" size="large" (onClick)="clearFilter()"/>
+    </p>
+  </div>
+</p-drawer>
+
+<p-toast/>

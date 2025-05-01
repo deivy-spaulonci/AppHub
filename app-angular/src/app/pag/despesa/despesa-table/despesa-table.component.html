@@ -1,0 +1,109 @@
+<p-panel header="Despesas" [toggleable]="false" [style]="{width: '1000px', margin: '0 auto'}">
+  <p-table #dt
+           [value]="despesas"
+           [size]="'small'"
+           [lazy]="true"
+           [loading]="loading"
+           [totalRecords]="totalElements"
+           [sortOrder]="-1"
+           [sortField]="sortField"
+           [paginator]="true"
+           [rows]="pageSize"
+           [rowsPerPageOptions]="[15, 20, 25]"
+           [(selection)]="despesaSelecinada"
+           (onLazyLoad)="loadData($event)"
+           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+           dataKey="id"
+           editMode="row"
+           scrollHeight="flex"
+           responsiveLayout="stack"
+           showGridlines
+           stripedRows>
+    <ng-template pTemplate="caption">
+      <p-toolbar [style]="{padding:'0px'}">
+        <ng-template #start>
+          <p-button icon="pi pi-plus" size="small" label="Cadastro" (onClick)="goToDespesaForm()"/>
+        </ng-template>
+        <ng-template #center>
+          <p-message severity="info">Valor Total: {{valorTotal | currency}}</p-message>
+          <p-message severity="info">Registros: {{totalElements}}</p-message>
+        </ng-template>
+        <ng-template #end>
+          <p-button icon="pi pi-filter" size="small" (click)="filtersIsVisible = true"/>
+        </ng-template>
+      </p-toolbar>
+    </ng-template>
+    <ng-template #header>
+      <tr>
+        <th pSortableColumn="id">Id
+          <p-sortIcon field="id"/>
+        </th>
+        <th pSortableColumn="tipoDespesa">Despesa
+          <p-sortIcon field="tipoDespesa"/>
+        </th>
+        <th pSortableColumn="fornecedor">Fornecedor
+          <p-sortIcon field="fornecedor"/>
+        </th>
+        <th pSortableColumn="dataPagamento">Data Pgto
+          <p-sortIcon field="dataPagamento"/>
+        </th>
+        <th pSortableColumn="formaPagamento">Forma Pgto
+          <p-sortIcon field="formaPagamento"/>
+        </th>
+        <th pSortableColumn="valor">Valor
+          <p-sortIcon field="valor"/>
+        </th>
+        <th>Ações</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-despesa>
+      <tr [pTooltip]="despesa.obs">
+        <td>{{ despesa.id }}</td>
+        <td>{{ despesa.tipoDespesa.nome }}</td>
+        <td>{{ despesa.fornecedor.nome }}</td>
+        <td class="text-center">{{ despesa.dataPagamento | date: 'dd/MM/yyyy' }}</td>
+        <td>{{ despesa.formaPagamento.nome }}</td>
+        <td class="text-right">{{ despesa.valor | currency }}</td>
+        <td>
+          <div style="display: grid; grid-template-columns: 50% 50%; text-align: center;">
+            <i class="pi pi-pencil" [pTooltip]="'Editar'" style="color: blue" (click)="editDespesa(despesa.id)"></i>
+            <i class="pi pi-trash" [pTooltip]="'Excluir'" style="color: red" (click)="delDespesa($event, despesa.id)"></i>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-panel>
+
+<p-drawer header="Filtros" [(visible)]="filtersIsVisible" position="right" [style]="{width: '400px'}">
+  <div style="display: grid; gap: 10px;">
+
+    <p-inputmask mask="999999999" [(ngModel)]="idFilter" [autoClear]="false" placeholder="Id" [style]="{width:'90%'}"
+                 [slotChar]="''" [showClear]="true"></p-inputmask>
+
+    <p-select [options]="tiposDespesa" optionLabel="nome" placeholder="Tipo Despesa" [style]="{width:'90%'}" [scrollHeight]="'500px'"
+              [filter]="true" filterBy="nome" [showClear]="true" [(ngModel)]="tipoDespesaFilter"/>
+
+    <p-select [options]="fornecedores" optionLabel="nome" placeholder="Fornecedor" [style]="{width:'90%'}" [scrollHeight]="'500px'"
+              [filter]="true" filterBy="nome" [showClear]="true" [(ngModel)]="fornecedorFilter"/>
+
+    <p-select [options]="formasPgto" optionLabel="nome" placeholder="Forma Pagmento" [style]="{width:'90%'}" [scrollHeight]="'500px'"
+              [filter]="true" filterBy="nome" [showClear]="true" [(ngModel)]="formaPgtoFilter"/>
+
+    <p>Período: </p>
+    <div style="display: grid; grid-template-columns: 100px 100px; align-items: center">
+      <p-inputmask mask="99/99/9999" placeholder="99/99/9999" [showClear]="true" [(ngModel)]="dataInicialFilter" [style]="{width:'95%'}"/>
+      <p-inputmask mask="99/99/9999" placeholder="99/99/9999" [showClear]="true" [(ngModel)]="dataFinalFilter" [style]="{width:'95%'}"/>
+    </div>
+
+    <p class="text-center" style="display: grid; grid-template-columns: 1fr 1fr">
+      <p-button icon="pi pi-filter" label="Filtrar" [raised]="true" size="large" (onClick)="dt._filter()"/>
+      <p-button icon="pi pi-filter-slash" severity="secondary" label="Limpar" [raised]="true" size="large" (onClick)="clearFilter()"/>
+    </p>
+  </div>
+</p-drawer>
+<p-confirmdialog message="Confirma a exclusão da despesa" header="Confirmação" closable="true"
+                 icon="pi pi-exclamation-triangle" closeOnEscape="true">
+
+</p-confirmdialog>
+<p-toast/>
