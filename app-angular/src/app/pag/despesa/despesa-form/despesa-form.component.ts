@@ -19,6 +19,9 @@ import {Panel} from "primeng/panel";
 import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
 import {firstValueFrom} from 'rxjs';
 import {Message} from 'primeng/message';
+import {ComboDefaultComponent} from '../../../shared/components/combo-default/combo-default.component';
+import {InputDateComponent} from '../../../shared/components/input-date/input-date.component';
+import {InputMoneyComponent} from '../../../shared/components/input-money/input-money.component';
 
 @Component({
   selector: 'app-despesa-form',
@@ -34,7 +37,10 @@ import {Message} from 'primeng/message';
     Panel,
     AutoComplete,
     Message,
-    CurrencyPipe
+    CurrencyPipe,
+    ComboDefaultComponent,
+    InputDateComponent,
+    InputMoneyComponent
   ],
   templateUrl: './despesa-form.component.html',
   standalone: true,

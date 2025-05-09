@@ -8,9 +8,9 @@ import {DespesaTableComponent} from './pag/despesa/despesa-table/despesa-table.c
 import {DespesaFormComponent} from './pag/despesa/despesa-form/despesa-form.component';
 import {ContaTableComponent} from './pag/conta/conta-table/conta-table.component';
 import {ContaFormComponent} from './pag/conta/conta-form/conta-form.component';
-import {ContaDetailComponent} from './pag/conta/conta-detail/conta-detail.component';
 import {ParametrosComponent} from './pag/parametros/parametros.component';
 import {DocumentoComponent} from './pag/documento/documento.component';
+import {ContaComponent} from './pag/conta/conta.component';
 
 export const routes: Routes = [
   {path:'home', component: HomeComponent},
@@ -22,8 +22,9 @@ export const routes: Routes = [
   {path:'despesa-form', component:DespesaFormComponent},
   {path:'conta-table', component:ContaTableComponent},
   {path:'conta-form', component:ContaFormComponent},
-  {path:'conta-detail/:id', component:ContaDetailComponent},
   {path:'parametros', component:ParametrosComponent},
   {path:'documentos', component:DocumentoComponent},
+  {path:'conta', component:ContaComponent},
+
   { path: '',   redirectTo: '/home', pathMatch: 'full' },
 ];

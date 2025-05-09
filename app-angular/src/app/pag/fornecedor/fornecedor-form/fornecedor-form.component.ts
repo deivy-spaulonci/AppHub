@@ -43,6 +43,7 @@ export class FornecedorFormComponent implements OnInit {
   nome: string = '';
   razaoSocial: string = '';
   loading: boolean = false;
+  maskCnpj:string='99.999.999/9999-99';
 
   constructor(private router: Router,
               private defaultService: DefaultService,
@@ -63,10 +64,6 @@ export class FornecedorFormComponent implements OnInit {
       complete: () => {
       }
     });
-  }
-
-  goFornecedorlist(){
-    this.router.navigate(['/fornecedor-table'])
   }
 
   searchCities(cidadeSelect: any) {
@@ -159,8 +156,5 @@ export class FornecedorFormComponent implements OnInit {
       });
 
     }
-
   }
-
-
 }

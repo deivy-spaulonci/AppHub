@@ -1,0 +1,15 @@
+  <p-inputmask mask="999"
+               slotChar=""
+               placeholder="0"
+               [style]="{width: '50px'}"
+               [(ngModel)]="valor"
+               (onInput)="aoDigitarValor($event)"
+               autoClear="false"/>
+  <i class="pi pi-minus" style="font-size: 1rem"></i>
+  <p-inputmask mask="999"
+               slotChar=""
+               placeholder="0"
+               [style]="{width: '50px'}"
+               [(ngModel)]="total"
+               (onInput)="aoDigitarTotal($event)"
+               autoClear="false"/>

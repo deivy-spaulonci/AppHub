@@ -1,56 +1,40 @@
-<p-panel header="Cadastro Despesa" [style]="{width: '900px', margin: '0 auto'}" [toggleable]="false" #despCard>
-  <ng-template #icons>
-    <p-button icon="pi pi-align-justify" severity="secondary" rounded text (onClick)="goParaDespesalist()"/>
-  </ng-template>
+<div id="frame">
+  <label *ngIf="idEdicao">Id: </label>
+  <label *ngIf="idEdicao">{{idEdicao}} </label>
+  <label>Tipo Despesa: </label>
+  <app-combo-default [values]="tiposDespesa" [loading]="loading" [(selected)]="tipoDespesaSelecionado" scrlHeight="550px"></app-combo-default>
 
-  <div id="frame">
-    <label *ngIf="idEdicao">Id: </label>
-    <label *ngIf="idEdicao">{{idEdicao}} </label>
-    <label>Tipo Despesa: </label>
-    <p-select [options]="tiposDespesa" [loading]="loading" optionLabel="nome" size="small"
-              [style]="{width: '300px'}" [(ngModel)]="tipoDespesaSelecionado" scrollHeight="350px"
-              [filter]="true" filterBy="nome"/>
+  <label>Fornecedor: </label>
+  <p-autocomplete [(ngModel)]="fornecedorSelecionado" [suggestions]="fornecedores" [inputStyle]="{width: '600px'}" size="small"
+                  optionLabel="nome" (completeMethod)="search($event)" [forceSelection]="true" placeholder="fornecedor">
+    <ng-template let-fornec #item>
+      <div>{{ fornec.nome }} [{{fornec.cnpj ? fornec.cnpj : fornec.cpf}}]</div>
+    </ng-template>
+  </p-autocomplete>
 
-    <label>Fornecedor: </label>
-    <p-autocomplete [(ngModel)]="fornecedorSelecionado" [suggestions]="fornecedores" [inputStyle]="{width: '600px'}" size="small"
-                    optionLabel="nome" (completeMethod)="search($event)" [forceSelection]="true" placeholder="fornecedor">
-      <ng-template let-fornec #item>
-        <div>{{ fornec.nome }} [{{fornec.cnpj ? fornec.cnpj : fornec.cpf}}]</div>
-      </ng-template>
-    </p-autocomplete>
-<!--    <p-select [options]="fornecedores" [loading]="loading" optionLabel="nome" size="small"-->
-<!--              [style]="{width: '600px'}" [(ngModel)]="fornecedorSelecionado" scrollHeight="350px"-->
-<!--              [filter]="true" filterBy="nome" [showClear]="true"/>-->
+  <label>Data: </label>
+  <app-input-date [(valor)]="data" larg="300px"></app-input-date>
 
-    <label>Data: </label>
-    <p-inputmask mask="99/99/9999" [style]="{width: '300px'}" [(ngModel)]="data" placeholder="99/99/9999" size="small" />
+  <label>Valor: </label>
+  <app-input-money [(money)]="valor" larg="300px"></app-input-money>
 
-    <label>Valor: </label>
-    <input pSize="small" type="text" [(ngModel)]="valor" (keyup)="maskaraMoeda($event)" [style]="{width: '300px'}"
-           pInputText style="width: 100%" />
+  <label>Forma Pgto: </label>
+  <app-combo-default [values]="formasPgto" [loading]="loading" [(selected)]="formaPgtoSelecionado"></app-combo-default>
 
-    <label>Forma Pgto: </label>
-    <p-select [options]="formasPgto" [loading]="loading" optionLabel="nome" size="small"
-              [style]="{width: '300px'}" [(ngModel)]="formaPgtoSelecionado" scrollHeight="350px"
-              [filter]="true" filterBy="nome"/>
+  <label>Observação: </label>
+  <textarea rows="3" [(ngModel)]="obs" cols="30" pTextarea pSize="small" [style]="{width: '300px'}"></textarea>
 
-    <label>Observação: </label>
-    <textarea rows="3" [(ngModel)]="obs" cols="30" pTextarea pSize="small" [style]="{width: '300px'}"></textarea>
+  <label></label>
+  <p-button label="Salvar" icon="pi pi-save" iconPos="top" [style]="{width: '120px'}" [raised]="true"
+            (onClick)="save()" *ngIf="!idEdicao"/>
 
-    <label></label>
-    <p-button label="Salvar" icon="pi pi-save" iconPos="top" [style]="{width: '120px'}" [raised]="true"
-              (onClick)="save()" *ngIf="!idEdicao"/>
-
-    <div *ngIf="idEdicao">
-      <p-button label="Atualizar" icon="pi pi-save" iconPos="top" [style]="{width: '120px', marginRight: '60px'}"
-                [raised]="true" (onClick)="save()"  severity="success"/>
-      <p-button label="Cancelar" icon="pi pi-times" iconPos="top" [style]="{width: '120px'}" [raised]="true"
-                severity="danger" (onClick)="goParaDespesalist()"/>
-    </div>
+  <div *ngIf="idEdicao">
+    <p-button label="Atualizar" icon="pi pi-save" iconPos="top" [style]="{width: '120px', marginRight: '60px'}"
+              [raised]="true" (onClick)="save()"  severity="success"/>
+<!--    <p-button label="Cancelar" icon="pi pi-times" iconPos="top" [style]="{width: '120px'}" [raised]="true"-->
+<!--              severity="danger" (onClick)="goParaDespesalist()"/>-->
   </div>
-  <ng-template #footer>
-    <p-message severity="secondary">Total: {{valorTotal | currency}}</p-message>
-  </ng-template>
-</p-panel>
+</div>
 
+<p-message severity="secondary">Total: {{valorTotal | currency}}</p-message>
 <p-toast/>

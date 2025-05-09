@@ -17,9 +17,11 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Entity
 public class Fatura implements Serializable {
+    private static final String SEQNAME = "fatura_seq";
 
     @Id
-    @Column
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQNAME)
+    @SequenceGenerator(name = SEQNAME, sequenceName = SEQNAME, allocationSize = 1)
     private BigInteger id;
 
     @Column(length = 10, nullable = false, columnDefinition = "0")

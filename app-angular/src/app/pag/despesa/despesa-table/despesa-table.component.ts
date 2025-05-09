@@ -27,35 +27,39 @@ import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {Message} from 'primeng/message';
 import {TipoConta} from '../../../model/tipo-conta';
 import {Panel} from "primeng/panel";
+import {ComboDefaultComponent} from '../../../shared/components/combo-default/combo-default.component';
+import {InputDateComponent} from '../../../shared/components/input-date/input-date.component';
 
 @Component({
   selector: 'app-despesa-table',
-    imports: [
-        Card,
-        TableModule,
-        DatePipe,
-        CurrencyPipe,
-        InputText,
-        ReactiveFormsModule,
-        FormsModule,
-        InputNumber,
-        InputMask,
-        Button,
-        InputGroupModule,
-        InputGroupAddonModule,
-        Toast,
-        Drawer,
-        ButtonDirective,
-        Toolbar,
-        Select,
-        JsonPipe,
-        NgIf,
-        Tooltip,
-        RouterLink,
-        ConfirmDialogModule,
-        Message,
-        Panel
-    ],
+  imports: [
+    Card,
+    TableModule,
+    DatePipe,
+    CurrencyPipe,
+    InputText,
+    ReactiveFormsModule,
+    FormsModule,
+    InputNumber,
+    InputMask,
+    Button,
+    InputGroupModule,
+    InputGroupAddonModule,
+    Toast,
+    Drawer,
+    ButtonDirective,
+    Toolbar,
+    Select,
+    JsonPipe,
+    NgIf,
+    Tooltip,
+    RouterLink,
+    ConfirmDialogModule,
+    Message,
+    Panel,
+    ComboDefaultComponent,
+    InputDateComponent
+  ],
   templateUrl: './despesa-table.component.html',
   providers: [MessageService,ConfirmationService],
   standalone: true,
@@ -75,7 +79,6 @@ export class DespesaTableComponent implements OnInit{
   fornecedorFilter:Fornecedor=new Fornecedor;
   dataInicialFilter:string='';
   dataFinalFilter:string='';
-  filtersIsVisible: boolean = false;
   tiposDespesa:TipoDespesa[]=[];
   formasPgto:FormaPagamento[]=[];
   fornecedores:Fornecedor[]=[];
@@ -112,10 +115,6 @@ export class DespesaTableComponent implements OnInit{
 
   editDespesa(param:number){
     this.router.navigate(['/despesa-form'],{ queryParams: { id: param} })
-  }
-
-  goToDespesaForm(){
-    this.router.navigate(['/despesa-form'])
   }
 
   delDespesa(event: Event, id:number){

@@ -1,0 +1,21 @@
+<p-toolbar>
+  <span><i class="pi pi-barcode" style="font-size: 1rem"></i> Contas</span>
+</p-toolbar>
+<p-tabs [value]="value" selectOnFocus="true">
+  <p-tablist>
+    <p-tab [value]="0">Consulta</p-tab>
+    <p-tab [value]="1">Cadastro</p-tab>
+  </p-tablist>
+  <p-tabpanels class="p-0">
+
+    <p-tabpanel [value]="0" class="p-0">
+        <app-conta-table></app-conta-table>
+    </p-tabpanel>
+
+    <p-tabpanel [value]="1">
+      <app-conta-form></app-conta-form>
+    </p-tabpanel>
+
+  </p-tabpanels>
+</p-tabs>
+

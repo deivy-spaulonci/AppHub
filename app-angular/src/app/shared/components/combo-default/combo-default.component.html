@@ -1,0 +1,13 @@
+<p-select [options]="values"
+          [loading]="loading"
+          [optionLabel]="optLabel"
+          resetFilterOnHide="true"
+          size="small"
+          appendTo="body"
+          [showClear]="shClear"
+          [style]="{width: larg}"
+          [(ngModel)]="selected"
+          [scrollHeight]="scrlHeight"
+          [filter]="true"
+          (onChange)="aoSelecionar($event)"
+          [filterBy]="filtBy"/>

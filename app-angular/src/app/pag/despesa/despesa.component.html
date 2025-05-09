@@ -1,1 +1,20 @@
-<p>despesa works!</p>
+<p-toolbar>
+  <span><i class="pi pi-money-bill" style="font-size: 1rem"></i> Despesa</span>
+</p-toolbar>
+<p-tabs [value]="value" selectOnFocus="true">
+  <p-tablist>
+    <p-tab [value]="0">Consulta</p-tab>
+    <p-tab [value]="1">Cadastro</p-tab>
+  </p-tablist>
+  <p-tabpanels class="p-0">
+
+    <p-tabpanel [value]="0" class="p-0">
+      <app-despesa-table></app-despesa-table>
+    </p-tabpanel>
+
+    <p-tabpanel [value]="1">
+      <app-despesa-form></app-despesa-form>
+    </p-tabpanel>
+
+  </p-tabpanels>
+</p-tabs>

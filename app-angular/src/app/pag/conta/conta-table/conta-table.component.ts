@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
 import {Card} from 'primeng/card';
 import {Toast} from 'primeng/toast';
 import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
@@ -31,6 +31,10 @@ import {ContextMenu} from 'primeng/contextmenu';
 import {Dialog} from 'primeng/dialog';
 import {Fatura} from '../../../model/fatura';
 import {InputText} from 'primeng/inputtext';
+import {ComboDefaultComponent} from '../../../shared/components/combo-default/combo-default.component';
+import {InputDateComponent} from '../../../shared/components/input-date/input-date.component';
+import {FaturaTableComponent} from '../../../shared/components/fatura-table/fatura-table.component';
+import {InputMoneyComponent} from '../../../shared/components/input-money/input-money.component';
 
 @Component({
   selector: 'app-conta-table',
@@ -62,7 +66,11 @@ import {InputText} from 'primeng/inputtext';
     Dialog,
     JsonPipe,
     InputText,
-    RouterLink
+    RouterLink,
+    ComboDefaultComponent,
+    InputDateComponent,
+    FaturaTableComponent,
+    InputMoneyComponent
   ],
   templateUrl: './conta-table.component.html',
   providers: [MessageService,ConfirmationService],
@@ -73,7 +81,7 @@ export class ContaTableComponent implements OnInit{
   contas:Conta[]=[];
   totalElements = 0;
   sortField:string='vencimento';
-  pageSize = 20;
+  pageSize = 15;
   valorTotal:number=0;
   loading:boolean=false;
   contaSelecinada!:Conta;
@@ -83,7 +91,6 @@ export class ContaTableComponent implements OnInit{
   emissaoInicialFilter:string='';
   vencimentoFinalFilter:string='';
   emissaoFinalFilter:string='';
-  filtersIsVisible: boolean = false;
   tiposConta:TipoConta[]=[];
   formasPgto:FormaPagamento[]=[];
   @ViewChild('dt') table?:Table;
@@ -273,10 +280,6 @@ export class ContaTableComponent implements OnInit{
     });
   }
 
-  maskaraMoeda($event: KeyboardEvent) {
-    const element = ( $event.target as HTMLInputElement);
-    element.value = Util.formatFloatToReal(element.value);
-  }
 
   // getStatusTheme(conta:Conta){
   //   switch (conta.status){

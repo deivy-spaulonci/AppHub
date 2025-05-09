@@ -1,12 +1,17 @@
 @import "primeicons/primeicons.css";
 @import "primeflex/primeflex.css";
+@import url("https://unpkg.com/primeflex@latest/primeflex.css");
 /* You can add global styles to this file, and also import other style files */
-html{
+html, body{
   margin: 0;
   padding: 0;
-  font-size: 13px;
+  font-size: 12px;
   font-family: "Segoe UI", Roboto,
   Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
   "Segoe UI Symbol";
 }
 
+
+.p-inputtext {
+  height: 25px;
+}

@@ -1,0 +1,20 @@
+<p-table [value]="faturas" size="small" [scrollable]="true" [scrollHeight]="sHeight" stripedRows>
+  <ng-template #header>
+    <tr>
+      <th class="text-center" [style]="{'width':'50px'}">Data</th>
+      <th class="text-center" [style]="{'width':'100px'}">Valor</th>
+      <th class="text-center" [style]="{'width':'50px'}">Parcelas</th>
+      <th>Fornecedor</th>
+      <th *ngIf="rmBaskt" [style]="{'width':'50px'}" class="text-center">Remover</th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-fatura>
+    <tr>
+      <td class="text-center">{{ fatura.dataPagamento | date: 'dd/MM/yyyy'}}</td>
+      <td class="text-right">{{ fatura.valor | currency}}</td>
+      <td class="text-center">{{ fatura.parcela +'/'+ fatura.totalParcela}}</td>
+      <td>{{ fatura.fornecedor.nome }}</td>
+      <td *ngIf="rmBaskt" class="text-center"><i class="pi pi-trash" [pTooltip]="'Excluir'" style="color: red" (click)="delFatura($event, fatura)"></i></td>
+    </tr>
+  </ng-template>
+</p-table>

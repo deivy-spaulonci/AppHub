@@ -1,55 +1,44 @@
-<p-panel header="Cadastro Fornecedor" [toggleable]="false"
-           [style]="{width: '950px', margin: '0 auto', height:'600px'}" #forecCard>
-  <ng-template #icons>
-    <p-button icon="pi pi-align-justify" severity="secondary" rounded text (onClick)="goFornecedorlist()"/>
-  </ng-template>
-  <div id="frame">
-    <label>Tipo Pessoa: </label>
-    <p-selectbutton [options]="stateOptions"
-                    [(ngModel)]="tipoPessoa"
-                    optionLabel="label"
-                    optionValue="value"
-                    (onChange)="changePerson()"
-                    aria-labelledby="basic">
-      <ng-template #item let-item>
-        {{ item.label }} <i [class]="item.icon"></i>
-      </ng-template>
-    </p-selectbutton>
+<div id="frame">
+  <label>Tipo Pessoa: </label>
+  <p-selectbutton [options]="stateOptions"
+                  [(ngModel)]="tipoPessoa"
+                  optionLabel="label"
+                  optionValue="value"
+                  (onChange)="changePerson()"
+                  aria-labelledby="basic">
+    <ng-template #item let-item>
+      {{ item.label }} <i [class]="item.icon"></i>
+    </ng-template>
+  </p-selectbutton>
 
-    <label>CNPJ: </label>
-    <div>
-      <p-inputmask mask="99.999.999/9999-99" [(ngModel)]="cnpj" placeholder="99.999.999/9999-99" size="small"
-                   disabled="{{tipoPessoa=='pf'}}"/>
-      <p-button icon="pi pi-cloud" [raised]="true" disabled="{{tipoPessoa=='pf'}}" (onClick)="searchCNPJ()"
-                [style]="{padding: '7px', marginLeft: '10px'}"/>
-    </div>
-
-    <label>CPF: </label>
-    <input type="text" pInputText pSize="small" style="width: 200px;" [disabled]="tipoPessoa=='pj'" [(ngModel)]="cpf"/>
-    <label>Nome: </label>
-    <input type="text" pInputText pSize="small" style="width: 500px;" [(ngModel)]="nome"/>
-    <label>Razão Social: </label>
-    <input type="text" pInputText pSize="small" style="width: 500px;" [(ngModel)]="razaoSocial"/>
-
-    <label>Cidade: </label>
-    <div>
-      <p-select [options]="estados" size="small" optionLabel="name" (onChange)="searchCities(null)" [(ngModel)]="estadoSelect"
-                placeholder="Estado" [disabled]="tipoPessoa=='pj'" [showClear]="true"/>
-
-      <p-select [options]="cidades" [loading]="loading" optionLabel="nome" size="small"
-                [style]="{width: '300px', marginLeft: '30px'}"
-                [(ngModel)]="cidadeSelect" [filter]="true" filterBy="nome" [showClear]="true"
-                [disabled]="tipoPessoa=='pj'"
-                [placeholder]="cidadeSelect.nome"/>
-    </div>
-
-    <label></label>
-    <p-button label="Salvar" icon="pi pi-save" iconPos="top" [style]="{width: '120px'}" [raised]="true"
-              (onClick)="save()"/>
+  <label>CNPJ: </label>
+  <div>
+    <p-inputmask [mask]="maskCnpj" [(ngModel)]="cnpj" [placeholder]="maskCnpj" size="small" disabled="{{tipoPessoa=='pf'}}"/>
+    <p-button icon="pi pi-cloud" [raised]="true" disabled="{{tipoPessoa=='pf'}}" (onClick)="searchCNPJ()"
+              [style]="{padding: '7px', marginLeft: '10px'}"/>
   </div>
 
+  <label>CPF: </label>
+  <input type="text" pInputText pSize="small" style="width: 200px;" [disabled]="tipoPessoa=='pj'" [(ngModel)]="cpf"/>
+  <label>Nome: </label>
+  <input type="text" pInputText pSize="small" style="width: 500px;" [(ngModel)]="nome"/>
+  <label>Razão Social: </label>
+  <input type="text" pInputText pSize="small" style="width: 500px;" [(ngModel)]="razaoSocial"/>
 
-</p-panel>
+  <label>Cidade: </label>
+  <div>
+    <p-select [options]="estados" size="small" optionLabel="name" (onChange)="searchCities(null)"
+              [(ngModel)]="estadoSelect" placeholder="Estado" [disabled]="tipoPessoa=='pj'" [showClear]="true"/>
+
+    <p-select [options]="cidades" [loading]="loading" optionLabel="nome" size="small" [disabled]="tipoPessoa=='pj'"
+              [style]="{width: '300px', marginLeft: '30px'}" [(ngModel)]="cidadeSelect" [filter]="true" filterBy="nome"
+              [showClear]="true" [placeholder]="cidadeSelect.nome"/>
+  </div>
+
+  <label></label>
+  <p-button label="Salvar" icon="pi pi-save" iconPos="top" [style]="{width: '120px'}" [raised]="true" (onClick)="save()"/>
+</div>
+
 <p-blockui [blocked]="loading" class="flex justify-center">
   <p-progress-spinner ariaLabel="loading"/>
 </p-blockui>

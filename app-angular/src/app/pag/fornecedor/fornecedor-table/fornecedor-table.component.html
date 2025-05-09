@@ -1,99 +1,79 @@
-<p-panel header="Fornecedores" [toggleable]="false" [style]="{width: '1200px', margin: '0 auto'}">
-  <ng-template #icons>
-    <p-button icon="pi pi-receipt" severity="secondary" rounded text (onClick)="goFornecedorForm()"/>
+<p-toolbar [style]="{padding:'3px'}">
+  <ng-template #start></ng-template>
+  <ng-template #center>
+    <input pInputText placeholder="busca" [(ngModel)]="filtroTexto" [style]="{width:'300px',height:'28px'}" />
+    <p-button size="small" icon="pi pi-search" (onClick)="dt._filter()"/>
   </ng-template>
-  <p-table #dt
-           [value]="fornecedores"
-           [size]="'small'"
-           [lazy]="true"
-           [loading]="loading"
-           [totalRecords]="totalElements"
-           [sortOrder]="1"
-           [sortField]="sortField"
-           [paginator]="true"
-           [rows]="pageSize"
-           [rowsPerPageOptions]="[15, 20, 25]"
-           [(selection)]="fornecedorSelecionado"
-           (onLazyLoad)="loadData($event)"
-           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-           dataKey="id"
-           editMode="row"
-           scrollHeight="flex"
-           responsiveLayout="stack"
-           showGridlines
-           stripedRows>
-    <ng-template pTemplate="caption">
-      <p-inputGroup [style]="{width:'50%',height:'30px'}">
-        <input type="text" pInputText placeholder="Keyword" [(ngModel)]="filtroTexto"/>
-        <p-inputgroup-addon>
-          <p-button size="small" type="button" pButton icon="pi pi-search" (onClick)="dt._filter()"></p-button>
-          <p-message severity="info">Registros: {{totalElements}}</p-message>
-        </p-inputgroup-addon>
-      </p-inputGroup>
+  <ng-template #end><p-message severity="info">Registros: {{totalElements}}</p-message></ng-template>
+</p-toolbar>
 
-    </ng-template>
-    <ng-template #header>
-      <tr>
-        <th pSortableColumn="id">Id
-          <p-sortIcon field="id"/>
-        </th>
-        <th pSortableColumn="nome">Nome
-          <p-sortIcon field="nome"/>
-        </th>
-        <th pSortableColumn="razaoSocial">Razao Social
-          <p-sortIcon field="razaoSocial"/>
-        </th>
-        <th pSortableColumn="cpf">CPF
-          <p-sortIcon field="cpf"/>
-        </th>
-        <th pSortableColumn="cnpj">CNPJ
-          <p-sortIcon field="cnpj"/>
-        </th>
-        <th pSortableColumn="cidade.nome">Cidade
-          <p-sortIcon field="cidade.nome"/>
-        </th>
-        <th>Ações</th>
-      </tr>
-    </ng-template>
-    <ng-template #body let-fornec let-editing="editing" let-ri="rowIndex">
-      <tr [pSelectableRow]="fornec" [pEditableRow]="fornec">
-        <td>{{ fornec.id }}</td>
-        <td>
-          <p-cellEditor>
-            <ng-template #input>
-              <input pInputText type="text" [(ngModel)]="fornec.nome" style="width: 100%"/>
-            </ng-template>
-            <ng-template #output>{{ fornec.nome }}</ng-template>
-          </p-cellEditor>
-        </td>
-        <td>
-          <p-cellEditor>
-            <ng-template #input>
-              <input pInputText type="text" [(ngModel)]="fornec.razaoSocial" style="width: 100%"/>
-            </ng-template>
-            <ng-template #output>{{ fornec.razaoSocial }}</ng-template>
-          </p-cellEditor>
-        </td>
-        <td>{{ fornec.cpf }}</td>
-        <td>{{ fornec.cnpj }}</td>
-        <td>{{ fornec.cidade.nome }}</td>
-        <td>
-          <div style="display: grid; grid-template-columns: 50% 50%; text-align: center;">
-            <i class="pi pi-pencil" [pTooltip]="'Editar'" pInitEditableRow style="color: blue" *ngIf="!editing"
-               (click)="onRowEditInit(fornec)"></i>
-            <i class="pi pi-pen-to-square" [pTooltip]="'Ajustar Nome e Razão Social do Fornecedor'" style="color: green"
-               *ngIf="!editing" (click)="updateNameFonnecedor(fornec)"></i>
-            <i class="pi pi-check" pSaveEditableRow style="color: green" *ngIf="editing"
-               (click)="onRowEditSave(fornec)"></i>
-            <i class="pi pi-times" pCancelEditableRow style="color: red" *ngIf="editing"
-               (click)="onRowEditCancel(fornec, ri)"></i>
-          </div>
-        </td>
-      </tr>
+<p-table #dt
+         [value]="fornecedores"
+         [size]="'small'"
+         [lazy]="true"
+         [loading]="loading"
+         [totalRecords]="totalElements"
+         [sortOrder]="1"
+         [sortField]="sortField"
+         [paginator]="true"
+         [rows]="pageSize"
+         [rowsPerPageOptions]="[15, 20, 25]"
+         [(selection)]="fornecedorSelecionado"
+         (onLazyLoad)="loadData($event)"
+         [paginatorPosition]="'top'"
+         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+         dataKey="id"
+         editMode="row"
+         scrollHeight="flex"
+         responsiveLayout="stack"
+         showGridlines
+         stripedRows>
+  <ng-template #header>
+    <tr>
+      <th pSortableColumn="id">Id<p-sortIcon field="id"/></th>
+      <th pSortableColumn="nome">Nome<p-sortIcon field="nome"/></th>
+      <th pSortableColumn="razaoSocial">Razao Social<p-sortIcon field="razaoSocial"/></th>
+      <th pSortableColumn="cpf">CPF<p-sortIcon field="cpf"/></th>
+      <th pSortableColumn="cnpj">CNPJ<p-sortIcon field="cnpj"/></th>
+      <th pSortableColumn="cidade.nome">Cidade<p-sortIcon field="cidade.nome"/></th>
+      <th>Ações</th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-fornec let-editing="editing" let-ri="rowIndex">
+    <tr [pSelectableRow]="fornec" [pEditableRow]="fornec">
+      <td>{{ fornec.id }}</td>
+      <td>
+        <p-cellEditor>
+          <ng-template #input>
+            <input pInputText type="text" [(ngModel)]="fornec.nome" style="width: 100%"/>
+          </ng-template>
+          <ng-template #output>{{ fornec.nome }}</ng-template>
+        </p-cellEditor>
+      </td>
+      <td>
+        <p-cellEditor>
+          <ng-template #input>
+            <input pInputText type="text" [(ngModel)]="fornec.razaoSocial" style="width: 100%"/>
+          </ng-template>
+          <ng-template #output>{{ fornec.razaoSocial }}</ng-template>
+        </p-cellEditor>
+      </td>
+      <td>{{ fornec.cpf }}</td>
+      <td>{{ fornec.cnpj }}</td>
+      <td>{{ fornec.cidade.nome }}</td>
+      <td>
+        <div style="display: grid; grid-template-columns: 50% 50%; text-align: center;">
+          <i class="pi pi-pencil" [pTooltip]="'Editar'" pInitEditableRow style="color: blue" *ngIf="!editing"
+             (click)="onRowEditInit(fornec)"></i>
+          <i class="pi pi-pen-to-square" [pTooltip]="'Ajustar Nome e Razão Social do Fornecedor'" style="color: green"
+             *ngIf="!editing" (click)="updateNameFonnecedor(fornec)"></i>
+          <i class="pi pi-check" pSaveEditableRow style="color: green" *ngIf="editing"
+             (click)="onRowEditSave(fornec)"></i>
+          <i class="pi pi-times" pCancelEditableRow style="color: red" *ngIf="editing"
+             (click)="onRowEditCancel(fornec, ri)"></i>
+        </div>
+      </td>
+    </tr>
 
-    </ng-template>
-  </p-table>
-</p-panel>
-<p-toast/>
-
-
+  </ng-template>
+</p-table>

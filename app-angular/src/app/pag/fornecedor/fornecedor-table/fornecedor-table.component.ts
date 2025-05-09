@@ -16,10 +16,11 @@ import {Util} from '../../../util/util';
 import {Message} from "primeng/message";
 import {Panel} from "primeng/panel";
 import {Router} from '@angular/router';
+import {Toolbar} from 'primeng/toolbar';
 
 @Component({
   selector: 'app-fornecedor-table',
-    imports: [Toast, ToastModule, TableModule, CardModule, ButtonModule, InputGroupModule, FormsModule, InputTextModule, InputGroupAddonModule, NgIf, Tooltip, Message, Panel],
+  imports: [Toast, ToastModule, TableModule, CardModule, ButtonModule, InputGroupModule, FormsModule, InputTextModule, InputGroupAddonModule, NgIf, Tooltip, Message, Panel, Toolbar],
   templateUrl: './fornecedor-table.component.html',
   styleUrl: './fornecedor-table.component.css',
   providers: [MessageService],
@@ -30,7 +31,7 @@ export class FornecedorTableComponent implements OnInit {
   filtroTexto: string = '';
   totalElements = 0;
   sortField: string = 'nome';
-  pageSize = 20;
+  pageSize = 15;
   loading: boolean = false;
   fornecedorSelecionado!: Fornecedor;
   clonedFornecedors: { [s: number]: Fornecedor } = {};
@@ -51,10 +52,6 @@ export class FornecedorTableComponent implements OnInit {
       complete: () => {
       }
     });
-  }
-
-  goFornecedorForm(){
-    this.router.navigate(['/fornecedor-form'])
   }
 
   onRowEditInit(fornecedor: Fornecedor) {

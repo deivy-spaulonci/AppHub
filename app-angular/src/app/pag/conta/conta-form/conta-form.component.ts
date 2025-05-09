@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {Card} from 'primeng/card';
 import {Toast} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
@@ -25,6 +25,15 @@ import {Conta} from '../../../model/conta';
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 import {firstValueFrom} from 'rxjs';
 import {Message} from 'primeng/message';
+import {Textarea} from 'primeng/textarea';
+import {FileUpload, UploadEvent} from 'primeng/fileupload';
+import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
+import {FaturaTableComponent} from '../../../shared/components/fatura-table/fatura-table.component';
+import {InputDateComponent} from '../../../shared/components/input-date/input-date.component';
+import {InputParcelasComponent} from '../../../shared/components/input-parcelas/input-parcelas.component';
+import {InputMoneyComponent} from '../../../shared/components/input-money/input-money.component';
+import {ComboDefaultComponent} from '../../../shared/components/combo-default/combo-default.component';
+import {Toolbar} from 'primeng/toolbar';
 
 @Component({
   selector: 'app-conta-form',
@@ -50,7 +59,15 @@ import {Message} from 'primeng/message';
     Tab,
     TabPanels,
     TabPanel,
-    Message
+    Message,
+    Textarea,
+    FileUpload,
+    FaturaTableComponent,
+    InputDateComponent,
+    InputParcelasComponent,
+    InputMoneyComponent,
+    ComboDefaultComponent,
+    Toolbar
   ],
   templateUrl: './conta-form.component.html',
   standalone: true,
@@ -77,15 +94,18 @@ export class ContaFormComponent  implements OnInit{
   fatura:Fatura=new Fatura();
   faturaValor:string='0,00';
   valorTotal:number=0;
+  maskCnpj:string='999999999999999999999999999999999999999999999999';
+
+  conteudoBase64: SafeResourceUrl | null = null;
 
   constructor(private router: Router,
               private route: ActivatedRoute,
               private defaultService: DefaultService,
-              private messageService: MessageService) {
+              private messageService: MessageService,
+              private sanitizer: DomSanitizer) {
   }
 
   ngOnInit(): void {
-
     this.route.queryParams.subscribe(params => {
       this.idEdicao = params['id'];
     });
@@ -105,7 +125,7 @@ export class ContaFormComponent  implements OnInit{
           this.totalParcela = res.totalParcela;
           this.valor = Util.formatFloatToReal(res.valor.toFixed(2).toString());
           this.obs = res.obs
-          this.dataPagto = res.dataPagamento
+          this.dataPagto = Util.dateToDataBR(res.dataPagamento);
           this.formaPgtoSelecionado = res.formaPagamento;
           this.faturas = res.faturas;
         },
@@ -113,8 +133,22 @@ export class ContaFormComponent  implements OnInit{
         complete: () => {}
       });
     }
+  }
 
+  goToContalist(){
+    this.router.navigate(['/conta'])
+  }
 
+  aoSelecionar(event: any) {
+    const file: File = event.files[0];
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const resultado = reader.result as string; // já é um data URL
+      this.conteudoBase64 = this.sanitizer.bypassSecurityTrustResourceUrl(resultado);
+    };
+
+    reader.readAsDataURL(file);
   }
 
   async loadInit(){
@@ -149,14 +183,6 @@ export class ContaFormComponent  implements OnInit{
     }
   }
 
-  delFatura(event: Event, fatura:Fatura){
-    this.faturas = this.faturas.filter(obj => {return obj !== fatura});
-  }
-
-  goToContalist(){
-    this.router.navigate(['/conta-table'])
-  }
-
   save(){
     this.parcela = Number(this.parcela);
     this.totalParcela = Number(this.totalParcela);
@@ -184,6 +210,7 @@ export class ContaFormComponent  implements OnInit{
       var conta:Conta = new Conta();
       if(this.idEdicao)
          conta.id = this.idEdicao;
+
       conta.codigoBarra = this.codBarras;
       conta.tipoConta = this.tipoContaSelecionado;
       conta.emissao = Util.dataBRtoDataIso(this.emissao);
@@ -202,28 +229,24 @@ export class ContaFormComponent  implements OnInit{
       }
       conta.faturas = this.faturas;
 
-      // console.log(JSON.stringify(conta));
       this.defaultService.save(conta, 'conta').subscribe({
         next: res => {
           this.messageService.add({severity: 'success', summary: 'Success', detail: 'Conta salva!'});
+
+          conta = new Conta();
         },
         error: error => {
           this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o conta'});
         },
         complete: () => {
           if(this.idEdicao)
-            this.router.navigate(['/conta-table'])
+            this.router.navigate(['/conta'])
           this.loading = false;
           this.valor = '0,00';
           this.obs = '';
         }
       });
     }
-  }
-
-  maskaraMoeda($event: KeyboardEvent) {
-    const element = ( $event.target as HTMLInputElement);
-    element.value = Util.formatFloatToReal(element.value);
   }
 
 }

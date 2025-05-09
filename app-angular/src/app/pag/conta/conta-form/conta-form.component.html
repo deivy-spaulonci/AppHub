@@ -1,125 +1,95 @@
-<p-panel header="Cadastro Contas" [toggleable]="false"
-         [style]="{width: '900px', margin: '0 auto', height:'700px'}" #contaCard>
-  <ng-template #icons>
-    <p-button icon="pi pi-align-justify" severity="secondary" rounded text (onClick)="goToContalist()"/>
-  </ng-template>
+<p-toolbar *ngIf="idEdicao" [style]="{'background-color': 'var(--p-yellow-100)'}">
+  <span><i class="pi pi-pencil" style="font-size: 1rem"></i> Edição de conta</span>
+</p-toolbar>
 
-  <p-tabs value="0">
-    <p-tablist>
-      <p-tab value="0">Dados</p-tab>
-      <p-tab value="1" [disabled]="!tipoContaSelecionado.cartaoCredito">Fatura</p-tab>
-    </p-tablist>
-    <p-tabpanels>
-      <p-tabpanel value="0">
-        <div class="frame">
-          <label *ngIf="idEdicao">Id: </label>
-          <label *ngIf="idEdicao">{{idEdicao}} </label>
-          <label>Cod. Barras</label>
-          <p-inputmask mask="999999999999999999999999999999999999999999999999" autoClear="false"
-                       [(ngModel)]="codBarras" [style]="{width: '350px'}"
-                       placeholder="999999999999999999999999999999999999999999999999"
-                       size="small"/>
-          <label>Tipo Conta: </label>
-          <p-select [options]="tiposContas" [loading]="loading" optionLabel="nome" size="small"
-                    [style]="{width: '300px'}" [(ngModel)]="tipoContaSelecionado" scrollHeight="400px"
-                    [filter]="true" filterBy="nome"/>
+<div id="frame">
+  <div id="gridFormConta">
+    <label>Cod. Barras</label>
+    <p-inputmask [mask]="maskCnpj" autoClear="false" [(ngModel)]="codBarras" [style]="{width: '350px'}" size="small"/>
+    <label>Tipo Conta: </label>
+    <app-combo-default [values]="tiposContas" [loading]="loading" [(selected)]="tipoContaSelecionado"></app-combo-default>
+    <label>Enissão:</label>
+    <div style="display: grid; grid-template-columns: repeat(3, 100px); align-items: center;">
+      <app-input-date [(valor)]="emissao"></app-input-date>
+      <label>Vencimento: </label>
+      <app-input-date [(valor)]="vencimento"></app-input-date>
+    </div>
+    <label>Parcelas: </label>
+    <div>
+      <app-input-parcelas [(valor)]="parcela" [(total)]="totalParcela"></app-input-parcelas>
+      <label> Valor: </label>
+      <app-input-money [(money)]="valor"></app-input-money>
+    </div>
+    <label> Obs: </label>
+    <textarea rows="3" [(ngModel)]="obs" cols="30" pTextarea pSize="small" [style]="{width: '300px'}"></textarea>
+    <label *ngIf="!idEdicao">Faturas </label>
+    <p-divider *ngIf="!idEdicao"/>
+    <div *ngIf="!idEdicao"></div>
+    <div *ngIf="!idEdicao">
+      <div class="p-2">
+        <label>Fornecedor: </label>
+        <app-combo-default [values]="fornecedores" [loading]="loading" [(selected)]="fatura.fornecedor" [larg]="'80%'"></app-combo-default>
+      </div>
+      <div class="p-2">
+        <label>Data: </label>
+        <app-input-date [(valor)]="fatura.dataPagamento"></app-input-date>
+        <label> Parcelas: </label>
+        <app-input-parcelas [(valor)]="fatura.parcela" [(total)]="fatura.totalParcela"></app-input-parcelas>
+        <label> Valor: </label>
+        <app-input-money [(money)]="faturaValor"></app-input-money>
+        <p-button severity="info" label="Incluir" (onClick)="addFatura()" icon="pi pi-plus" class="p-1" [raised]="true"/>
+      </div>
+    </div>
 
-          <label>Enissão: </label>
-          <div style="display: grid; grid-template-columns: repeat(3, 100px); align-items: center;">
-            <p-inputmask mask="99/99/9999" [style]="{width: '80px'}" [(ngModel)]="emissao" placeholder="99/99/9999" size="small" />
-            <label>Vencimento: </label>
-            <p-inputmask mask="99/99/9999" [style]="{width: '80px'}" [(ngModel)]="vencimento" placeholder="99/99/9999" size="small" />
-          </div>
+    <div *ngIf="!idEdicao"></div>
+    <div class="p-2" *ngIf="!idEdicao">
+      <app-fatura-table [faturas]="faturas" sHeight="320px" [rmBaskt]="true"></app-fatura-table>
+    </div>
 
-          <label>Parcelas: </label>
-          <div style="display: grid; grid-template-columns: 50px 10px 80px 50px 100px; align-items: center;">
-            <p-inputmask mask="999" slotChar="" placeholder="0" [style]="{width: '50px'}" [(ngModel)]="parcela" autoClear="false"/>
-            <i class="pi pi-minus" style="font-size: 1rem"></i>
-            <p-inputmask mask="999" slotChar="" placeholder="0" [style]="{width: '50px'}" [(ngModel)]="totalParcela" autoClear="false"/>
-            <label>Valor: </label>
-            <input pSize="small" type="text" [(ngModel)]="valor" (keyup)="maskaraMoeda($event)" [style]="{width: '100px'}"
-                   pInputText style="width: 100%" />
-          </div>
+    <label>Pagamento </label>
+    <p-divider/>
+    <label>Data Pgto: </label>
+    <app-input-date [(valor)]="dataPagto"></app-input-date>
 
-          <label>Obs: </label>
-          <textarea rows="3" [(ngModel)]="obs" cols="30" pTextarea pSize="small" [style]="{width: '300px'}"></textarea>
+    <label>Forma Pgto: </label>
+    <app-combo-default [values]="formasPagamento" [loading]="loading" [(selected)]="formaPgtoSelecionado">
+    </app-combo-default>
 
-          <label>Pagamento </label>
-          <p-divider/>
-          <label>Data Pgto: </label>
-          <p-inputmask mask="99/99/9999" [style]="{width: '80px'}" [(ngModel)]="dataPagto" placeholder="99/99/9999" size="small" />
-          <label>Forma Pgto: </label>
-          <p-select [options]="formasPagamento" [loading]="loading" optionLabel="nome" size="small"
-                    [style]="{width: '300px'}" [(ngModel)]="formaPgtoSelecionado" scrollHeight="350px"
-                    [filter]="true" filterBy="nome" [showClear]="true"/>
+    <label></label>
+    <div style="display: grid; grid-template-columns: 1fr 1fr;">
+      <p-button label="Salvar" icon="pi pi-save" iconPos="top" [style]="{width: '120px'}" [raised]="true"
+                (onClick)="save()" />
+      <p-button label="Cancelar" icon="pi pi-times" iconPos="top" [style]="{width: '120px'}" [raised]="true"
+                severity="danger" (onClick)="goToContalist()" *ngIf="idEdicao"/>
+    </div>
 
-          <label></label>
-          <p-button label="Salvar" icon="pi pi-save" iconPos="top" [style]="{width: '120px'}" [raised]="true"
-                    (onClick)="save()" *ngIf="!idEdicao"/>
+  </div>
+  <div id="gridIframe" >
+    <p-fileupload #fu mode="basic" chooseLabel="Selecionar" chooseIcon="pi pi-upload" auto="true"
+                  accept=".pdf,image/*"  (onSelect)="aoSelecionar($event)" customUpload="true" *ngIf="!idEdicao"/>
+    <iframe *ngIf="conteudoBase64 && !idEdicao" [src]="conteudoBase64" width="100%" height="700px"></iframe>
+<!--    EDIÇÃO-->
+    <div *ngIf="idEdicao">
+      <div class="p-2">
+        <label>Fornecedor: </label>
+        <app-combo-default [values]="fornecedores" [loading]="loading" [(selected)]="fatura.fornecedor" [larg]="'80%'">
+        </app-combo-default>
+      </div>
+      <div class="p-2">
+        <label>Data: </label>
+        <app-input-date [(valor)]="fatura.dataPagamento"></app-input-date>
+        <label> Parcelas: </label>
+        <app-input-parcelas [(valor)]="fatura.parcela" [(total)]="fatura.totalParcela"></app-input-parcelas>
+        <label> Valor: </label>
+        <app-input-money [(money)]="faturaValor"></app-input-money>
+        <p-button severity="info" label="Incluir" (onClick)="addFatura()" icon="pi pi-plus" class="p-1" [raised]="true"/>
+      </div>
+    </div>
+    <app-fatura-table *ngIf="tipoContaSelecionado.cartaoCredito" [faturas]="faturas" sHeight="620px" [rmBaskt]="true">
+    </app-fatura-table>
 
-          <div *ngIf="idEdicao">
-            <p-button label="Atualizar" icon="pi pi-save" iconPos="top" [style]="{width: '120px', marginRight: '60px'}"
-                      [raised]="true" (onClick)="save()"  severity="success"/>
-            <p-button label="Cancelar" icon="pi pi-times" iconPos="top" [style]="{width: '120px'}" [raised]="true"
-                      severity="danger" (onClick)="goToContalist()"/>
-          </div>
+  </div>
 
-        </div>
-      </p-tabpanel>
-
-      <p-tabpanel value="1">
-        <div style="display: grid; grid-template-columns: 100px 1fr; align-items: center; margin: 20px 0px;">
-          <label>Fornecedor: </label>
-          <p-select [options]="fornecedores" [loading]="loading" optionLabel="nome" size="small"
-                    [style]="{width: '600px'}" scrollHeight="350px" [(ngModel)]="fatura.fornecedor"
-                    [filter]="true" filterBy="nome" [showClear]="true"/>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 40px 100px 40px 100px 60px 150px 100px 200px; align-items: center; margin-bottom: 30px;">
-          <label>Data: </label>
-          <p-inputmask mask="99/99/9999" [style]="{width: '80px'}" [(ngModel)]="fatura.dataPagamento"
-                       placeholder="99/99/9999" size="small" />
-          <label>Valor: </label>
-          <input pSize="small" type="text" (keyup)="maskaraMoeda($event)" [style]="{width: '90px'}"
-                 pInputText style="width: 100%" [(ngModel)]="faturaValor"/>
-          <label>Parcelas: </label>
-          <div style="display: grid; grid-template-columns: 50px 10px 80px; align-items: center;">
-            <p-inputmask mask="999" slotChar="" placeholder="0" [style]="{width: '50px', textAlign: 'right'}"
-                         [(ngModel)]="fatura.parcela" autoClear="false"/>
-            <i class="pi pi-minus" style="font-size: 1rem"></i>
-            <p-inputmask mask="999" slotChar="" placeholder="0" [style]="{width: '50px', textAlign: 'right'}"
-                         [(ngModel)]="fatura.totalParcela" autoClear="false"/>
-          </div>
-          <p-button severity="info" label="Incluir" (onClick)="addFatura()" icon="pi pi-plus" [style]="{width: '90px'}" [raised]="true"/>
-        </div>
-
-        <p-table [value]="faturas" size="small" [scrollable]="true" scrollHeight="320px" stripedRows>
-          <ng-template #header>
-            <tr>
-              <th class="text-center" [style]="{'width':'50px'}">Data</th>
-              <th class="text-center" [style]="{'width':'100px'}">Valor</th>
-              <th class="text-center" [style]="{'width':'50px'}">Parcelas</th>
-              <th>Fornecedor</th>
-              <th [style]="{'width':'50px'}" class="text-center">Remover</th>
-            </tr>
-          </ng-template>
-          <ng-template #body let-fatura>
-            <tr>
-              <td class="text-center">{{ fatura.dataPagamento }}</td>
-              <td class="text-right">{{ fatura.valor | currency}}</td>
-              <td class="text-center">{{ fatura.parcela +'/'+ fatura.totalParcela}}</td>
-              <td>{{ fatura.fornecedor.nome }}</td>
-              <td class="text-center"><i class="pi pi-trash" [pTooltip]="'Excluir'" style="color: red" (click)="delFatura($event, fatura)"></i></td>
-            </tr>
-          </ng-template>
-        </p-table>
-
-      </p-tabpanel>
-    </p-tabpanels>
-  </p-tabs>
-  <ng-template #footer>
-    <p-message severity="secondary">Total: {{valorTotal | currency}}</p-message>
-  </ng-template>
-</p-panel>
+</div>
 
 <p-toast/>

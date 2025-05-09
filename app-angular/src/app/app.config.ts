@@ -41,9 +41,9 @@ export const appConfig: ApplicationConfig = {
             }
           }
         }),
-        // options: {
-        //   darkModeSelector: false || 'none'
-        // },
+        options: {
+          darkModeSelector: false || 'none'
+        },
       }
     })
   ]

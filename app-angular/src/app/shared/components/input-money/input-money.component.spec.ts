@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ContaDetailComponent } from './conta-detail.component';
+import { InputMoneyComponent } from './input-money.component';
 
-describe('ContaDetailComponent', () => {
-  let component: ContaDetailComponent;
-  let fixture: ComponentFixture<ContaDetailComponent>;
+describe('InputMoneyComponent', () => {
+  let component: InputMoneyComponent;
+  let fixture: ComponentFixture<InputMoneyComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ContaDetailComponent]
+      imports: [InputMoneyComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ContaDetailComponent);
+    fixture = TestBed.createComponent(InputMoneyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
