@@ -1,9 +1,6 @@
 package com.br.commands;
 
-import com.br.business.service.CidadeService;
-import com.br.business.service.DespesaService;
-import com.br.business.service.FornecedorService;
-import com.br.business.service.TipoContaService;
+import com.br.business.service.*;
 import com.br.config.ShellHelper;
 import com.br.entity.*;
 import com.br.filter.DespesaFilter;
@@ -25,6 +22,7 @@ import org.springframework.shell.standard.AbstractShellComponent;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.NumberFormat;
@@ -56,6 +54,10 @@ public class DespesaCommands extends AbstractShellComponent {
     private CidadeService cidadeService;
     @Autowired
     private FornecedorRepository fornecedorRepository;
+    @Autowired
+    private TipoDespesaService tipoDespesaService;
+    @Autowired
+    private FormaPagamentoService formaPagamentoService;
 
 	@ShellMethod("Status despesas")
 	public void statusDespesa(){
@@ -116,9 +118,9 @@ public class DespesaCommands extends AbstractShellComponent {
 			if(despesaFilter.getFornecedor()!=null) shellHelper.printInfo("	-> Fornecedor = "
 					+ fornecedorService.findById(despesaFilter.getFornecedor().getId()).get().getNome());
 			shellHelper.printInfo("");
-			shellHelper.printInfo("paginação > [exit]   [pag xx]   [order 'xx']  [size]");
-			shellHelper.printInfo("filtros   > [id xx]  [tipo]     [forma]       [periodo 00/00/0000 00/00/0000] [fornecedor] [clear]");
-			shellHelper.printInfo("comandos  > [clear]  [pagar xx] [editar xx]");
+			shellHelper.printInfo("paginação > [exit ]  [pag xx  ]  [order xx ]  [size]");
+			shellHelper.printInfo("filtros   > [id xx]  [tipo    ]  [forma    ]  [periodo 00/00/0000 00/00/0000] [fornecedor] [clear]");
+			shellHelper.printInfo("comandos  > [clear]  [pagar xx]  [editar xx]");
 			shellHelper.printInfo("");
 
 			String resposta = this.defaultComponent.inputTextDefault(" ->", "");
@@ -212,8 +214,18 @@ public class DespesaCommands extends AbstractShellComponent {
 		Despesa despesaCadastro = new Despesa();
 		do {
 			System.out.print("\033\143");
-//			despesaCadastro.setTipoDespesa(TipoDespesa.forValues(this.defaultComponent.selectTipoDespesa()));
 
+			//TIPO DESPESA ----------------------------------------------------
+			BigInteger codTipo  = new BigInteger(defaultComponent.selectTipoDespesa(tipoDespesaService));
+			Optional<TipoDespesa> tipoDespesaOptional = tipoDespesaService.findById(codTipo);
+			if(tipoDespesaOptional.isEmpty())
+				return;
+
+			TipoDespesa tipoDespesa = tipoDespesaOptional.get();
+			despesaCadastro.setTipoDespesa(tipoDespesa);
+			shellHelper.printInfo('✅'+ " Tipo Despesa : ["+tipoDespesa.getId()+"] "+tipoDespesa.getNome());
+
+			//FORNECEDOR ----------------------------------------------------
 			Fornecedor fornecedor = this.inputFornecedor();
 			if(fornecedor==null)
 				return;
@@ -221,10 +233,30 @@ public class DespesaCommands extends AbstractShellComponent {
 
 			//DATA ----------------------------------------------------
 			this.inputDataPgto(despesaCadastro);
+			shellHelper.printInfo('✅'+ " Data pagamento : "+ Util.toDatePtBr(despesaCadastro.getDataPagamento()));
+
+			//VALOR ----------------------------------------------------
 			this.inputValor(despesaCadastro);
-//			despesaCadastro.setFormaPagamento(FormaPagamento.forValues(this.defaultComponent.selectFormaPagamento()));
+			shellHelper.printInfo('✅'+ " Valor : "+ Util.toCurrencyPtBr(despesaCadastro.getValor()));
+
+			//FORMA PAGAMENTO ----------------------------------------------------
+			BigInteger codForma = new BigInteger(defaultComponent.selectFormaPagamento(formaPagamentoService));
+			Optional<FormaPagamento> formaPagamentoOptional = formaPagamentoService.findById(codForma);
+			if(formaPagamentoOptional.isEmpty())
+				return;
+
+			FormaPagamento formaPagamento = formaPagamentoOptional.get();
+			despesaCadastro.setFormaPagamento(formaPagamento);
+			shellHelper.printInfo('✅'+ " Forma Pagamento : ["+formaPagamento.getId()+"] "+formaPagamento.getNome());
+
+			//OBSERVAÇÃO ----------------------------------------------------
 			despesaCadastro.setObs(this.defaultComponent.inputoObs());
+			shellHelper.printInfo('✅'+ " Observação : "+despesaCadastro.getObs());
+
+			shellHelper.printInfo("-".repeat(230));
 			this.showDespesa(despesaCadastro);
+			shellHelper.printInfo("-".repeat(230));
+			
 			cont = this.defaultComponent.confirmationInput("Salvar Despesa", true);
 			if(cont==true)
 				despesaService.save(despesaCadastro);
@@ -237,7 +269,9 @@ public class DespesaCommands extends AbstractShellComponent {
 	public void editarDespesa(Despesa despesa){
 		this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
 		System.out.print("\033\143");
+
 		this.showDespesa(despesa);
+
 //		if(defaultComponent.confirmationInput("Alterar Tipo Despesa", false))
 //			despesa.setTipoDespesa(TipoDespesa.forValues(this.defaultComponent.selectTipoDespesa()));
 		if(defaultComponent.confirmationInput("Alterar Fornecedor", false)){
@@ -290,18 +324,18 @@ public class DespesaCommands extends AbstractShellComponent {
 			do{
 				cnpj = this.defaultComponent.inputCnpjFornecedor();
 				if(!fornecedorService.isCnpjValido(cnpj)){
-					shellHelper.printError("CNPJ inválido !!!");
+					shellHelper.printError('⛔' + " CNPJ inválido !!!");
 					contForn = this.defaultComponent.confirmationInput("Fornecedor não encontrado!  Deseja continuar", true);
 				}else{
-					shellHelper.printInfo("buscando fornecedor no banco...");
+					shellHelper.printInfo(" Buscando fornecedor no banco...");
 					fornecedor = fornecedorService.findByCnpj(cnpj);
 					if(fornecedor == null){
-						shellHelper.printWarning("fornecedor não encontrado no banco, buscando na internet...");
+						shellHelper.printWarning(" Fornecedor não encontrado no banco, buscando na internet...");
 						fornecedor = fornecedorService.getFornecedorFromWeb(cnpj);
 						if(fornecedor == null){
 							contForn = this.defaultComponent.confirmationInput("Fornecedor não encontrado!  Deseja continuar", true);
 						}else {
-							shellHelper.printSuccess("fornecedor econtrado!");
+							shellHelper.printSuccess(" Fornecedor econtrado!");
 							shellHelper.printInfo(String.format("Nome : %s", fornecedor.getNome()));
 							shellHelper.printInfo(String.format("Razao Social : %s", fornecedor.getRazaoSocial()));
 							shellHelper.printInfo(String.format("CNPJ : %s", fornecedor.getCnpj()));
@@ -315,8 +349,8 @@ public class DespesaCommands extends AbstractShellComponent {
 							}
 						}
 					}else{
-						shellHelper.printInfo("fornecedor no banco econtrado!");
-						shellHelper.printInfo(fornecedor.getNome() + " id : " + fornecedor.getId());
+						shellHelper.printInfo(" Fornecedor no banco econtrado!");
+						shellHelper.printInfo('✅'+ " ["+fornecedor.getId()+"] " + fornecedor.getNome());
 						contForn = false;
 					}
 				}
@@ -382,7 +416,7 @@ public class DespesaCommands extends AbstractShellComponent {
 			valid = !data.isEmpty() && Validate.isValidDate(data);
 			if(valid)
 				despesa.setDataPagamento(Util.getData(data));
-		} while (valid ? false :  this.defaultComponent.confirmationInput("Data Pgto inválida! Continuar", true));
+		} while (valid ? false :  this.defaultComponent.confirmationInput('⛔' + " Data Pgto inválida! Continuar", true));
 		return valid;
 	}
 
@@ -396,7 +430,7 @@ public class DespesaCommands extends AbstractShellComponent {
 			}catch(NumberFormatException e){
 				valid  = false;
 			}
-		}while (valid ? false :  this.defaultComponent.confirmationInput("Valor inválido! Continuar", true));
+		}while (valid ? false :  this.defaultComponent.confirmationInput('⛔' + "Valor inválido! Continuar", true));
 		return valid;
 	}
 

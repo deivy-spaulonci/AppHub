@@ -1,18 +1,24 @@
 package com.br.commands;
 
+import com.br.business.service.DespesaService;
+import com.br.business.service.FormaPagamentoService;
+import com.br.business.service.TipoDespesaService;
 import com.br.entity.FormaPagamento;
 import com.br.entity.TipoConta;
 import com.br.entity.TipoDespesa;
 import lombok.Getter;
 import lombok.Setter;
 import org.jline.terminal.Terminal;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.shell.component.ConfirmationInput;
 import org.springframework.shell.component.SingleItemSelector;
 import org.springframework.shell.component.StringInput;
 import org.springframework.shell.component.support.SelectorItem;
+import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.style.TemplateExecutor;
 
+import java.math.BigInteger;
 import java.util.*;
 
 @Getter
@@ -30,21 +36,22 @@ public class DefaultComponent {
         this.resourceLoader = resourceLoader;
     }
 
-    public String selectFormaPagamento() {
+    public String selectFormaPagamento(FormaPagamentoService formaPagamentoService) {
         List<SelectorItem<String>> items = new ArrayList<>();//Arrays.asList(i1, i2, i3, i4);
-//        Arrays.stream(FormaPagamento.values()).toList().forEach(forma ->
-//                items.add(SelectorItem.of(forma.getNome(), forma.getValue()))
-//        );
+        formaPagamentoService.findFormasPagamento().forEach(forma -> {
+            items.add(SelectorItem.of(forma.getNome(), forma.getId().toString()));
+        });
+
         return selectDefault(items, "Forma Pagamento");
     }
 
-    public String selectTipoDespesa() {
+    public String selectTipoDespesa(TipoDespesaService tipoDespesaService) {
         List<SelectorItem<String>> items = new ArrayList<>();//Arrays.asList(i1, i2, i3, i4);
-//        Arrays.stream(TipoDespesa.values()).toList().forEach(tipo ->
-//                items.add(SelectorItem.of(tipo.getNome(), tipo.getValue()))
-//        );
+        tipoDespesaService.findTipoDespesas().forEach(despesa -> {
+            items.add(SelectorItem.of(despesa.getNome(), despesa.getId().toString()));
+        });
         items.sort(Comparator.comparing(SelectorItem::getName));
-        return selectDefault(items, "Tipo Despesa");
+        return selectDefault(items, "Tipo Despesa :");
     }
 
     public Integer selectPageDefault() {
@@ -54,6 +61,8 @@ public class DefaultComponent {
         items.add(SelectorItem.of("20", 20));
         items.add(SelectorItem.of("25", 25));
         items.add(SelectorItem.of("30", 30));
+        items.add(SelectorItem.of("40", 40));
+        items.add(SelectorItem.of("50", 50));
         return selectDefaultInt(items, "Tamanho da Pagina:");
     }
 
@@ -90,9 +99,12 @@ public class DefaultComponent {
                 null);
         component.setResourceLoader(getResourceLoader());
         component.setTemplateExecutor(getTemplateExecutor());
-        component.setMaxItems(20);
-        SingleItemSelector.SingleItemSelectorContext<String, SelectorItem<String>> context = component.run(SingleItemSelector.SingleItemSelectorContext.empty());
-        String result = context.getResultItem().flatMap(si -> Optional.ofNullable(si.getItem())).get();
+        component.setMaxItems(25);
+        component.setPrintResults(false);
+        SingleItemSelector.SingleItemSelectorContext<String, SelectorItem<String>> context =
+                component.run(SingleItemSelector.SingleItemSelectorContext.empty());
+        String result = context.getResultItem().flatMap(si ->
+                Optional.ofNullable(si.getItem())).get();
         return result;
     }
 
@@ -108,6 +120,7 @@ public class DefaultComponent {
         StringInput component = new StringInput(getTerminal(), "Valor: ", "");
         component.setResourceLoader(getResourceLoader());
         component.setTemplateExecutor(getTemplateExecutor());
+        component.setPrintResults(false);
         StringInput.StringInputContext context = component.run(StringInput.StringInputContext.empty());
         return context.getResultValue();
     }
@@ -116,6 +129,7 @@ public class DefaultComponent {
         StringInput component = new StringInput(getTerminal(), "Fornecedor (CNPJ)", "");
         component.setResourceLoader(getResourceLoader());
         component.setTemplateExecutor(getTemplateExecutor());
+        component.setPrintResults(false);
         StringInput.StringInputContext context = component.run(StringInput.StringInputContext.empty());
         return context.getResultValue();
     }
@@ -125,6 +139,7 @@ public class DefaultComponent {
             StringInput component = new StringInput(getTerminal(), label, defaultValue);
             component.setResourceLoader(getResourceLoader());
             component.setTemplateExecutor(getTemplateExecutor());
+            component.setPrintResults(false);
             StringInput.StringInputContext context = component.run(StringInput.StringInputContext.empty());
             return context.getResultValue();
         }catch (Exception e){
@@ -136,6 +151,7 @@ public class DefaultComponent {
         StringInput component = new StringInput(getTerminal(), "Observação: ", "");
         component.setResourceLoader(getResourceLoader());
         component.setTemplateExecutor(getTemplateExecutor());
+        component.setPrintResults(false);
         StringInput.StringInputContext context = component.run(StringInput.StringInputContext.empty());
         return context.getResultValue();
     }
@@ -155,6 +171,7 @@ public class DefaultComponent {
         ConfirmationInput component = new ConfirmationInput(getTerminal(), String.format("%s ?", msg), def);
         component.setResourceLoader(getResourceLoader());
         component.setTemplateExecutor(getTemplateExecutor());
+        component.setPrintResults(false);
         ConfirmationInput.ConfirmationInputContext context = component.run(ConfirmationInput.ConfirmationInputContext.empty());
         return context.getResultValue();
     }
