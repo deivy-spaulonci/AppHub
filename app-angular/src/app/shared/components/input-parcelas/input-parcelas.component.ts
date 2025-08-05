@@ -12,6 +12,7 @@ import {FormsModule} from '@angular/forms';
   styleUrl: './input-parcelas.component.css'
 })
 export class InputParcelasComponent {
+  @Input() desabilitado:boolean=false;
   @Input() valor=0;
   @Input() total=0;
 

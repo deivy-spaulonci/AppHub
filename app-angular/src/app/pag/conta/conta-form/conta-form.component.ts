@@ -1,5 +1,4 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {Card} from 'primeng/card';
 import {Toast} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -7,26 +6,18 @@ import {DefaultService} from '../../../service/default.service';
 import {InputMask} from 'primeng/inputmask';
 import {FormsModule} from '@angular/forms';
 import {TipoConta} from '../../../model/tipo-conta';
-import {Select} from 'primeng/select';
-import {InputNumber} from 'primeng/inputnumber';
 import {Divider} from 'primeng/divider';
-import {InputText} from 'primeng/inputtext';
 import {Util} from '../../../util/util';
 import {FormaPagamento} from '../../../model/forma-pagamento';
 import {Button} from 'primeng/button';
-import {CurrencyPipe, JsonPipe, NgIf} from '@angular/common';
-import {Panel} from 'primeng/panel';
-import {Dialog} from 'primeng/dialog';
+import {NgIf} from '@angular/common';
 import {Fornecedor} from '../../../model/fornecedor';
 import {Fatura} from '../../../model/fatura';
 import {TableModule} from 'primeng/table';
-import {Tooltip} from 'primeng/tooltip';
 import {Conta} from '../../../model/conta';
-import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 import {firstValueFrom} from 'rxjs';
-import {Message} from 'primeng/message';
 import {Textarea} from 'primeng/textarea';
-import {FileUpload, UploadEvent} from 'primeng/fileupload';
+import {FileUpload} from 'primeng/fileupload';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 import {FaturaTableComponent} from '../../../shared/components/fatura-table/fatura-table.component';
 import {InputDateComponent} from '../../../shared/components/input-date/input-date.component';
@@ -38,28 +29,13 @@ import {Toolbar} from 'primeng/toolbar';
 @Component({
   selector: 'app-conta-form',
   imports: [
-    Card,
     Toast,
     InputMask,
     FormsModule,
-    Select,
-    InputNumber,
     Divider,
-    InputText,
     Button,
     NgIf,
-    Panel,
-    Dialog,
     TableModule,
-    CurrencyPipe,
-    Tooltip,
-    JsonPipe,
-    Tabs,
-    TabList,
-    Tab,
-    TabPanels,
-    TabPanel,
-    Message,
     Textarea,
     FileUpload,
     FaturaTableComponent,
@@ -232,6 +208,8 @@ export class ContaFormComponent  implements OnInit{
       this.defaultService.save(conta, 'conta').subscribe({
         next: res => {
           this.messageService.add({severity: 'success', summary: 'Success', detail: 'Conta salva!'});
+          this.codBarras = '';
+          this.faturas = [];
 
           conta = new Conta();
         },

@@ -67,28 +67,5 @@ public class Conta extends Pagamento implements Serializable {
         this.setLancamento(LocalDateTime.now());
     }
 
-    @Transient
-    public int getIntStatus() {
-        if(getVencimento()!=null && getDataPagamento()==null){
-            if(getVencimento().isAfter(LocalDate.now()))
-                return 1;
-            if(getVencimento().isEqual(LocalDate.now()))
-                return 0;
-            if(getVencimento().isBefore(LocalDate.now()))
-                return -1;
-        }
-        return 2;
-    }
-
-    @Transient
-    public String getStatus() {
-        return switch (getIntStatus()) {
-            case 1 -> ContaStatus.ABERTO.getNome();
-            case 0 -> ContaStatus.HOJE.getNome();
-            case -1 -> ContaStatus.ATRASADO.getNome();
-            case 2 -> ContaStatus.PAGO.getNome();
-            default -> ContaStatus.PAGO.getNome();
-        };
-    }
 
 }

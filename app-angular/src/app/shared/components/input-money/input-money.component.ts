@@ -13,6 +13,7 @@ import {InputText} from 'primeng/inputtext';
   styleUrl: './input-money.component.css'
 })
 export class InputMoneyComponent {
+  @Input() desabilitado:boolean=false;
   @Input() money:string='0,00';
   @Input() larg:string='80px'
   @Output() moneyChange = new EventEmitter<string>();

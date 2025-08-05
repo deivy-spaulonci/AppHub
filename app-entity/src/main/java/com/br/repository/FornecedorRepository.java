@@ -53,7 +53,8 @@ public interface FornecedorRepository extends JpaRepository<Fornecedor, BigInteg
                     Predicate name = criteriaBuilder.like(criteriaBuilder.lower(root.get(Fornecedor_.nome)), "%" + busca.toLowerCase() + "%");
                     Predicate legalName = criteriaBuilder.like(criteriaBuilder.lower(root.get(Fornecedor_.razaoSocial)), "%" + busca.toLowerCase() + "%");
                     Predicate cnpj = criteriaBuilder.like(criteriaBuilder.lower(root.get(Fornecedor_.cnpj)), "%" + busca.toLowerCase() + "%");
-                    predicates.add(criteriaBuilder.or(name, legalName, cnpj));
+                    Predicate cpf = criteriaBuilder.like(criteriaBuilder.lower(root.get(Fornecedor_.cpf)), "%" + busca.toLowerCase() + "%");
+                    predicates.add(criteriaBuilder.or(name, legalName, cnpj, cpf));
                 }
                 return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
             }

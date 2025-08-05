@@ -1,0 +1,38 @@
+<div class="panelTop">
+
+</div>
+
+<p-table #dt
+         [value]="tiposConta"
+         [size]="'small'"
+
+         [scrollable]="true"
+         [style]="{ width: '600px' }"
+         responsiveLayout="stack"
+         scrollHeight="600px"
+         showGridlines
+         stripedRows>
+  <ng-template #header>
+    <tr>
+      <th pSortableColumn="id">Id<p-sortIcon field="id"/></th>
+      <th pSortableColumn="nome">Conta<p-sortIcon field="nome"/></th>
+      <th pSortableColumn="cartaoCredito">Cartão de Crédito<p-sortIcon field="cartaoCredito"/></th>
+      <th pSortableColumn="ativo">Ativo<p-sortIcon field="ativo"/></th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-tipo>
+    <tr>
+      <td>{{ tipo.id }}</td>
+      <td>
+        <div [ngStyle]="rowStyle(tipo.ativo)">{{ tipo.nome }}</div>
+      </td>
+      <td class="text-center" style="padding: 0;  width: 150px;" >
+        <i *ngIf="tipo.cartaoCredito" class="pi pi-credit-card" style="color: var(--p-blue-500)"></i>
+      </td>
+      <td class="text-center" style="padding: 0; width: 100px">
+        <i *ngIf="tipo.ativo" class="pi pi-check-square" style="color: var(--p-blue-500)"></i>
+        <i *ngIf="!tipo.ativo" class="pi pi-times-circle" style="color: var(--p-red-500)"></i>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

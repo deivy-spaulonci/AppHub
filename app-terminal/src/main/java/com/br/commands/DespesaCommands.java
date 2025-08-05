@@ -256,7 +256,7 @@ public class DespesaCommands extends AbstractShellComponent {
 			shellHelper.printInfo("-".repeat(230));
 			this.showDespesa(despesaCadastro);
 			shellHelper.printInfo("-".repeat(230));
-			
+
 			cont = this.defaultComponent.confirmationInput("Salvar Despesa", true);
 			if(cont==true)
 				despesaService.save(despesaCadastro);

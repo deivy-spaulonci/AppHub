@@ -12,6 +12,7 @@ import {FormsModule} from '@angular/forms';
   styleUrl: './input-date.component.css'
 })
 export class InputDateComponent {
+  @Input() desabilitado:boolean=false;
   @Input() valor='';
   @Input() larg='80px';
   @Input() shClear:boolean=false;

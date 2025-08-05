@@ -80,7 +80,7 @@
          [sortField]="sortField"
          [paginator]="true"
          [rows]="pageSize"
-         [rowsPerPageOptions]="[10, 15, 20, 25]"
+         [rowsPerPageOptions]="[10, 15, 20, 25,35,45]"
          [(selection)]="contaSelecinada"
          (onLazyLoad)="loadData($event)"
          [(contextMenuSelection)]="contaSelecinada"
@@ -111,8 +111,8 @@
           <td>{{ conta.id }}</td>
           <td>
             {{ conta.tipoConta.nome }}
-            <i *ngIf="!conta.tipoConta.ativo" class="pi pi-times-circle" [style]="{float:'right'}" style="color: red"
-               pTooltip="Conta Cancelada"></i>
+            <i *ngIf="!conta.tipoConta.ativo" class="pi pi-times-circle"
+               [style]="{float:'right'}" style="color: red" pTooltip="Conta Cancelada"></i>
           </td>
           <td class="text-center">{{ conta.emissao | date: 'dd/MM/yyyy' }}</td>
           <td class="text-center">{{ conta.vencimento | date: 'dd/MM/yyyy' }}</td>

@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.springframework.http.ResponseEntity.ok;
+
 @RestController
 @RequestMapping("/api/v1/conta")
 public class ContaRestController {
@@ -40,7 +42,7 @@ public class ContaRestController {
         if(result.isEmpty()){
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(contaMapper.toDtoList(result));
+        return ok(contaMapper.toDtoList(result));
     }
 
     @GetMapping("/page")
@@ -49,13 +51,13 @@ public class ContaRestController {
         if(result.isEmpty()){
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(result);
+        return ok(result);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> ContaFindById(@PathVariable("id") BigInteger id){
         Optional<Conta> ContaOptional = contaService.findById(id);
-        return ContaOptional.<ResponseEntity<Object>>map(value -> ResponseEntity.ok(contaMapper.toDto(value)))
+        return ContaOptional.<ResponseEntity<Object>>map(value -> ok(contaMapper.toDto(value)))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("conta não encontrada!"));
     }
 
@@ -80,7 +82,7 @@ public class ContaRestController {
         Optional<Conta> contaOptional = contaService.findById(contaDTO.getId());
         if(contaOptional.isPresent()){
             Conta conta = contaService.save(contaMapper.toEntity(contaDTO));
-            return ResponseEntity.ok(contaMapper.toDto(conta));
+            return ok(contaMapper.toDto(conta));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("nehuma conta encontrada!");
     }
@@ -91,7 +93,7 @@ public class ContaRestController {
         Optional<Conta> conta = contaService.findById(id);
         if(conta.isPresent()){
             contaService.deleteById(conta.get().getId());
-            return ResponseEntity.ok().build();
+            return ok().build();
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("nehuma conta encontrada!");
     }
@@ -117,6 +119,6 @@ public class ContaRestController {
             lista.add(contaByTipoDto);
         }
 
-        return ResponseEntity.ok(lista);
+        return ok(lista);
     }
 }

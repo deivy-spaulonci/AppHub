@@ -14,5 +14,5 @@ public class DespesaByTipoDto {
 
     private TipoDespesa tipoDespesa;
 
-    private BigDecimal value;
+    private BigDecimal subTotal;
 }

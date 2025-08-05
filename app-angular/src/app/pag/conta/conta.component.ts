@@ -3,6 +3,7 @@ import {Tab, TabList, TabPanels, Tabs,TabPanel} from 'primeng/tabs';
 import {ContaTableComponent} from './conta-table/conta-table.component';
 import {ContaFormComponent} from './conta-form/conta-form.component';
 import {Toolbar} from 'primeng/toolbar';
+import {TipoContaComponent} from './tipo-conta/tipo-conta.component';
 
 @Component({
   selector: 'app-conta',
@@ -15,6 +16,7 @@ import {Toolbar} from 'primeng/toolbar';
     ContaTableComponent,
     ContaFormComponent,
     Toolbar,
+    TipoContaComponent,
   ],
   templateUrl: './conta.component.html',
   styleUrl: './conta.component.css'

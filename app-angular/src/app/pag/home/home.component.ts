@@ -3,20 +3,30 @@ import {CardModule} from 'primeng/card';
 import {MessageModule} from 'primeng/message';
 import {DefaultService} from '../../service/default.service';
 import {FormsModule} from '@angular/forms';
-import {CurrencyPipe, isPlatformBrowser} from '@angular/common';
-import {Fieldset} from 'primeng/fieldset';
+import {CurrencyPipe, DatePipe, isPlatformBrowser, NgForOf, NgIf} from '@angular/common';
 import {ChartModule, UIChart} from 'primeng/chart';
 import {forkJoin} from 'rxjs';
+import {DataView} from 'primeng/dataview';
 
 @Component({
   selector: 'app-home',
-  imports: [CardModule, MessageModule, FormsModule, CurrencyPipe, Fieldset, UIChart, ChartModule],
+  imports: [CardModule, MessageModule, FormsModule, CurrencyPipe, UIChart, ChartModule, DataView, NgForOf, DatePipe, NgIf],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
   standalone: true,
   providers: [CurrencyPipe]
 })
 export class HomeComponent implements OnInit{
+
+  readonly VLR_TOTAL_CONTA_URL = 'conta/valorTotal';
+  readonly CT_PAGO_URL = '?contaStatus=PAGO';
+  readonly CT_HOJE_URL = '?contaStatus=HOJE';
+  readonly CT_ABERTO_URL = '?contaStatus=ABERTO';
+  readonly CT_ATRASADO_URL = '?contaStatus=ATRASADO';
+  readonly CT_STATUS_URL = 'conta?contaStatus='
+
+  readonly VLR_TOTAL_DESPESA_URL= 'despesa/valorTotal';
+  readonly DESPESA_POR_TIPO_URL= 'despesa/despesaPorTipo';
 
   totalDespesa$!: number;
   totalConta$!: number;
@@ -25,13 +35,15 @@ export class HomeComponent implements OnInit{
   totalContaHoje$!:number;
   totalContaAtrasado$!:number;
 
+  dataContas: any;
+  dataDespesas: any;
 
-  data: any;
-
-  options: any;
+  optionsContas: any;
+  optionsDespesa: any;
 
   platformId = inject(PLATFORM_ID);
 
+  contasEmAberto:any=[];
   // configService = inject(AppConfigService);
   //
   // designerService = inject(DesignerService);
@@ -51,36 +63,69 @@ export class HomeComponent implements OnInit{
 
   ngOnInit(): void {
 
-    this.defaultService.get('despesa/valorTotal').subscribe(res =>{
+    this.defaultService.get(this.VLR_TOTAL_DESPESA_URL).subscribe(res =>{
       this.totalDespesa$ = res;
     });
 
-    this.defaultService.get('conta/valorTotal').subscribe(res =>{
+    this.defaultService.get(this.VLR_TOTAL_CONTA_URL).subscribe(res =>{
       this.totalConta$ = res;
     });
 
     forkJoin({
-      pago:this.defaultService.get('conta/valorTotal?contaStatus=PAGO'),
-      hoje:this.defaultService.get('conta/valorTotal?contaStatus=HOJE'),
-      aberto:this.defaultService.get('conta/valorTotal?contaStatus=ABERTO'),
-      atrasado:this.defaultService.get('conta/valorTotal?contaStatus=ATRASADO'),
+      emaberto:this.defaultService.get('conta'+this.CT_ABERTO_URL),
+      atrasado:this.defaultService.get('conta'+this.CT_ATRASADO_URL),
+      hoje:this.defaultService.get('conta'+this.CT_HOJE_URL)
+    }).subscribe({
+      next: ({emaberto,atrasado,hoje}) => {
+        this.contasEmAberto = (emaberto as []).concat(atrasado as []);
+      }
+    });
+
+    // this.defaultService.get('conta'+this.CT_ABERTO_URL).subscribe(res =>{
+    //   this.contasEmAberto = res;
+    //   this.defaultService.get('conta'+this.CT_ATRASADO_URL).subscribe(res =>{
+    //     this.contasEmAberto.concat(res);
+    //     this.defaultService.get('conta'+this.CT_HOJE_URL).subscribe(res =>{
+    //       this.contasEmAberto.concat(res);
+    //     })
+    //   })
+    //
+    // });
+
+
+    forkJoin({
+      pago:this.defaultService.get(this.VLR_TOTAL_CONTA_URL+this.CT_PAGO_URL),
+      hoje:this.defaultService.get(this.VLR_TOTAL_CONTA_URL+this.CT_HOJE_URL),
+      aberto:this.defaultService.get(this.VLR_TOTAL_CONTA_URL+this.CT_ABERTO_URL),
+      atrasado:this.defaultService.get(this.VLR_TOTAL_CONTA_URL+this.CT_ATRASADO_URL),
     }).subscribe({
       next: ({pago,hoje,aberto,atrasado}) => {
         this.totalContaAvencer$ = pago;
         this.totalContaHoje$ = hoje;
         this.totalContaAberto$ = aberto;
         this.totalContaAtrasado$ = atrasado;
-        this.initChart();
+        this.initChartContas();
       },
       error: erro => {
         console.error('Falhou alguma chamada', erro);
       }
     });
 
+    this.defaultService.get(this.DESPESA_POR_TIPO_URL).subscribe({
+      next: (res) => {
+        this.dataDespesas = res;
+        // console.log(this.dataDespesas);
+        this.initChartDespesas();
+      },
+      error: erro => {
+        console.error('Falhou alguma chamada', erro);
+      }
+
+    })
   }
 
   getStatus(status:string){
-    this.defaultService.get('conta/valorTotal?contaStatus='+status).subscribe(res =>{
+    this.defaultService.get(this.CT_STATUS_URL+status).subscribe(res =>{
       this.totalContaAvencer$ = res;
     });
   }
@@ -92,12 +137,49 @@ export class HomeComponent implements OnInit{
     return (valor ? ((valor/this.totalConta$)*100).toFixed(2) : '0');
   }
 
-  initChart() {
+  initChartDespesas(){
     if (isPlatformBrowser(this.platformId)) {
       const documentStyle = getComputedStyle(document.documentElement);
       const textColor = documentStyle.getPropertyValue('--text-color');
 
-      this.data = {
+      const nomesTiposDespesa = this.dataDespesas.map((d: { tipoDespesa: { nome: any; }; }) => d.tipoDespesa.nome);
+      const valorTiposDespesa = this.dataDespesas.map((d: { subTotal: any; })  => d.subTotal);
+
+      this.dataDespesas = {
+        labels: nomesTiposDespesa,
+        datasets: [
+          {
+            label: 'Tipos de Despesa',
+            backgroundColor: documentStyle.getPropertyValue('--p-blue-500'),
+            borderColor: documentStyle.getPropertyValue('--p-blue-500'),
+            data: valorTiposDespesa
+          }
+        ]
+      };
+
+      this.optionsDespesa = {
+        indexAxis: 'y',
+        maintainAspectRatio: false,
+        aspectRatio: 0.8,
+        plugins: {
+          legend: {
+            labels: {
+              color: textColor
+            }
+          }
+        }
+      };
+      this.cd.markForCheck()
+
+    }
+  }
+
+  initChartContas() {
+    if (isPlatformBrowser(this.platformId)) {
+      const documentStyle = getComputedStyle(document.documentElement);
+      const textColor = documentStyle.getPropertyValue('--text-color');
+
+      this.dataContas = {
         labels: [
           `Contas Pagas - ${this.getMoneyFormat(this.totalContaAvencer$)} [ ${this.getPercentFormat(this.totalContaAvencer$)}% ]`,
           `Vencem Hoje - ${this.getMoneyFormat(this.totalContaHoje$)} [ ${this.getPercentFormat(this.totalContaHoje$)}% ]`,
@@ -128,7 +210,7 @@ export class HomeComponent implements OnInit{
         ]
       };
 
-      this.options = {
+      this.optionsContas = {
         plugins: {
           legend: {
             labels: {
@@ -140,7 +222,5 @@ export class HomeComponent implements OnInit{
       };
       this.cd.markForCheck()
     }
-
   }
-
 }

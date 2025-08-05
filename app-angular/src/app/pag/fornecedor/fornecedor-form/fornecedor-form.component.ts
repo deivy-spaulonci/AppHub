@@ -22,7 +22,7 @@ import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-fornecedor-form',
-    imports: [CardModule, InputMask, InputMaskModule, InputGroupAddon, InputGroupAddonModule, InputGroupModule, Button, SelectButton, FormsModule, InputText, Select, Toast, JsonPipe, BlockUI, ProgressSpinner, AutoComplete, NgIf, Panel],
+    imports: [CardModule, InputMask, InputMaskModule, InputGroupAddonModule, InputGroupModule, Button, SelectButton, FormsModule, InputText, Select, Toast, BlockUI, ProgressSpinner],
   templateUrl: './fornecedor-form.component.html',
   standalone: true,
   styleUrl: './fornecedor-form.component.css',

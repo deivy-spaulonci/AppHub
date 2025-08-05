@@ -1,20 +1,14 @@
 package com.br.business.service;
 
-import com.br.dto.DespesaDto;
-import com.br.dto.FornecedorDto;
 import com.br.dto.LoteDespesaDto;
 import com.br.entity.Despesa;
-import com.br.entity.FormaPagamento;
 import com.br.entity.Fornecedor;
-import com.br.entity.TipoDespesa;
 import com.br.filter.DespesaFilter;
 import com.br.repository.DespesaRepository;
 import com.br.repository.FornecedorRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.data.domain.Page;
@@ -22,15 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Log4j2

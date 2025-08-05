@@ -2,5 +2,6 @@
        type="text"
        [(ngModel)]="money"
        (keyup)="maskaraMoeda($event)"
+       [disabled]="desabilitado"
        [style]="{width: larg, 'text-align':'right'}"
        pInputText/>

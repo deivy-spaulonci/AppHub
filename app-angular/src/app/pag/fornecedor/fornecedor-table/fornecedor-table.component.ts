@@ -20,7 +20,7 @@ import {Toolbar} from 'primeng/toolbar';
 
 @Component({
   selector: 'app-fornecedor-table',
-  imports: [Toast, ToastModule, TableModule, CardModule, ButtonModule, InputGroupModule, FormsModule, InputTextModule, InputGroupAddonModule, NgIf, Tooltip, Message, Panel, Toolbar],
+  imports: [ToastModule, TableModule, CardModule, ButtonModule, InputGroupModule, FormsModule, InputTextModule, InputGroupAddonModule, NgIf, Tooltip, Message, Toolbar],
   templateUrl: './fornecedor-table.component.html',
   styleUrl: './fornecedor-table.component.css',
   providers: [MessageService],

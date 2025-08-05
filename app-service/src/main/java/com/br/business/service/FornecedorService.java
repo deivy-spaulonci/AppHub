@@ -3,7 +3,7 @@ package com.br.business.service;
 
 import com.br.entity.Cidade;
 import com.br.entity.Fornecedor;
-import com.br.entity.FornecedorAWS;
+import com.br.dto.FornecedorCloudDto;
 import com.br.repository.CidadeRepository;
 import com.br.repository.FornecedorRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -74,7 +74,7 @@ public class FornecedorService {
         String json = getFornecedorApiWeb(cnpj);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            FornecedorAWS fornecedorAWS = objectMapper.readValue(json, FornecedorAWS.class);
+            FornecedorCloudDto fornecedorAWS = objectMapper.readValue(json, FornecedorCloudDto.class);
 
             Cidade cidade = cidadeRepository.findCidadeByIbgeCod(fornecedorAWS.getIbgeCod());
 

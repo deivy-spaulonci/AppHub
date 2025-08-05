@@ -22,22 +22,29 @@
     </div>
     <label> Obs: </label>
     <textarea rows="3" [(ngModel)]="obs" cols="30" pTextarea pSize="small" [style]="{width: '300px'}"></textarea>
+
     <label *ngIf="!idEdicao">Faturas </label>
     <p-divider *ngIf="!idEdicao"/>
     <div *ngIf="!idEdicao"></div>
     <div *ngIf="!idEdicao">
       <div class="p-2">
         <label>Fornecedor: </label>
-        <app-combo-default [values]="fornecedores" [loading]="loading" [(selected)]="fatura.fornecedor" [larg]="'80%'"></app-combo-default>
+        <app-combo-default [desabilitado]="!tipoContaSelecionado.cartaoCredito" [values]="fornecedores"
+                           [loading]="loading" [(selected)]="fatura.fornecedor" [larg]="'80%'">
+        </app-combo-default>
       </div>
       <div class="p-2">
         <label>Data: </label>
-        <app-input-date [(valor)]="fatura.dataPagamento"></app-input-date>
+        <app-input-date [desabilitado]="!tipoContaSelecionado.cartaoCredito" [(valor)]="fatura.dataPagamento">
+        </app-input-date>
         <label> Parcelas: </label>
-        <app-input-parcelas [(valor)]="fatura.parcela" [(total)]="fatura.totalParcela"></app-input-parcelas>
+        <app-input-parcelas [desabilitado]="!tipoContaSelecionado.cartaoCredito" [(valor)]="fatura.parcela"
+                            [(total)]="fatura.totalParcela"></app-input-parcelas>
         <label> Valor: </label>
-        <app-input-money [(money)]="faturaValor"></app-input-money>
-        <p-button severity="info" label="Incluir" (onClick)="addFatura()" icon="pi pi-plus" class="p-1" [raised]="true"/>
+        <app-input-money [desabilitado]="!tipoContaSelecionado.cartaoCredito" [(money)]="faturaValor"></app-input-money>
+        <p-button severity="info" label="Incluir" (onClick)="addFatura()" icon="pi pi-plus" class="p-1"
+                  [disabled]="!tipoContaSelecionado.cartaoCredito"
+                  [raised]="true"/>
       </div>
     </div>
 

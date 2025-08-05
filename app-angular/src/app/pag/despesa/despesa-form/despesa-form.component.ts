@@ -26,15 +26,10 @@ import {InputMoneyComponent} from '../../../shared/components/input-money/input-
 @Component({
   selector: 'app-despesa-form',
   imports: [
-    Card,
-    Select,
     FormsModule,
-    InputMask,
-    InputText,
     Button,
     Toast,
     NgIf,
-    Panel,
     AutoComplete,
     Message,
     CurrencyPipe,

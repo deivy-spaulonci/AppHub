@@ -75,14 +75,14 @@ public class ContaCommands  extends AbstractShellComponent {
                         Util.toDatePtBr(conta.getVencimento()),
                         Util.toCurrencyPtBr(conta.getValor()),
                         (conta.getParcela()+"/"+conta.getTotalParcela()),
-                        conta.getStatus(),
+                        //conta.getStatus(),
                         (conta.getObs()==null ? "" : conta.getObs()));
-                switch (conta.getIntStatus()){
-                    case 0 : shellHelper.printWarning(label); break;
-                    case 1 : shellHelper.printInfo(label); break;
-                    case -1 : shellHelper.printError(label); break;
-                    default : shellHelper.printSuccess(label); break;
-                }
+//                switch (conta.getIntStatus()){
+//                    case 0 : shellHelper.printWarning(label); break;
+//                    case 1 : shellHelper.printInfo(label); break;
+//                    case -1 : shellHelper.printError(label); break;
+//                    default : shellHelper.printSuccess(label); break;
+//                }
             });
         }else
             shellHelper.printInfo("nenhum conta encontrada...");
@@ -486,7 +486,7 @@ public class ContaCommands  extends AbstractShellComponent {
                             conta.getEmissao(),
                             conta.getValor(),
                             (conta.getParcela()+"/"+conta.getTotalParcela()),
-                            conta.getStatus(),
+//                            conta.getStatus(),
                             (conta.getObs()==null ? "" : conta.getObs()));
                     tipos.add(SelectorItem.of(label, conta.getId().toString()));
                 });

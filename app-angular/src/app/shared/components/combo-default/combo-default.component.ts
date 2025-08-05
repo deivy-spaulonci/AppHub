@@ -12,6 +12,7 @@ import {FormsModule} from '@angular/forms';
   styleUrl: './combo-default.component.css'
 })
 export class ComboDefaultComponent {
+  @Input() desabilitado:boolean=false;
   @Input() larg:string='300px';
   @Input() scrlHeight:string='400px';
   @Input() values:any[]=[];

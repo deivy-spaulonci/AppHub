@@ -8,11 +8,6 @@ import {FornecedorFormComponent} from './fornecedor-form/fornecedor-form.compone
   selector: 'app-fornecedor',
   imports: [
     Toolbar,
-    Tab,
-    TabList,
-    TabPanel,
-    TabPanels,
-    Tabs,
     FornecedorTableComponent,
     FornecedorFormComponent
   ],

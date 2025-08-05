@@ -121,7 +121,7 @@ public class DespesaRestController {
             DespesaByTipoDto despesaByTipoDto = new DespesaByTipoDto();
             var subitem = (Object[]) item;
             despesaByTipoDto.setTipoDespesa((TipoDespesa) subitem[0]);
-            despesaByTipoDto.setValue(new BigDecimal(subitem[1].toString()));
+            despesaByTipoDto.setSubTotal(new BigDecimal(subitem[1].toString()));
             lista.add(despesaByTipoDto);
         }
 

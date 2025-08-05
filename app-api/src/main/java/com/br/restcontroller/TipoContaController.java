@@ -1,20 +1,19 @@
 package com.br.restcontroller;
 
-import com.br.business.service.DespesaService;
 import com.br.business.service.TipoContaService;
 import com.br.dto.TipoContaDto;
-import com.br.entity.*;
-import com.br.mapper.DespesaMapper;
+import com.br.entity.TipoConta;
 import com.br.mapper.TipoContaMapper;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
@@ -37,4 +36,21 @@ public class TipoContaController {
         return ok(tipoContaMapper.toDtoList(result));
     }
 
+    @PostMapping
+    @Transactional
+    public ResponseEntity<TipoContaDto> createTipoConta(@RequestBody @Valid TipoContaDto tipoContaDto) {
+        TipoConta tipoConta = tipoContaService.save(tipoContaMapper.toEntity(tipoContaDto));
+        return ok(tipoContaMapper.toDto(tipoConta));
+    }
+
+    @PutMapping
+    @Transactional
+    public ResponseEntity<?> updateTipoConta(@RequestBody TipoContaDto tipoContaDto) {
+        Optional<TipoConta> tipoContaOptional = tipoContaService.findById(tipoContaDto.getId());
+        if(tipoContaOptional.isPresent()){
+            TipoConta tipoConta = tipoContaService.save(tipoContaMapper.toEntity(tipoContaDto));
+            return ok(tipoContaMapper.toDto(tipoConta));
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("nehum tipo de conta econtrado!");
+    }
 }
