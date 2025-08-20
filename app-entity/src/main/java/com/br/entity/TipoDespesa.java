@@ -1,10 +1,7 @@
 package com.br.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -22,4 +19,9 @@ public class TipoDespesa extends Tipo implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQNAME)
     @SequenceGenerator(name = SEQNAME, sequenceName = SEQNAME, allocationSize = 1)
     private BigInteger id;
+
+    @Override
+    public String toString() {
+        return getNome(); // O JComboBox exibirá o nome
+    }
 }

@@ -1,39 +1,27 @@
-import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Card} from 'primeng/card';
 import {Toast} from 'primeng/toast';
 import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
-import {Router, RouterLink} from '@angular/router';
+import {Router} from '@angular/router';
 import {DefaultService} from '../../../service/default.service';
-import {Despesa} from '../../../model/despesa';
 import {Conta} from '../../../model/conta';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {Message} from 'primeng/message';
-import {TipoDespesa} from '../../../model/tipo-despesa';
 import {TipoConta} from '../../../model/tipo-conta';
 import {FormaPagamento} from '../../../model/forma-pagamento';
-import {Fornecedor} from '../../../model/fornecedor';
 import {Table, TableLazyLoadEvent, TableModule} from 'primeng/table';
 import {Util} from '../../../util/util';
 import {Button} from 'primeng/button';
-import {CurrencyPipe, DatePipe, JsonPipe, NgClass, NgForOf, NgIf, NgStyle} from '@angular/common';
-import {Toolbar} from 'primeng/toolbar';
+import {CurrencyPipe, DatePipe, JsonPipe, NgIf} from '@angular/common';
 import {Tooltip} from 'primeng/tooltip';
-import {Drawer} from 'primeng/drawer';
 import {InputMask} from 'primeng/inputmask';
 import {Select} from 'primeng/select';
 import {FormsModule} from '@angular/forms';
-import {StyleClass} from 'primeng/styleclass';
-import {Divider} from 'primeng/divider';
 import {ScrollPanelModule} from 'primeng/scrollpanel';
-import {Fieldset} from 'primeng/fieldset';
-import {Panel} from "primeng/panel";
 import {ContextMenu} from 'primeng/contextmenu';
 import {Dialog} from 'primeng/dialog';
-import {Fatura} from '../../../model/fatura';
-import {InputText} from 'primeng/inputtext';
 import {ComboDefaultComponent} from '../../../shared/components/combo-default/combo-default.component';
 import {InputDateComponent} from '../../../shared/components/input-date/input-date.component';
-import {FaturaTableComponent} from '../../../shared/components/fatura-table/fatura-table.component';
 import {InputMoneyComponent} from '../../../shared/components/input-money/input-money.component';
 
 @Component({
@@ -57,8 +45,8 @@ import {InputMoneyComponent} from '../../../shared/components/input-money/input-
     Dialog,
     ComboDefaultComponent,
     InputDateComponent,
-    FaturaTableComponent,
-    InputMoneyComponent
+    InputMoneyComponent,
+    JsonPipe
   ],
   templateUrl: './conta-table.component.html',
   providers: [MessageService,ConfirmationService],
@@ -69,7 +57,7 @@ export class ContaTableComponent implements OnInit{
   contas:Conta[]=[];
   totalElements = 0;
   sortField:string='vencimento';
-  pageSize = 15;
+  pageSize = 10;
   valorTotal:number=0;
   loading:boolean=false;
   contaSelecinada!:Conta;
@@ -95,6 +83,11 @@ export class ContaTableComponent implements OnInit{
               private router: Router,
               private defaultService: DefaultService,
               private messageService: MessageService) {
+  }
+
+  onpage(event: Event | undefined){
+    console.log("ocorre o evento")
+    console.log(JSON.stringify(event))
   }
 
   ngOnInit(): void {
@@ -131,7 +124,7 @@ export class ContaTableComponent implements OnInit{
     this.router.navigate(['/conta-form'],{ queryParams: { id: param} })
   }
 
-  setPago(event: Event, conta:Conta){
+  setPago(conta:Conta){
     this.contaSelecinada = conta;
     this.contaPagaValor = Util.formatFloatToReal(conta.valor.toFixed(2).toString());
     this.contaPagaDataPgto = Util.dateToDataBR(conta.vencimento);
@@ -139,33 +132,43 @@ export class ContaTableComponent implements OnInit{
   }
 
   pagarConta(){
+    if(this.contaSelecinada){
+      if(!Util.dataIsValida(this.contaPagaDataPgto))
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Data pagamento inválida!'});
+      else if(['0,00','0','', null, undefined].indexOf(this.contaPagaValor.trim()) == 0)
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Valor inválido!'});
+      else if(!this.contaPagaFormaPgto || !this.contaPagaFormaPgto.id)
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Forma de Pagamento inválida!'});
+      else{
+        this.loading = true;
+        //this.contaSelecinada.valor = Util.formatMoedaToFloat(Util.formatFloatToReal(this.contaPagaValor));
 
-    if(!Util.dataIsValida(this.contaPagaDataPgto))
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Data pagamento inválida!'});
-    else if(['0,00','0','', null, undefined].indexOf(this.contaPagaValor.trim()) == 0)
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Valor inválido!'});
-    else if(!this.contaPagaFormaPgto || !this.contaPagaFormaPgto.id)
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Forma de Pagamento inválida!'});
-    else{
-      this.loading = true;
-      this.contaSelecinada.valor = Util.formatMoedaToFloat(Util.formatFloatToReal(this.contaPagaValor));
-      this.contaSelecinada.dataPagamento = Util.dataBRtoDataIso(this.contaPagaDataPgto);
-      this.contaSelecinada.formaPagamento = this.contaPagaFormaPgto;
+        let vlPg: number = Util.formatMoedaToFloat(Util.formatFloatToReal(this.contaPagaValor));
+        if(vlPg > this.contaSelecinada.valor)
+          this.contaSelecinada.multa = Math.round((vlPg - this.contaSelecinada.valor) * 100)/100;
+        if(vlPg < this.contaSelecinada.valor)
+          this.contaSelecinada.desconto = Math.round((this.contaSelecinada.valor - vlPg) * 100)/100;
 
-      this.defaultService.save(this.contaSelecinada, 'conta').subscribe({
-        next: res => {
-          this.messageService.add({severity: 'success', summary: 'Success', detail: 'Conta salva!'});
-        },
-        error: error => {
-          this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o conta'});
-        },
-        complete: () => {
-          this.loading = false;
-          this.setContaPagaVisible=false;
-          this.table?._filter();
-        }
-      });
-    }
+        this.contaSelecinada.dataPagamento = Util.dataBRtoDataIso(this.contaPagaDataPgto);
+        this.contaSelecinada.formaPagamento = this.contaPagaFormaPgto;
+
+        this.defaultService.save(this.contaSelecinada, 'conta').subscribe({
+          next: res => {
+            this.messageService.add({severity: 'success', summary: 'Success', detail: 'Conta salva!'});
+          },
+          error: error => {
+            this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o conta'});
+          },
+          complete: () => {
+            this.loading = false;
+            this.setContaPagaVisible=false;
+            this.table?._filter();
+          }
+        });
+      }
+    }else
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'sem conta selecionada'});
+
   }
 
   delConta(event: Event, id:number){
@@ -205,6 +208,10 @@ export class ContaTableComponent implements OnInit{
     this.table?._filter();
   }
 
+  checkData(value:string){
+    return (value && ['__/__/____','____/__/__','____-__-__'].indexOf(value)==-1)
+  }
+
   loadData(event: TableLazyLoadEvent) {
     let urlfiltros: string = '';
     // let prefix: string =''
@@ -214,13 +221,13 @@ export class ContaTableComponent implements OnInit{
       urlfiltros += '&id='+this.idFilter;
     if(this.tipoContaFilter && this.tipoContaFilter.id)
       urlfiltros += '&tipoConta.id='+ this.tipoContaFilter.id;
-    if(this.vencimentoInicialFilter)
+    if(this.checkData(this.vencimentoInicialFilter))
       urlfiltros += '&vencimentoInicial='+Util.dataStringBrToDateString(this.vencimentoInicialFilter);
-    if(this.vencimentoFinalFilter)
+    if(this.checkData(this.vencimentoFinalFilter))
       urlfiltros += '&vencimentoFinal='+Util.dataStringBrToDateString(this.vencimentoFinalFilter);
-    if(this.emissaoInicialFilter)
+    if(this.checkData(this.emissaoInicialFilter))
       urlfiltros += '&emissaoInicial='+Util.dataStringBrToDateString(this.emissaoInicialFilter);
-    if(this.emissaoFinalFilter)
+    if(this.checkData(this.emissaoFinalFilter))
       urlfiltros += '&emissaoFinal='+Util.dataStringBrToDateString(this.vencimentoFinalFilter);
     if(this.statusFilter && this.statusFilter.code)
       urlfiltros += '&contaStatus='+this.statusFilter.code;
@@ -228,7 +235,7 @@ export class ContaTableComponent implements OnInit{
     event.rows = (event.rows ? event.rows : this.pageSize);
     event.sortField = (event.sortField ? event.sortField : 'dataPagamento');
 
-    const url: string = 'conta/page?page=' + (event.first! / this.pageSize)
+    const url: string = 'conta/page?page=' + (event.first! / event.rows)
       + '&size=' + event.rows
       + '&sort=' + event.sortField + ',' + (event.sortOrder == 1 ? 'asc' : 'desc')
       + urlfiltros;
@@ -287,4 +294,5 @@ export class ContaTableComponent implements OnInit{
   //   }
   //   return null;
   // }
+  protected readonly event = event;
 }

@@ -3,7 +3,6 @@
   display: grid;
   grid-template-columns: 600px 1fr;
   align-items: start;
-  height: 100%;
 }
 
 #gridFormConta{
@@ -12,8 +11,4 @@
   column-gap: 10px;
   row-gap: 10px;
   align-items: center;
-}
-
-#gridIframe{
-  height: 100%;
 }

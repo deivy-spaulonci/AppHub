@@ -47,20 +47,17 @@ public class Conta extends Pagamento implements Serializable {
     @Column(length = 10, nullable = false, columnDefinition = "0", name = "TOTAL_PARCELA")
     private Integer totalParcela = 0;
 
-    @Column(precision = 10, scale = 2, nullable = true)
-    private BigDecimal multa;
+    @Column(precision = 10, scale = 2, nullable = false, columnDefinition = "0")
+    private BigDecimal multa = BigDecimal.ZERO;
+
+    @Column(precision = 10, scale = 2, nullable = false, columnDefinition = "0")
+    private BigDecimal desconto = BigDecimal.ZERO;
 
     @Column
     private String titulo;
 
     @Column
     private String comprovante;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JoinTable(name = "CONTA_FATURA",
-            joinColumns = @JoinColumn(name = "ID_CONTA"),
-            inverseJoinColumns = @JoinColumn(name = "ID_FATURA"))
-    private List<Fatura> faturas;
 
     @PrePersist
     public void prePersist() {

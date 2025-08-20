@@ -18,4 +18,9 @@ public class FormaPagamento extends Tipo implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQNAME)
     @SequenceGenerator(name = SEQNAME, sequenceName = SEQNAME, allocationSize = 1)
     private BigInteger id;
+
+    @Override
+    public String toString() {
+        return getNome(); // O JComboBox exibirá o nome
+    }
 }

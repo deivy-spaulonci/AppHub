@@ -20,6 +20,7 @@
         <module>app-service</module>
         <module>app-api</module>
         <module>app-terminal</module>
+        <module>AppSw</module>
     </modules>
 
     <properties>

@@ -1,4 +1,4 @@
-<p-toolbar *ngIf="idEdicao" [style]="{'background-color': 'var(--p-yellow-100)'}">
+<p-toolbar *ngIf="idEdicao" [style]="{'background-color': 'var(--p-yellow-100)', 'color':'red'}">
   <span><i class="pi pi-pencil" style="font-size: 1rem"></i> Edição de conta</span>
 </p-toolbar>
 
@@ -7,7 +7,7 @@
     <label>Cod. Barras</label>
     <p-inputmask [mask]="maskCnpj" autoClear="false" [(ngModel)]="codBarras" [style]="{width: '350px'}" size="small"/>
     <label>Tipo Conta: </label>
-    <app-combo-default [values]="tiposContas" [loading]="loading" [(selected)]="tipoContaSelecionado"></app-combo-default>
+    <app-combo-default [values]="tiposContas" [loading]="loading" [(selected)]="tipoContaSelecionado" scrlHeight="700px"></app-combo-default>
     <label>Enissão:</label>
     <div style="display: grid; grid-template-columns: repeat(3, 100px); align-items: center;">
       <app-input-date [(valor)]="emissao"></app-input-date>
@@ -23,36 +23,6 @@
     <label> Obs: </label>
     <textarea rows="3" [(ngModel)]="obs" cols="30" pTextarea pSize="small" [style]="{width: '300px'}"></textarea>
 
-    <label *ngIf="!idEdicao">Faturas </label>
-    <p-divider *ngIf="!idEdicao"/>
-    <div *ngIf="!idEdicao"></div>
-    <div *ngIf="!idEdicao">
-      <div class="p-2">
-        <label>Fornecedor: </label>
-        <app-combo-default [desabilitado]="!tipoContaSelecionado.cartaoCredito" [values]="fornecedores"
-                           [loading]="loading" [(selected)]="fatura.fornecedor" [larg]="'80%'">
-        </app-combo-default>
-      </div>
-      <div class="p-2">
-        <label>Data: </label>
-        <app-input-date [desabilitado]="!tipoContaSelecionado.cartaoCredito" [(valor)]="fatura.dataPagamento">
-        </app-input-date>
-        <label> Parcelas: </label>
-        <app-input-parcelas [desabilitado]="!tipoContaSelecionado.cartaoCredito" [(valor)]="fatura.parcela"
-                            [(total)]="fatura.totalParcela"></app-input-parcelas>
-        <label> Valor: </label>
-        <app-input-money [desabilitado]="!tipoContaSelecionado.cartaoCredito" [(money)]="faturaValor"></app-input-money>
-        <p-button severity="info" label="Incluir" (onClick)="addFatura()" icon="pi pi-plus" class="p-1"
-                  [disabled]="!tipoContaSelecionado.cartaoCredito"
-                  [raised]="true"/>
-      </div>
-    </div>
-
-    <div *ngIf="!idEdicao"></div>
-    <div class="p-2" *ngIf="!idEdicao">
-      <app-fatura-table [faturas]="faturas" sHeight="320px" [rmBaskt]="true"></app-fatura-table>
-    </div>
-
     <label>Pagamento </label>
     <p-divider/>
     <label>Data Pgto: </label>
@@ -62,39 +32,24 @@
     <app-combo-default [values]="formasPagamento" [loading]="loading" [(selected)]="formaPgtoSelecionado">
     </app-combo-default>
 
+    <label>Valor Pago: </label>
+    <app-input-money [(money)]="valorPago"></app-input-money>
+
     <label></label>
-    <div style="display: grid; grid-template-columns: 1fr 1fr;">
-      <p-button label="Salvar" icon="pi pi-save" iconPos="top" [style]="{width: '120px'}" [raised]="true"
-                (onClick)="save()" />
-      <p-button label="Cancelar" icon="pi pi-times" iconPos="top" [style]="{width: '120px'}" [raised]="true"
-                severity="danger" (onClick)="goToContalist()" *ngIf="idEdicao"/>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; ">
+      <p-button label="Salvar" icon="pi pi-save" iconPos="top" [style]="{width: '120px'}" [raised]="true" (onClick)="save()" />
+      <p-button label="Cancelar" icon="pi pi-times" iconPos="top" [style]="{width: '120px'}" [raised]="true" severity="danger" (onClick)="goToContalist()" *ngIf="idEdicao"/>
+<!--      <p-button label="Documento" icon="pi pi-file" iconPos="top" [style]="{width: '120px'}" [raised]="true" severity="info" (onClick)="popupDoc=true" />-->
+
     </div>
 
   </div>
-  <div id="gridIframe" >
-    <p-fileupload #fu mode="basic" chooseLabel="Selecionar" chooseIcon="pi pi-upload" auto="true"
-                  accept=".pdf,image/*"  (onSelect)="aoSelecionar($event)" customUpload="true" *ngIf="!idEdicao"/>
-    <iframe *ngIf="conteudoBase64 && !idEdicao" [src]="conteudoBase64" width="100%" height="700px"></iframe>
-<!--    EDIÇÃO-->
-    <div *ngIf="idEdicao">
-      <div class="p-2">
-        <label>Fornecedor: </label>
-        <app-combo-default [values]="fornecedores" [loading]="loading" [(selected)]="fatura.fornecedor" [larg]="'80%'">
-        </app-combo-default>
-      </div>
-      <div class="p-2">
-        <label>Data: </label>
-        <app-input-date [(valor)]="fatura.dataPagamento"></app-input-date>
-        <label> Parcelas: </label>
-        <app-input-parcelas [(valor)]="fatura.parcela" [(total)]="fatura.totalParcela"></app-input-parcelas>
-        <label> Valor: </label>
-        <app-input-money [(money)]="faturaValor"></app-input-money>
-        <p-button severity="info" label="Incluir" (onClick)="addFatura()" icon="pi pi-plus" class="p-1" [raised]="true"/>
-      </div>
-    </div>
-    <app-fatura-table *ngIf="tipoContaSelecionado.cartaoCredito" [faturas]="faturas" sHeight="620px" [rmBaskt]="true">
-    </app-fatura-table>
 
+  <div>
+    <div style="display: grid; grid-template-columns: 120px 1fr; ">
+      <p-fileupload #fu [style]="{width: '120px', height: '48px'}" mode="basic" chooseLabel="Selecionar" chooseIcon="pi pi-upload" auto="true" accept=".pdf,image/*"  (onSelect)="aoSelecionar($event)" customUpload="true"/>
+    </div>
+    <iframe *ngIf="conteudoBase64" [src]="conteudoBase64" style="height: 700px; width: 850px;"></iframe>
   </div>
 
 </div>

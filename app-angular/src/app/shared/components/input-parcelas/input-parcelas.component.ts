@@ -1,6 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {InputMask} from 'primeng/inputmask';
 import {FormsModule} from '@angular/forms';
+import { Util } from '../../../util/util';
 
 @Component({
   selector: 'app-input-parcelas',
@@ -21,10 +22,11 @@ export class InputParcelasComponent {
 
   aoDigitarValor(event: Event) {
     const input = event.target as HTMLInputElement;
+    input.value = Util.maskaraTeste(input.value)
     this.valorChange.emit(input.value);
   }
-  aoDigitarTotal(event: Event) {
-    const input = event.target as HTMLInputElement;
-    this.totalChange.emit(input.value);
-  }
+  // aoDigitarTotal(event: Event) {
+  //   const input = event.target as HTMLInputElement;
+  //   this.totalChange.emit(input.value);
+  // }
 }

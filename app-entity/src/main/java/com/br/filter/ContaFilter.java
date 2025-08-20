@@ -4,6 +4,7 @@ import com.br.entity.ContaStatus;
 import com.br.entity.TipoConta;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;

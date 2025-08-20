@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Toast} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -12,19 +12,18 @@ import {FormaPagamento} from '../../../model/forma-pagamento';
 import {Button} from 'primeng/button';
 import {NgIf} from '@angular/common';
 import {Fornecedor} from '../../../model/fornecedor';
-import {Fatura} from '../../../model/fatura';
 import {TableModule} from 'primeng/table';
-import {Conta} from '../../../model/conta';
 import {firstValueFrom} from 'rxjs';
 import {Textarea} from 'primeng/textarea';
 import {FileUpload} from 'primeng/fileupload';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
-import {FaturaTableComponent} from '../../../shared/components/fatura-table/fatura-table.component';
 import {InputDateComponent} from '../../../shared/components/input-date/input-date.component';
 import {InputParcelasComponent} from '../../../shared/components/input-parcelas/input-parcelas.component';
 import {InputMoneyComponent} from '../../../shared/components/input-money/input-money.component';
 import {ComboDefaultComponent} from '../../../shared/components/combo-default/combo-default.component';
 import {Toolbar} from 'primeng/toolbar';
+import {Dialog} from 'primeng/dialog';
+import {Conta} from '../../../model/conta';
 
 @Component({
   selector: 'app-conta-form',
@@ -38,7 +37,6 @@ import {Toolbar} from 'primeng/toolbar';
     TableModule,
     Textarea,
     FileUpload,
-    FaturaTableComponent,
     InputDateComponent,
     InputParcelasComponent,
     InputMoneyComponent,
@@ -54,7 +52,6 @@ export class ContaFormComponent  implements OnInit{
   tiposContas:TipoConta[]=[];
   formasPagamento:FormaPagamento[]=[];
   fornecedores:Fornecedor[]=[];
-  faturas:Fatura[]=[];
   loading:boolean=false;
   codBarras:string='';
   tipoContaSelecionado:TipoConta = new TipoConta();
@@ -67,10 +64,9 @@ export class ContaFormComponent  implements OnInit{
   valor:string='0,00';
   obs:string='';
   idEdicao!:number;
-  fatura:Fatura=new Fatura();
-  faturaValor:string='0,00';
   valorTotal:number=0;
   maskCnpj:string='999999999999999999999999999999999999999999999999';
+  valorPago:string='0,00';
 
   conteudoBase64: SafeResourceUrl | null = null;
 
@@ -100,10 +96,10 @@ export class ContaFormComponent  implements OnInit{
           this.parcela = res.parcela;
           this.totalParcela = res.totalParcela;
           this.valor = Util.formatFloatToReal(res.valor.toFixed(2).toString());
+          this.valorPago = Util.formatFloatToReal(res.valorPago.toFixed(2).toString());
           this.obs = res.obs
           this.dataPagto = Util.dateToDataBR(res.dataPagamento);
           this.formaPgtoSelecionado = res.formaPagamento;
-          this.faturas = res.faturas;
         },
         error: error => {},
         complete: () => {}
@@ -133,7 +129,6 @@ export class ContaFormComponent  implements OnInit{
     this.fornecedores = await firstValueFrom(this.defaultService.get('fornecedor'));
     if(!this.idEdicao){
       this.tipoContaSelecionado = this.tiposContas[0];
-      this.fatura.fornecedor = this.fornecedores[0];
     }
   }
 
@@ -141,27 +136,10 @@ export class ContaFormComponent  implements OnInit{
     this.valorTotal = await firstValueFrom(this.defaultService.get('conta/valorTotal'))
   }
 
-  addFatura(){
-    if(!Util.dataIsValida(this.fatura.dataPagamento))
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Data da fatura inválida!'});
-    else if(['0,00','0','', null, undefined].indexOf(this.faturaValor.trim()) == 0)
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Valor data fatura inválida!'});
-    else{
-      var fatura = Object.assign({}, this.fatura);
-      fatura.valor  = Util.formatMoedaToFloat(Util.formatFloatToReal(this.faturaValor));
-      fatura.parcela = Number(fatura.parcela) ? Number(fatura.parcela)  : 0;
-      fatura.totalParcela = Number(fatura.totalParcela) ? Number(fatura.totalParcela) : 0;
-      fatura.dataPagamento = Util.dataBRtoDataIso(fatura.dataPagamento);
-      this.faturas.push(fatura);
-      this.faturaValor = '0';
-      this.fatura.parcela = 0;
-      this.fatura.totalParcela = 0;
-    }
-  }
-
   save(){
     this.parcela = Number(this.parcela);
     this.totalParcela = Number(this.totalParcela);
+
     if(this.codBarras.trim()=="")
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'Código de Barras inválido!'});
     else if(!Util.dataIsValida(this.emissao))
@@ -176,8 +154,6 @@ export class ContaFormComponent  implements OnInit{
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'Data Pagamento inválida!'});
     else if(!this.formaPgtoSelecionado && Util.dataIsValida(this.emissao))
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'Forma de Pagamento inválida!'});
-    else if(!this.tipoContaSelecionado.cartaoCredito && this.faturas.length > 0)
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Conta com faturas (nao e conta cartao)!'});
     else if(Util.dataBRtoDataIso(this.emissao) > Util.dataBRtoDataIso(this.vencimento))
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'emissão maior que o vencimento'});
     else{
@@ -196,20 +172,27 @@ export class ContaFormComponent  implements OnInit{
       conta.totalParcela = this.totalParcela;
       conta.valor =  Util.formatMoedaToFloat(Util.formatFloatToReal(this.valor));
       conta.obs = this.obs;
+      conta.multa = 0;
+      conta.desconto = 0;
       if(this.formaPgtoSelecionado && Util.dataIsValida(this.dataPagto)){
         conta.formaPagamento = this.formaPgtoSelecionado;
         conta.dataPagamento = Util.dataBRtoDataIso(this.dataPagto);
+
+        var vlPg:number = Util.formatMoedaToFloat(Util.formatFloatToReal(this.valorPago));
+        if(vlPg > conta.valor)
+            conta.multa = Math.round((vlPg - conta.valor)*100)/100;
+        if(vlPg < conta.valor)
+            conta.desconto = Math.round((conta.valor - vlPg)*100)/100;
+
       }else{
         conta.formaPagamento = undefined;
         conta.dataPagamento = '';
       }
-      conta.faturas = this.faturas;
 
       this.defaultService.save(conta, 'conta').subscribe({
         next: res => {
           this.messageService.add({severity: 'success', summary: 'Success', detail: 'Conta salva!'});
           this.codBarras = '';
-          this.faturas = [];
 
           conta = new Conta();
         },
@@ -217,8 +200,8 @@ export class ContaFormComponent  implements OnInit{
           this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o conta'});
         },
         complete: () => {
-          if(this.idEdicao)
-            this.router.navigate(['/conta'])
+          // if(this.idEdicao)
+          //   this.router.navigate(['/conta'])
           this.loading = false;
           this.valor = '0,00';
           this.obs = '';

@@ -1,16 +1,14 @@
-<!-- Topbar -->
-<div class="topbar shadow-2">
-  <a href="/" style="text-decoration: none; color: white">AppHub</a>
-</div>
-
-<!-- Sidebar -->
-<div class="sidebar shadow-2">
-  <a href="conta"><i class="pi pi-barcode" style="font-size: 1rem"></i> Contas</a>
-  <a href="despesa"><i class="pi pi-money-bill" style="font-size: 1rem"></i> Despesas</a>
-  <a href="fornecedor"><i class="pi pi-box" style="font-size: 1rem"></i> Forncedores</a>
-</div>
-
-<!-- Conteúdo principal -->
-<div class="main p-0">
-  <router-outlet />
+<div id="frame">
+  <div id="topbar" class="shadow-2">
+    <a href="/" style="text-decoration: none; color: white">AppHub</a>
+  </div>
+  <div id="sidebar" class="shadow-2">
+      <a href="conta"><i class="pi pi-barcode" style="font-size: 1rem; margin-right: 5px;"></i>Contas</a>
+      <a href="despesa"><i class="pi pi-money-bill" style="font-size: 1rem; margin-right: 5px;"></i> Despesas</a>
+      <a href="fornecedor"><i class="pi pi-box" style="font-size: 1rem; margin-right: 5px;"></i> Forncedores</a>
+      <a href="documentos"><i class="pi pi-file-o" style="font-size: 1rem; margin-right: 5px;"></i> Documentos</a>
+  </div>
+  <div>
+    <router-outlet />
+  </div>
 </div>

@@ -49,7 +49,7 @@ public class MyCommands extends AbstractShellComponent {
 //		}
 //		progressCounter.reset();
 //	}
-
+//
 //	@ShellMethod("Displays progress counter (with spinner)")
 //	public void progressCounter() throws InterruptedException {
 //		for (int i = 1; i <= 100; i++) {
@@ -58,7 +58,7 @@ public class MyCommands extends AbstractShellComponent {
 //		}
 //		progressCounter.reset();
 //	}
-//
+////
 //	@ShellMethod("Displays progress bar")
 //	public void progressBar() throws InterruptedException {
 //		for (int i = 1; i <= 100; i++) {

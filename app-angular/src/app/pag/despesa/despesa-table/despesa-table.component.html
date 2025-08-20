@@ -7,14 +7,11 @@
         <app-input-date [(valor)]="dataFinalFilter" larg="95%" [shClear]="true"></app-input-date>
       </div>
       <label>Tipo Despesa: </label>
-      <app-combo-default [values]="tiposDespesa" [loading]="loading" [(selected)]="tipoDespesaFilter"
-                         [scrlHeight]="'500px'" larg="100%" [shClear]="true"></app-combo-default>
+      <app-combo-default [values]="tiposDespesa" [loading]="loading" [(selected)]="tipoDespesaFilter" [scrlHeight]="'500px'" larg="100%" [shClear]="true"></app-combo-default>
       <label>Forma Pgto: </label>
-      <app-combo-default [values]="formasPgto" [loading]="loading" [(selected)]="formaPgtoFilter"
-                         [scrlHeight]="'500px'" larg="100%" [shClear]="true"></app-combo-default>
+      <app-combo-default [values]="formasPgto" [loading]="loading" [(selected)]="formaPgtoFilter" [scrlHeight]="'500px'" larg="100%" [shClear]="true"></app-combo-default>
       <label>Fornecedor: </label>
-      <app-combo-default [values]="fornecedores" [loading]="loading" [(selected)]="fornecedorFilter"
-                         [scrlHeight]="'500px'" larg="100%" [shClear]="true"></app-combo-default>
+      <app-combo-default [values]="fornecedores" [loading]="loading" [(selected)]="fornecedorFilter" [scrlHeight]="'500px'" larg="100%" [shClear]="true"></app-combo-default>
       <label></label>
       <div style="display: grid; grid-template-columns: 1fr 1fr;">
         <p-button icon="pi pi-filter" label="Filtrar" [raised]="true" (onClick)="dt._filter()"/>
@@ -87,8 +84,7 @@
     </tr>
   </ng-template>
 </p-table>
-<p-confirmdialog message="Confirma a exclusão da despesa" header="Confirmação" closable="true"
-                 icon="pi pi-exclamation-triangle" closeOnEscape="true">
+<p-confirmdialog message="Confirma a exclusão da despesa" header="Confirmação" closable="true" icon="pi pi-exclamation-triangle" closeOnEscape="true">
 
 </p-confirmdialog>
 <p-toast/>

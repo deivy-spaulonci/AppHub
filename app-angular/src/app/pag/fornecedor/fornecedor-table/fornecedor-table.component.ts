@@ -109,14 +109,19 @@ export class FornecedorTableComponent implements OnInit {
     console.log(url);
     this.defaultService.get(url).subscribe({
       next: resultado => {
-        this.fornecedores = resultado.content;
-        this.totalElements = resultado.totalElements;
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Info',
-          detail: `${this.totalElements} fornecedores carregados`,
-          life: 3000
-        });
+        if(resultado){
+          this.fornecedores = resultado.content;
+          this.totalElements = resultado.totalElements;
+          this.messageService.add({
+            severity: 'info',
+            summary: 'Info',
+            detail: `${this.totalElements} fornecedores carregados`,
+            life: 3000
+          });
+        }else{
+          this.fornecedores = [];
+          this.totalElements = 0;
+        }
       },
       error: error => {
         this.messageService.add({

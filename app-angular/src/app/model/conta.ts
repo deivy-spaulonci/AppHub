@@ -1,5 +1,4 @@
-import {Tipo} from "./tipo";
-import {Fatura} from "./fatura";
+
 import {TipoConta} from "./tipo-conta";
 import {FormaPagamento} from './forma-pagamento';
 
@@ -15,10 +14,12 @@ export class Conta {
   formaPagamento?: FormaPagamento;
   dataPagamento?: string;
   multa?: number;
+  desconto?: number;
+  valorPago!: number;
   titulo!: string;
   comprovante!: string;
   status!: string;
   intStatus!: number;
-  faturas!: Fatura[];
   obs!: string;
+
 }

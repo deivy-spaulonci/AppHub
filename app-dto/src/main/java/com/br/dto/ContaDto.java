@@ -62,11 +62,12 @@ public class ContaDto implements Serializable {
     @Digits(message = "Valor da conta inválido!", integer = 10, fraction = 2)
     BigDecimal multa;
 
+    @Digits(message = "Valor da conta inválido!", integer = 10, fraction = 2)
+    BigDecimal desconto;
+
     String titulo;
 
     String comprovante;
-
-    List<Fatura> faturas;
 
     public int getIntStatus() {
         if(getVencimento()!=null && getDataPagamento()==null){
@@ -88,5 +89,12 @@ public class ContaDto implements Serializable {
             case 2 -> ContaStatus.PAGO.getNome();
             default -> ContaStatus.PAGO.getNome();
         };
+    }
+
+    public BigDecimal getValorPago() {
+        if(dataPagamento!=null && formaPagamento!=null)
+            return getValor().add(multa).subtract(desconto);
+        return BigDecimal.ZERO;
+
     }
 }

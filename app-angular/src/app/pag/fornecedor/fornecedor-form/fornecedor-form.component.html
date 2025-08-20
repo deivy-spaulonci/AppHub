@@ -14,8 +14,7 @@
   <label>CNPJ: </label>
   <div>
     <p-inputmask [mask]="maskCnpj" [(ngModel)]="cnpj" [placeholder]="maskCnpj" size="small" disabled="{{tipoPessoa=='pf'}}"/>
-    <p-button icon="pi pi-cloud" [raised]="true" disabled="{{tipoPessoa=='pf'}}" (onClick)="searchCNPJ()"
-              [style]="{padding: '7px', marginLeft: '10px'}"/>
+    <p-button icon="pi pi-cloud" [raised]="true" disabled="{{tipoPessoa=='pf'}}" (onClick)="searchCNPJ()" [style]="{padding: '7px', marginLeft: '10px'}"/>
   </div>
 
   <label>CPF: </label>
@@ -27,12 +26,9 @@
 
   <label>Cidade: </label>
   <div>
-    <p-select [options]="estados" size="small" optionLabel="name" (onChange)="searchCities(null)"
-              [(ngModel)]="estadoSelect" placeholder="Estado" [disabled]="tipoPessoa=='pj'" [showClear]="true"/>
+    <p-select [options]="estados" size="small" optionLabel="name" (onChange)="searchCities(null)" [(ngModel)]="estadoSelect" placeholder="Estado" [disabled]="tipoPessoa=='pj'" [showClear]="true"/>
 
-    <p-select [options]="cidades" [loading]="loading" optionLabel="nome" size="small" [disabled]="tipoPessoa=='pj'"
-              [style]="{width: '300px', marginLeft: '30px'}" [(ngModel)]="cidadeSelect" [filter]="true" filterBy="nome"
-              [showClear]="true" [placeholder]="cidadeSelect.nome"/>
+    <p-select [options]="cidades" [loading]="loading" optionLabel="nome" size="small" [disabled]="tipoPessoa=='pj'" [style]="{width: '300px', marginLeft: '30px'}" [(ngModel)]="cidadeSelect" [filter]="true" filterBy="nome" [showClear]="true" [placeholder]="cidadeSelect.nome"/>
   </div>
 
   <label></label>

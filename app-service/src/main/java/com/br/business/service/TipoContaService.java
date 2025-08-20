@@ -26,6 +26,10 @@ public class TipoContaService {
         return tipoContaRepository.findAll(sort);
     }
 
+    public List<TipoConta> findTipoContas() {
+        return tipoContaRepository.findAll();
+    }
+
     public Optional<TipoConta> findById(BigInteger id) {
         return tipoContaRepository.findById(id);
     }

@@ -35,4 +35,9 @@ public class Cidade implements Serializable {
 
     @JsonProperty("uf")
     private String uf;
+
+    @Override
+    public String toString() {
+        return nome;
+    }
 }

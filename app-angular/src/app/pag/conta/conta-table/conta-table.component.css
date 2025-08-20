@@ -4,6 +4,7 @@
   column-gap: 5px;
   row-gap: 5px;
   height: 260px;
+  width: 1260px;
 }
 #panelFiltros{
   display: grid;
@@ -20,7 +21,7 @@
 
 #gridDetailConta{
   display: grid;
-  grid-template-columns: 420px 1fr;
+  grid-template-columns: 420px repeat(3,1fr);
   column-gap: 5px;
   row-gap: 5px;
 

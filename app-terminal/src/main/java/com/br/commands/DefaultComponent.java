@@ -4,8 +4,10 @@ import com.br.business.service.DespesaService;
 import com.br.business.service.FormaPagamentoService;
 import com.br.business.service.TipoDespesaService;
 import com.br.entity.FormaPagamento;
+import com.br.entity.Fornecedor;
 import com.br.entity.TipoConta;
 import com.br.entity.TipoDespesa;
+import com.br.util.Validate;
 import lombok.Getter;
 import lombok.Setter;
 import org.jline.terminal.Terminal;
@@ -18,6 +20,7 @@ import org.springframework.shell.component.support.SelectorItem;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.style.TemplateExecutor;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -36,22 +39,110 @@ public class DefaultComponent {
         this.resourceLoader = resourceLoader;
     }
 
-    public String selectFormaPagamento(FormaPagamentoService formaPagamentoService) {
-        List<SelectorItem<String>> items = new ArrayList<>();//Arrays.asList(i1, i2, i3, i4);
-        formaPagamentoService.findFormasPagamento().forEach(forma -> {
-            items.add(SelectorItem.of(forma.getNome(), forma.getId().toString()));
+    public FormaPagamento selectFormaPagamento(List<FormaPagamento> formas) {
+        List<SelectorItem<FormaPagamento>> items = new ArrayList<>();//Arrays.asList(i1, i2, i3, i4);
+        formas.forEach(forma -> {
+            items.add(SelectorItem.of(forma.getNome(), forma));
         });
-
-        return selectDefault(items, "Forma Pagamento");
+//        return selectDefaultTipo(items, "Forma Pagamento");
+        items.sort(Comparator.comparing(SelectorItem::getName));
+        SingleItemSelector<FormaPagamento, SelectorItem<FormaPagamento>> component = new SingleItemSelector<>(
+                getTerminal(),
+                items,
+                "Forma Pagamento: ",
+                null);
+        component.setResourceLoader(getResourceLoader());
+        component.setTemplateExecutor(getTemplateExecutor());
+        component.setMaxItems(25);
+        component.setPrintResults(false);
+        SingleItemSelector.SingleItemSelectorContext<FormaPagamento, SelectorItem<FormaPagamento>> context =
+                component.run(SingleItemSelector.SingleItemSelectorContext.empty());
+        FormaPagamento result = context.getResultItem().flatMap(si ->
+                Optional.ofNullable(si.getItem())).get();
+        return result;
     }
 
-    public String selectTipoDespesa(TipoDespesaService tipoDespesaService) {
-        List<SelectorItem<String>> items = new ArrayList<>();//Arrays.asList(i1, i2, i3, i4);
-        tipoDespesaService.findTipoDespesas().forEach(despesa -> {
-            items.add(SelectorItem.of(despesa.getNome(), despesa.getId().toString()));
+    public TipoDespesa selectTipoDespesa(List<TipoDespesa> tipos) {
+        List<SelectorItem<TipoDespesa>> items = new ArrayList<>();//Arrays.asList(i1, i2, i3, i4);
+        tipos.forEach(tipo -> {
+            items.add(SelectorItem.of(tipo.getNome(), tipo));
         });
         items.sort(Comparator.comparing(SelectorItem::getName));
-        return selectDefault(items, "Tipo Despesa :");
+        SingleItemSelector<TipoDespesa, SelectorItem<TipoDespesa>> component = new SingleItemSelector<>(
+                getTerminal(),
+                items,
+                "Tipo Despesa: ",
+                null);
+        component.setResourceLoader(getResourceLoader());
+        component.setTemplateExecutor(getTemplateExecutor());
+        component.setMaxItems(25);
+        component.setPrintResults(false);
+        SingleItemSelector.SingleItemSelectorContext<TipoDespesa, SelectorItem<TipoDespesa>> context =
+                component.run(SingleItemSelector.SingleItemSelectorContext.empty());
+        TipoDespesa result = context.getResultItem().flatMap(si ->
+                Optional.ofNullable(si.getItem())).get();
+        return result;
+    }
+
+    public Fornecedor selectFornecedor(List<Fornecedor> fornecedores) {
+        List<SelectorItem<Fornecedor>> items = new ArrayList<>();//Arrays.asList(i1, i2, i3, i4);
+        fornecedores.forEach(fornec -> {
+            items.add(SelectorItem.of(fornec.getNome(), fornec));
+        });
+        items.sort(Comparator.comparing(SelectorItem::getName));
+        SingleItemSelector<Fornecedor, SelectorItem<Fornecedor>> component = new SingleItemSelector<>(
+                getTerminal(),
+                items,
+                "Fornecedor: ",
+                null);
+        component.setResourceLoader(getResourceLoader());
+        component.setTemplateExecutor(getTemplateExecutor());
+        component.setMaxItems(25);
+        component.setPrintResults(false);
+        SingleItemSelector.SingleItemSelectorContext<Fornecedor, SelectorItem<Fornecedor>> context =
+                component.run(SingleItemSelector.SingleItemSelectorContext.empty());
+        Fornecedor result = context.getResultItem().flatMap(si ->
+                Optional.ofNullable(si.getItem())).get();
+        return result;
+    }
+
+    public TipoConta selectTipoConta(List<TipoConta> tipos) {
+        List<SelectorItem<TipoConta>> items = new ArrayList<>();//Arrays.asList(i1, i2, i3, i4);
+        tipos.forEach(tipo -> {
+            items.add(SelectorItem.of(tipo.getNome(), tipo));
+        });
+        items.sort(Comparator.comparing(SelectorItem::getName));
+        SingleItemSelector<TipoConta, SelectorItem<TipoConta>> component = new SingleItemSelector<>(
+                getTerminal(),
+                items,
+                "Tipo Conta: ",
+                null);
+        component.setResourceLoader(getResourceLoader());
+        component.setTemplateExecutor(getTemplateExecutor());
+        component.setMaxItems(25);
+        component.setPrintResults(false);
+        SingleItemSelector.SingleItemSelectorContext<TipoConta, SelectorItem<TipoConta>> context =
+                component.run(SingleItemSelector.SingleItemSelectorContext.empty());
+        TipoConta result = context.getResultItem().flatMap(si ->
+                Optional.ofNullable(si.getItem())).get();
+        return result;
+    }
+
+    public String selectDefault(List<SelectorItem<String>> itens, String label){
+        SingleItemSelector<String, SelectorItem<String>> component = new SingleItemSelector<>(
+                getTerminal(),
+                itens,
+                label,
+                null);
+        component.setResourceLoader(getResourceLoader());
+        component.setTemplateExecutor(getTemplateExecutor());
+        component.setMaxItems(25);
+        component.setPrintResults(false);
+        SingleItemSelector.SingleItemSelectorContext<String, SelectorItem<String>> context =
+                component.run(SingleItemSelector.SingleItemSelectorContext.empty());
+        String result = context.getResultItem().flatMap(si ->
+                Optional.ofNullable(si.getItem())).get();
+        return result;
     }
 
     public Integer selectPageDefault() {
@@ -77,52 +168,12 @@ public class DefaultComponent {
         return result;
     }
 
-//    public String selectDefault(List<SelectorItem<String>> itens, String label, int size){
-//        SingleItemSelector<String, SelectorItem<String>> component = new SingleItemSelector<>(
-//                getTerminal(),
-//                itens,
-//                label,
-//                null);
-//        component.setResourceLoader(getResourceLoader());
-//        component.setTemplateExecutor(getTemplateExecutor());
-//        component.setMaxItems(20);
-//        SingleItemSelector.SingleItemSelectorContext<String, SelectorItem<String>> context = component.run(SingleItemSelector.SingleItemSelectorContext.empty());
-//        String result = context.getResultItem().flatMap(si -> Optional.ofNullable(si.getItem())).get();
-//        return result;
-//    }
-
-    public String selectDefault(List<SelectorItem<String>> itens, String label){
-        SingleItemSelector<String, SelectorItem<String>> component = new SingleItemSelector<>(
-                getTerminal(),
-                itens,
-                label,
-                null);
-        component.setResourceLoader(getResourceLoader());
-        component.setTemplateExecutor(getTemplateExecutor());
-        component.setMaxItems(25);
-        component.setPrintResults(false);
-        SingleItemSelector.SingleItemSelectorContext<String, SelectorItem<String>> context =
-                component.run(SingleItemSelector.SingleItemSelectorContext.empty());
-        String result = context.getResultItem().flatMap(si ->
-                Optional.ofNullable(si.getItem())).get();
-        return result;
-    }
-
     public Integer inputInteger(String label){
         StringInput component = new StringInput(getTerminal(), label, "");
         component.setResourceLoader(getResourceLoader());
         component.setTemplateExecutor(getTemplateExecutor());
         StringInput.StringInputContext context = component.run(StringInput.StringInputContext.empty());
         return Integer.valueOf(context.getResultValue());
-    }
-
-    public String inputValor(){
-        StringInput component = new StringInput(getTerminal(), "Valor: ", "");
-        component.setResourceLoader(getResourceLoader());
-        component.setTemplateExecutor(getTemplateExecutor());
-        component.setPrintResults(false);
-        StringInput.StringInputContext context = component.run(StringInput.StringInputContext.empty());
-        return context.getResultValue();
     }
 
     public String inputCnpjFornecedor(){
@@ -158,14 +209,14 @@ public class DefaultComponent {
 
     //	@ShellMethod("Change password.")
 //	public String inputData(@Size(min = 10, max = 10) String data){
-    public String inputData(){
-        StringInput component = new StringInput(getTerminal(), "Data ddMMyyyy", "");
-        component.setResourceLoader(getResourceLoader());
-        component.setTemplateExecutor(getTemplateExecutor());
-
-        StringInput.StringInputContext context = component.run(StringInput.StringInputContext.empty());
-        return context.getResultValue();
-    }
+//    public String inputData(){
+//        StringInput component = new StringInput(getTerminal(), "Data ddMMyyyy", "");
+//        component.setResourceLoader(getResourceLoader());
+//        component.setTemplateExecutor(getTemplateExecutor());
+//
+//        StringInput.StringInputContext context = component.run(StringInput.StringInputContext.empty());
+//        return context.getResultValue();
+//    }
 
     public boolean confirmationInput(String msg, boolean def) {
         ConfirmationInput component = new ConfirmationInput(getTerminal(), String.format("%s ?", msg), def);
@@ -175,5 +226,43 @@ public class DefaultComponent {
         ConfirmationInput.ConfirmationInputContext context = component.run(ConfirmationInput.ConfirmationInputContext.empty());
         return context.getResultValue();
     }
+
+    public String inData(String label){
+        boolean valid = false;
+        String data = "";
+        do{
+            StringInput component = new StringInput(terminal, " %s [ddMMyyyy] ".formatted(label), "");
+            component.setResourceLoader(getResourceLoader());
+            component.setTemplateExecutor(getTemplateExecutor());
+            component.setPrintResults(false);
+            StringInput.StringInputContext context = component.run(StringInput.StringInputContext.empty());
+            data = context.getResultValue();
+            valid = !data.isEmpty() && Validate.isValidDate(data);
+
+        } while (valid ? false :  confirmationInput('⛔' + " %s inválida! Continuar".formatted(label), true));
+        return data;
+    }
+
+    public String inValor(String label){
+        boolean valid = false;
+        String valor = "";
+        do{
+            StringInput component = new StringInput(getTerminal(), "%s: ".formatted(label), "");
+            component.setResourceLoader(getResourceLoader());
+            component.setTemplateExecutor(getTemplateExecutor());
+            component.setPrintResults(false);
+            StringInput.StringInputContext context = component.run(StringInput.StringInputContext.empty());
+            valor = context.getResultValue().replaceAll(",", ".");
+
+            try{
+                valid = new BigDecimal(valor).compareTo(BigDecimal.ZERO) == 1;
+            }catch(NumberFormatException e){
+                valid  = false;
+            }
+        }while (valid ? false : confirmationInput('⛔' + "%s inválido! Continuar".formatted(label), true));
+        return valor;
+
+    }
+
 
 }

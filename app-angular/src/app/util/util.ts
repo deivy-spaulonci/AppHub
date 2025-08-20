@@ -47,4 +47,21 @@ export class Util {
     const regex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
     return ['', null, undefined].indexOf(data) != 0 && regex.test(data);
   }
+
+  static maskaraTeste(valor: string): string{
+
+
+    // Remove tudo que não for dígito
+    valor = valor.replace(/\D/g, "");
+
+    // Limita a 5 dígitos
+    valor = valor.substring(0, 5);
+
+    // Adiciona a barra após o segundo dígito
+    if (valor.length > 2) {
+      valor = valor.substring(0, 2) + "/" + valor.substring(2);
+    }
+
+    return valor;
+  }
 }

@@ -1,16 +1,34 @@
-<p-panel header="Documentos" [style]="{width: '900px', margin: '0 auto'}" [toggleable]="false">
+<p-toolbar>
+  <span><i class="pi pi-file-o" style="font-size: 1rem"></i> Documentos</span>
+</p-toolbar>
 
+<input type="text" pInputText [(ngModel)]="basePath" style="width: 50%"/>
+<p-button label="Carregar" icon="pi pi-sync" size="small" (onClick)="carregar()"/>
 
-    <p-button icon="pi pi-plus" label="Expand all" (click)="expandAll()" /> -
-    <p-button icon="pi pi-minus" label="Collapse all" (click)="collapseAll()" />
+<div id="gridDoc">
 
-  <p-tree [value]="files" styleClass="w-full md:w-[30rem]" scrollHeight="600px" (onNodeSelect)="nodeSelect($event)"
-          [loading]="loading" selectionMode="single" [(selection)]="selectedFile"/>
+  <p-table
+    [scrollable]="true"
+    selectionMode="single"
+    [(selection)]="selectedFile"
+    scrollHeight="800px"
+    (onRowSelect)="aoSelecionar($event)"
+    [value]="files">
+    <ng-template #header>
+      <tr>
+        <th pSortableColumn="file">Nome</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-file>
+      <tr [pSelectableRow]="file">
+        <td>{{ file }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
 
-</p-panel>
+  <iframe *ngIf="conteudoBase64" [src]="conteudoBase64" style="height: 100%; width: 100%;"></iframe>
 
-<p-blockui [blocked]="loading" class="flex justify-center">
-  <p-progress-spinner ariaLabel="loading"/>
-</p-blockui>
+</div>
+
 
 <p-toast/>

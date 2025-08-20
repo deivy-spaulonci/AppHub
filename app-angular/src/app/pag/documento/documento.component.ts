@@ -1,23 +1,25 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {MessageService, TreeNode} from 'primeng/api';
+import {Component, OnInit} from '@angular/core';
+import {MessageService} from 'primeng/api';
 import {DefaultService} from '../../service/default.service';
-import {Panel} from 'primeng/panel';
-import {Tree} from 'primeng/tree';
-import {Diretorio} from '../../model/diretorio';
 import {Button} from 'primeng/button';
-import {BlockUI} from 'primeng/blockui';
-import {ProgressSpinner} from 'primeng/progressspinner';
 import {Toast} from 'primeng/toast';
+import {Toolbar} from 'primeng/toolbar';
+import {InputText} from 'primeng/inputtext';
+import {TableModule} from 'primeng/table';
+import {NgIf} from '@angular/common';
+import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-documento',
   imports: [
-    Panel,
-    Tree,
     Button,
-    BlockUI,
-    ProgressSpinner,
-    Toast
+    Toast,
+    Toolbar,
+    InputText,
+    TableModule,
+    NgIf,
+    FormsModule
   ],
   templateUrl: './documento.component.html',
   standalone: true,
@@ -25,19 +27,24 @@ import {Toast} from 'primeng/toast';
   providers: [MessageService],
 })
 export class DocumentoComponent implements OnInit{
-  files!: TreeNode[];
+  files!: String[];
   loading: boolean = false;
-  selectedFile!: TreeNode;
+  selectedFile!: string;
+  conteudoBase64: SafeResourceUrl | null = null;
+  basePath:string='';
 
   constructor(private defaultService: DefaultService,
-              private cd: ChangeDetectorRef,
+              private sanitizer: DomSanitizer,
               private messageService: MessageService,) {}
 
   ngOnInit() {
-    this.loading=true;
-    this.defaultService.get('documentos/listar-arquivos').subscribe({
+    this.carregar();
+  }
+
+  carregar(){
+    this.defaultService.get('documentos/diretorio?path='+this.basePath).subscribe({
       next: res => {
-        this.files = this.diretoriosParaTreeNodes(res);
+        this.files = res;
       },
       error: error => {
         this.messageService.add({severity: 'error', summary: 'Error', detail: 'consulta de documentos'});
@@ -46,76 +53,26 @@ export class DocumentoComponent implements OnInit{
         this.loading=false;
       }
     });
+
   }
 
-  // Função para converter a estrutura de Diretorio para TreeNode
-  diretorioParaTreeNode(diretorio: Diretorio, parentNode: TreeNode | null = null): TreeNode {
-    const node:TreeNode={};
-    node.label=diretorio.nome;
-    node.data=diretorio;
-    node.key=diretorio.nome;
-    node.children=[]
-    node.leaf=diretorio.subDiretorios.length === 0 && diretorio.arquivos.length === 0;
-    node.parent=parentNode!;
-    node.expanded=false;
-    node.icon='pi pi-folder';
-    node.expandedIcon='pi pi-folder-open';
-    node.collapsedIcon='pi pi-folder';
+  aoSelecionar(event: any) {
 
+    let url = 'documentos/base64?path='+this.basePath+this.selectedFile;
+    this.defaultService.get(url).subscribe({
+      next: res => {
+        const dataUrl = `data:${res.mimeType};base64,${res.base64}`;
+        this.conteudoBase64 = this.sanitizer.bypassSecurityTrustResourceUrl(dataUrl);
+      },
+      error: error => {
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'consulta de documentos'});
+      },
+      complete: () => {
 
-//    Adicionando subdiretórios como filhos
-    if (diretorio.subDiretorios.length > 0) {
-      node.children = diretorio.subDiretorios.map(subDiretorio => this.diretorioParaTreeNode(subDiretorio, node));
-    }
-
-    // Adicionando arquivos como filhos também, representados como "leaf nodes" (nós folha)
-    if (diretorio.arquivos.length > 0) {
-      diretorio.arquivos.forEach(arquivo => {
-        node.children?.push({
-          label: arquivo, // O nome do arquivo será o label
-          data: arquivo, // O dado completo do arquivo
-          key: arquivo, // A chave única do arquivo pode ser o nome
-          leaf: true, // Arquivos não têm filhos, então são nós folha
-          icon: 'pi pi-file', // O ícone para um arquivo
-        });
-      });
-    }
-
-    return node;
-  }
-
-  // Função para converter a lista de diretórios
-  diretoriosParaTreeNodes(diretorios: any[]): TreeNode[] {
-    return diretorios.map(diretorio => this.diretorioParaTreeNode(diretorio));
-  }
-
-  expandAll() {
-    this.files.forEach((node) => {
-      this.expandRecursive(node, true);
+      }
     });
   }
 
-  collapseAll() {
-    this.files.forEach((node) => {
-      this.expandRecursive(node, false);
-    });
-  }
 
-  expandRecursive(node: TreeNode, isExpand: boolean) {
-    node.expanded = isExpand;
-    if (node.children) {
-      node.children.forEach((childNode) => {
-        this.expandRecursive(childNode, isExpand);
-      });
-    }
-  }
-
-  nodeSelect(event: any) {
-    if(event.node.leaf)
-      console.log(event.node)
-    // if(event.node.leaf==0)
-
-    //this.messageService.add({ severity: 'info', summary: 'Node Selected', detail: event.node.label });
-  }
 
 }
