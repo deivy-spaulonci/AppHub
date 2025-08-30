@@ -8,12 +8,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class FornecedorCloudDto {
+public class FornecedorCloudDTO {
 
     @JsonProperty("razao_social")
     public String nome;
     @JsonProperty("estabelecimento")
-    public EstabelecimentoCloudDto estabelecimentoCloudDto;
+    public EstabelecimentoCloudDTO estabelecimentoCloudDto;
 
     public String getFantasia(){
         return estabelecimentoCloudDto.getFantasia();
@@ -30,19 +30,19 @@ public class FornecedorCloudDto {
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-class EstabelecimentoCloudDto {
+class EstabelecimentoCloudDTO {
     @JsonProperty("nome_fantasia")
     public String fantasia;
     @JsonProperty("cnpj")
     public String cnpj;
     @JsonProperty("cidade")
-    public CidadeCloudDto cidade;
+    public CidadeCloudDTO cidade;
 }
 
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-class CidadeCloudDto {
+class CidadeCloudDTO {
     @JsonProperty("ibge_id")
     public String ibgeCod;
 

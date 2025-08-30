@@ -35,13 +35,8 @@ public interface ContaRepository extends JpaRepository<Conta, BigInteger>, JpaSp
         final CriteriaQuery<Object> query = cb.createQuery(Object.class);
         final Root<Conta> root = query.from(Conta.class);
 
-        query.multiselect(
-                root.get(Conta_.tipoConta),
-                root.get(Conta_.tipoConta.getName()),
-                cb.sum(root.get(Conta_.valor)));
-        query.groupBy(
-                root.get(Conta_.tipoConta),
-                root.get(Conta_.tipoConta.getName()));
+        query.multiselect(root.get(Conta_.tipoConta),cb.sum(root.get(Conta_.valor)));
+        query.groupBy(root.get(Conta_.tipoConta));
 
         Query qry = entityManager.createQuery(query);
         return qry.getResultList();

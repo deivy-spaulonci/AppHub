@@ -1,9 +1,7 @@
 package com.br.restcontroller;
 
 import com.br.business.service.FornecedorService;
-import com.br.dto.FornecedorDto;
-import com.br.entity.Cidade;
-import com.br.entity.Estado;
+import com.br.dto.FornecedorDTO;
 import com.br.entity.Fornecedor;
 import com.br.mapper.FornecedorMapper;
 import jakarta.transaction.Transactional;
@@ -20,8 +18,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigInteger;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,80 +28,59 @@ import static org.springframework.http.ResponseEntity.ok;
 public class FornecedorRestController {
     @Autowired
     private FornecedorService fornecedorService;
-    private static final FornecedorMapper fornecedorMapper = FornecedorMapper.INSTANCE;
 
     @GetMapping()
-    public ResponseEntity<List<FornecedorDto>> get(Sort sort) {
-        List<Fornecedor> result = fornecedorService.listFornecedoresSorted("", sort);
-        if (result.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ok(fornecedorMapper.toDtoList(result));
+    @ResponseStatus(HttpStatus.OK)
+    public List<FornecedorDTO> get(Sort sort) {
+        return fornecedorService.listFornecedoresSorted("", sort);
     }
 
     @GetMapping("/find/{busca}")
-    public ResponseEntity<List<FornecedorDto>> get(@PathVariable("busca") String busca, Sort sort) {
-        List<Fornecedor> result = fornecedorService.listFornecedoresSorted(busca, sort);
-        if (result.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ok(fornecedorMapper.toDtoList(result));
+    @ResponseStatus(HttpStatus.OK)
+    public List<FornecedorDTO> get(@PathVariable("busca") String busca, Sort sort) {
+        return fornecedorService.listFornecedoresSorted(busca, sort);
     }
 
     @GetMapping("/page")
-    public ResponseEntity<Page<FornecedorDto>> getPage(@RequestParam(required = false) String busca, Pageable pageable) {
-        Page<FornecedorDto> result = fornecedorService.listFornecedoresPaged(busca, pageable).map(fornecedorMapper::toDto);
-        if (result.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ok(result);
+    @ResponseStatus(HttpStatus.OK)
+    public Page<FornecedorDTO> getPage(@RequestParam(required = false) String busca, Pageable pageable) {
+        return fornecedorService.listFornecedoresPaged(busca, pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> contaFindById(@PathVariable("id") BigInteger id) {
-        Optional<Fornecedor> fornecedorOptional = fornecedorService.findById(id);
-        return fornecedorOptional.<ResponseEntity<Object>>map(value -> ok(fornecedorMapper.toDto(value)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Fornecedor não econtrado!"));
+    @ResponseStatus(HttpStatus.OK)
+    public FornecedorDTO contaFindById(@PathVariable("id") BigInteger id) {
+        return fornecedorService.findById(id);
     }
 
     @PostMapping
     @Transactional
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<FornecedorDto> create(@RequestBody @Valid FornecedorDto fornecedorDTO,
-                                                UriComponentsBuilder uriBuilder) {
-        Fornecedor fornecedor = fornecedorService.save(fornecedorMapper.toEntity(fornecedorDTO));
-        URI uri = uriBuilder.path("/{id}").buildAndExpand(fornecedor.getId()).toUri();
-        return ResponseEntity.created(uri).body(fornecedorMapper.toDto(fornecedor));
+    public ResponseEntity<FornecedorDTO> create(@RequestBody @Valid FornecedorDTO fornecedorDTO) {
+        return new ResponseEntity<>(fornecedorService.save(fornecedorDTO), HttpStatus.CREATED);
     }
 
     @PutMapping
     @Transactional
-    public ResponseEntity<?> update(@RequestBody @Valid FornecedorDto fornecedorDTO) {
-        Optional<Fornecedor> fornecedorOptional = fornecedorService.findById(fornecedorDTO.getId());
-        if (fornecedorOptional.isPresent()) {
-            Fornecedor fornecedor = fornecedorService.save(fornecedorMapper.toEntity(fornecedorDTO));
-            return ok(fornecedorMapper.toDto(fornecedor));
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum fornecedor econtrado!");
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<FornecedorDTO> update(@RequestBody @Valid FornecedorDTO fornecedorDTO) {
+        return new ResponseEntity<>(fornecedorService.save(fornecedorDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<?> delete(@PathVariable Long id) {
-        return ok("Não ha permissao de exclusao do fornecedor!");
+        return ok("Não ha permissão de exclusão do fornecedor até o momentod!");
     }
-
 
     @GetMapping(value = "/consultaCnpj/{cnpj}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> consultaCNPJ(@PathVariable("cnpj") String cnpj) {
-
-        List<Fornecedor> fornecedorList = fornecedorService.listFornecedoresSorted(cnpj, Sort.unsorted());
-        if (!fornecedorList.isEmpty()) {
+        List<FornecedorDTO> fornecedorList = fornecedorService.listFornecedoresSorted(cnpj, Sort.unsorted());
+        if (!fornecedorList.isEmpty())
             return ResponseEntity.status(HttpStatus.CONFLICT).body("CNPJ já cadastrado!");
-        } else {
-            return ok(fornecedorService.getFornecedorFromWeb(cnpj));
-        }
-        //return ResponseEntity.status(HttpStatus.CONFLICT).body("conflito na requisição da receita!");
+
+        return ok(fornecedorService.getFornecedorFromWeb(cnpj));
     }
 }

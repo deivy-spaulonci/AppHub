@@ -6,15 +6,12 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * DTO for {@link Conta}
@@ -22,7 +19,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContaDto implements Serializable {
+public class ContaDTO implements Serializable {
 
     @NotNull(message = "Valor da conta vazio!")
     @Min(message = "Valor da conta vazio!", value = 0)

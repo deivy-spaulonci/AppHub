@@ -18,7 +18,7 @@ import java.math.BigInteger;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DocumentoDto implements Serializable {
+public class DocumentoDTO implements Serializable {
     @NotNull(message = "Id do Documento Inválido!")
     BigInteger id;
     @NotNull(message = "Nome do Documento Inválido!")
@@ -28,5 +28,5 @@ public class DocumentoDto implements Serializable {
     String nomeArquivo;
     String descricao;
     @NotNull(message = "Tipo de documento inválido!")
-    TipoDocumentoDto tipoDocumento;
+    TipoDocumentoDTO tipoDocumento;
 }

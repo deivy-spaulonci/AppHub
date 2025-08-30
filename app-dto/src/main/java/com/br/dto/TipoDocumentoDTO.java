@@ -11,15 +11,18 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigInteger;
 
+/**
+ * DTO for {@link com.br.entity.TipoDocumento}
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TipoDespesaDto implements Serializable {
-    @NotNull(message = "nome tipo despesa inválido!")
-    @Size(message = "nome tipo despesa muito extenso!", min = 3, max = 255)
-    @NotEmpty(message = "nome tipo despesa inválido!")
-    @NotBlank(message = "nome tipo despesa inválido!")
+public class TipoDocumentoDTO implements Serializable {
+    @NotNull(message = "Nome tipo documento vazio!")
+    @Size(message = "Nome do tipo muito longo!", min = 3, max = 255)
+    @NotEmpty(message = "Nome tipo documento vazio!")
+    @NotBlank(message = "Nome tipo documento vazio!")
     String nome;
-    @NotNull(message = "id do tipo despesa inválido!")
+    @NotNull(message = "Id tipo documento vazio!")
     BigInteger id;
 }

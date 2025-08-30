@@ -1,9 +1,12 @@
 package com.br.business.service;
 
+import com.br.dto.FormaPagamentoDTO;
 import com.br.entity.FormaPagamento;
 import com.br.entity.FormaPagamento_;
+import com.br.mapper.FormaPagamentoMapper;
 import com.br.repository.FormaPagamentoRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,16 +25,19 @@ public class FormaPagamentoService {
     @PersistenceContext
     private EntityManager manager;
 
-    public List<FormaPagamento> findFormasPagamento() {
-        return formaPagamentoRepository.findAll(Sort.by(FormaPagamento_.NOME));
+    public static final FormaPagamentoMapper formaPagamentoMapper = FormaPagamentoMapper.INSTANCE;
+
+    public List<FormaPagamentoDTO> findFormasPagamento() {
+        return formaPagamentoMapper.toDtoList(formaPagamentoRepository.findAll(Sort.by(FormaPagamento_.NOME)));
     }
 
-    public Optional<FormaPagamento> findById(BigInteger id) {
-        return formaPagamentoRepository.findById(id);
+    public FormaPagamentoDTO findById(BigInteger id) {
+        FormaPagamento formaPagamento = formaPagamentoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Forma Pagagamento não encontrado com o ID: " + id));
+        return formaPagamentoMapper.toDto(formaPagamento);
     }
 
-    public FormaPagamento save(FormaPagamento formaPagamento) {
-        return Optional.ofNullable(formaPagamentoRepository.save(formaPagamento))
-                .orElseThrow(()-> new RuntimeException("Erro ao salvar a forma de pagamento"));
+    public FormaPagamentoDTO save(FormaPagamentoDTO formaPagamentoDTO) {
+        FormaPagamento formaPagamento = formaPagamentoMapper.toEntity(formaPagamentoDTO);
+        return formaPagamentoMapper.toDto(formaPagamentoRepository.save(formaPagamento));
     }
 }

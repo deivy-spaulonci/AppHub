@@ -1,6 +1,6 @@
 package com.br.mapper;
 
-import com.br.dto.DespesaDto;
+import com.br.dto.DespesaDTO;
 import com.br.entity.Despesa;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -10,12 +10,12 @@ import java.util.List;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface DespesaMapper {
     DespesaMapper INSTANCE = Mappers.getMapper(DespesaMapper.class);
-    Despesa toEntity(DespesaDto despesaDto);
+    Despesa toEntity(DespesaDTO despesaDto);
 
-    DespesaDto toDto(Despesa despesa);
+    DespesaDTO toDto(Despesa despesa);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Despesa partialUpdate(DespesaDto despesaDto, @MappingTarget Despesa despesa);
+    Despesa partialUpdate(DespesaDTO despesaDto, @MappingTarget Despesa despesa);
 
-    List<DespesaDto> toDtoList(List<Despesa> despesaList);
+    List<DespesaDTO> toDtoList(List<Despesa> despesaList);
 }

@@ -22,7 +22,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DespesaDto implements Serializable {
+public class DespesaDTO implements Serializable {
     @NotNull(message = "Valor da despesa vazio!")
     @Min(message = "Valor da despesa vazio!", value = 0)
     @Digits(message = "Valor da despesa inválido!", integer = 10, fraction = 2)
@@ -36,7 +36,7 @@ public class DespesaDto implements Serializable {
     @NotNull(message = "Tipo da despesa inválido!")
     TipoDespesa tipoDespesa;
     @NotNull(message = "Fornecedor da despesa inválido!")
-    FornecedorDto fornecedor;
+    FornecedorDTO fornecedor;
 
     LocalDate lancamento;
 }

@@ -13,7 +13,7 @@ import java.math.BigInteger;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FormaPagamentoDto {
+public class FormaPagamentoDTO {
     @NotNull(message = "nome forma pagamento inválido!")
     @Size(message = "nome forma pagamento muito extenso!", min = 3, max = 255)
     @NotEmpty(message = "nome forma pagamento inválido!")

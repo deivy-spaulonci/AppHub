@@ -1,9 +1,14 @@
 package com.br.business.service;
 
+import com.br.dto.ContaByTipoDTO;
+import com.br.dto.ContaDTO;
 import com.br.entity.Conta;
+import com.br.entity.TipoConta;
 import com.br.filter.ContaFilter;
+import com.br.mapper.ContaMapper;
 import com.br.repository.ContaRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,8 +19,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 @Service
 public class ContaService {
@@ -24,31 +30,44 @@ public class ContaService {
     private ContaRepository contaRepository;
     @PersistenceContext
     private EntityManager em;
+    public static final ContaMapper contaMapper = ContaMapper.INSTANCE;
 
-    public List<Conta> listContas() {
-        return contaRepository.findAll();
+    public List<ContaDTO> listContas() {
+        return contaMapper.toDtoList(contaRepository.findAll());
     }
-    public Optional<Conta> findById(BigInteger id) {
-        return contaRepository.findById(id);
+    public ContaDTO findById(BigInteger id) {
+        Conta conta = contaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Produto não encontrado com o ID: " + id));
+        return contaMapper.toDto(conta);
     }
-    public List<Conta> listContaSorted(ContaFilter contaFilter, Sort sort) {
-        return contaRepository.listContaSorted(sort, contaFilter, em);
+    public List<ContaDTO> listContaSorted(ContaFilter contaFilter, Sort sort) {
+        return contaMapper.toDtoList(contaRepository.listContaSorted(sort, contaFilter, em));
     }
-    public Page<Conta> listContaPaged(ContaFilter contaFilter, Pageable pageable) {
-        return contaRepository.listContaPaged(pageable, contaFilter, em);
+    public Page<ContaDTO> listContaPaged(ContaFilter contaFilter, Pageable pageable) {
+        Page<Conta> contaPage = contaRepository.listContaPaged(pageable, contaFilter, em);
+        return contaPage.map(contaMapper::toDto);
     }
-    public Conta save(Conta conta) {
+    public ContaDTO save(ContaDTO contaDTO) {
+        Conta conta = contaMapper.toEntity(contaDTO);
         conta.setLancamento(LocalDateTime.now());
-        return Optional.ofNullable(contaRepository.save(conta))
-                .orElseThrow(()-> new RuntimeException("Erro ao salvar a conta!"));
+        Conta newConta =  contaRepository.save(conta);
+        return contaMapper.toDto(newConta);
     }
-    public boolean deleteById(BigInteger idConta) {
-        Optional<Conta> contaOptional = findById(idConta);
-        contaOptional.ifPresent(conta -> contaRepository.deleteById(idConta));
-        return contaRepository.findById(idConta).isEmpty();
+    public void deleteById(BigInteger idConta) {
+        if(Objects.nonNull(findById(idConta)))
+            contaRepository.deleteById(idConta);
     }
-    public List getContaByTipo(){
-        return contaRepository.getContaByTipo(em);
+    public List<ContaByTipoDTO> getContaByTipo(){
+        List<ContaByTipoDTO> lista = new ArrayList<>();
+
+        for(Object item : contaRepository.getContaByTipo(em)){
+            ContaByTipoDTO contaByTipoDto = new ContaByTipoDTO();
+            var subitem = (Object[]) item;
+            contaByTipoDto.setTipoConta((TipoConta) subitem[0]);
+            contaByTipoDto.setValor(new BigDecimal(subitem[1].toString()));
+            lista.add(contaByTipoDto);
+        }
+
+        return lista;
     }
     public BigDecimal getSumConta(ContaFilter contaFilter){
         return contaRepository.getSumConta(contaFilter, em);

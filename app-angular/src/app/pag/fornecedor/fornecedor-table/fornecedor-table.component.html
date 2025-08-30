@@ -1,4 +1,4 @@
-<p-toolbar [style]="{padding:'3px'}">
+<p-toolbar [style]="{padding:'3px',width:'1260px'}">
   <ng-template #start></ng-template>
   <ng-template #center>
     <input pInputText placeholder="busca" [(ngModel)]="filtroTexto" [style]="{width:'300px',height:'28px'}" />
@@ -17,10 +17,11 @@
          [sortField]="sortField"
          [paginator]="true"
          [rows]="pageSize"
-         [rowsPerPageOptions]="[15, 20, 25]"
+         [rowsPerPageOptions]="[10, 20, 30]"
          [(selection)]="fornecedorSelecionado"
          (onLazyLoad)="loadData($event)"
          [paginatorPosition]="'top'"
+         [style]="{width:'1260px'}"
          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
          dataKey="id"
          editMode="row"
@@ -73,3 +74,7 @@
 
   </ng-template>
 </p-table>
+
+<app-loading-modal [visible]="loading" message="Processando sua requisição..."></app-loading-modal>
+
+<p-toast/>

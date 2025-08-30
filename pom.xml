@@ -21,6 +21,7 @@
         <module>app-api</module>
         <module>app-terminal</module>
         <module>AppSw</module>
+        <module>app-teste</module>
     </modules>
 
     <properties>

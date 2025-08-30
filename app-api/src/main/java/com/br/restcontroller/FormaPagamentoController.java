@@ -1,17 +1,13 @@
 package com.br.restcontroller;
 
 import com.br.business.service.FormaPagamentoService;
-import com.br.dto.FormaPagamentoDto;
-import com.br.dto.TipoDespesaDto;
+import com.br.dto.FormaPagamentoDTO;
 import com.br.entity.FormaPagamento;
-import com.br.entity.TipoDespesa;
-import com.br.mapper.FormaPagamentoMapper;
-import com.br.mapper.TipoDespesaMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -26,14 +22,9 @@ public class FormaPagamentoController {
     @Autowired
     private FormaPagamentoService formaPagamentoService;
 
-    public static final FormaPagamentoMapper formaPagamentoMapper = FormaPagamentoMapper.INSTANCE;
-
     @GetMapping()
-    public ResponseEntity<List<FormaPagamentoDto>> getFormaPagamento() {
-        List<FormaPagamento> result =  formaPagamentoService.findFormasPagamento();
-        if(result.isEmpty()){
-            return noContent().build();
-        }
-        return ok(formaPagamentoMapper.toDtoList(result));
+    @ResponseStatus(HttpStatus.OK)
+    public List<FormaPagamentoDTO> getFormaPagamento() {
+        return formaPagamentoService.findFormasPagamento();
     }
 }

@@ -28,74 +28,74 @@ public class CadastroContas {
         this.shellHelper = shellHelper;
     }
 
-    public void cadastrar(ContaService contaService,
-                          TipoContaService tipoContaService,
-                          FormaPagamentoService formaPagamentoService,
-                          FornecedorService fornecedorService) {
-        this.tipoContaService = tipoContaService;
-        this.contaService = contaService;
-        this.fornecedorService = fornecedorService;
-
-        System.out.print("\033\143");
-        shellHelper.printInfo("+"+"-".repeat(110));
-
-        //CODIGO DE BRRAS ----------------------------------------------------
-        Conta conta = new Conta();
-        if(!this.inputCodigoBarra(conta))
-            return;
-        shellHelper.printInfo("| %-16s : %-25s".formatted("Código Barras", conta.getCodigoBarra()));
-
-        //TIPO CONTA ----------------------------------------------------
-        conta.setTipoConta(this.defaultComponent.selectTipoConta(tipoContaService.findTipoContas()));
-        shellHelper.printInfo("| %-16s : %-25s".formatted("Tipo Conta", conta.getTipoConta().getNome()));
-
-        //EMISSAO  ----------------------------------------------------
-        conta.setEmissao(Util.getData(this.defaultComponent.inData("Emissão")));
-        shellHelper.printInfo("| %-16s : %-25s".formatted("Emissão", Util.toDatePtBr(conta.getEmissao())));
-
-        //VENCIMETNO  ----------------------------------------------------
-        conta.setVencimento(Util.getData(this.defaultComponent.inData("Vencimento")));
-        shellHelper.printInfo("| %-16s : %-25s".formatted("Vencimento", Util.toDatePtBr(conta.getVencimento())));
-
-        //PARCELAS  ----------------------------------------------------
-        if(!inputParcela(conta))
-            return;
-        shellHelper.printInfo("| %-16s : %-25s".formatted("Parcelas ", conta.getParcela() +"/"+ conta.getTotalParcela()));
-
-        //VALOR   ----------------------------------------------------
-        conta.setValor(new BigDecimal(this.defaultComponent.inValor("Valor")));
-        shellHelper.printInfo("| %-16s : %-25s".formatted("Valor ", Util.toCurrencyPtBr(conta.getValor())));
-
-        //OBSERVAÇÃO ----------------------------------------------------
-        conta.setObs(this.defaultComponent.inputoObs());
-        shellHelper.printInfo("| %-16s : %-25s".formatted("Observação",conta.getObs()));
-
-        if(this.defaultComponent.confirmationInput("Conta ja paga", false)){
-            //FORMA PAGAMENTO ----------------------------------------------------
-            conta.setFormaPagamento(this.defaultComponent.selectFormaPagamento(formaPagamentoService.findFormasPagamento()));
-            shellHelper.printInfo("| %-16s : %-25s".formatted("Forma Pagamento",conta.getFormaPagamento().getNome()));
-
-            //DATA PAGAMENTO ----------------------------------------------------
-            conta.setDataPagamento(Util.getData(this.defaultComponent.inData("Data Pagamento")));
-            shellHelper.printInfo("| %-16s : %-25s".formatted("Data Pagamento", Util.toDatePtBr(conta.getDataPagamento())));
-
-            //VALOR PAGO/DESCONTO/MULTA ----------------------------------------------------
-            inputCalcValuePgto(conta);
-            shellHelper.printInfo("| %-16s : %-25s".formatted("Desconto ", Util.toCurrencyPtBr(conta.getDesconto())));
-            shellHelper.printInfo("| %-16s : %-25s".formatted("Multa ", Util.toCurrencyPtBr(conta.getMulta())));
-            shellHelper.printInfo("| %-16s : %-25s".formatted("Total Pago",
-                    Util.toCurrencyPtBr(conta.getValor().subtract(conta.getDesconto()).add(conta.getMulta()))));
-        }
-
-
-        System.out.print("\033\143");
-        ConsultaConta consultaConta = new ConsultaConta(this.defaultComponent, this.shellHelper);
-        consultaConta.showConta(conta);
-
-        if(this.defaultComponent.confirmationInput("Salvar conta", true)){
-            contaService.save(conta);
-        }
-    }
+//    public void cadastrar(ContaService contaService,
+//                          TipoContaService tipoContaService,
+//                          FormaPagamentoService formaPagamentoService,
+//                          FornecedorService fornecedorService) {
+//        this.tipoContaService = tipoContaService;
+//        this.contaService = contaService;
+//        this.fornecedorService = fornecedorService;
+//
+//        System.out.print("\033\143");
+//        shellHelper.printInfo("+"+"-".repeat(110));
+//
+//        //CODIGO DE BRRAS ----------------------------------------------------
+//        Conta conta = new Conta();
+//        if(!this.inputCodigoBarra(conta))
+//            return;
+//        shellHelper.printInfo("| %-16s : %-25s".formatted("Código Barras", conta.getCodigoBarra()));
+//
+//        //TIPO CONTA ----------------------------------------------------
+//        conta.setTipoConta(this.defaultComponent.selectTipoConta(tipoContaService.findTipoContas()));
+//        shellHelper.printInfo("| %-16s : %-25s".formatted("Tipo Conta", conta.getTipoConta().getNome()));
+//
+//        //EMISSAO  ----------------------------------------------------
+//        conta.setEmissao(Util.getData(this.defaultComponent.inData("Emissão")));
+//        shellHelper.printInfo("| %-16s : %-25s".formatted("Emissão", Util.toDatePtBr(conta.getEmissao())));
+//
+//        //VENCIMETNO  ----------------------------------------------------
+//        conta.setVencimento(Util.getData(this.defaultComponent.inData("Vencimento")));
+//        shellHelper.printInfo("| %-16s : %-25s".formatted("Vencimento", Util.toDatePtBr(conta.getVencimento())));
+//
+//        //PARCELAS  ----------------------------------------------------
+//        if(!inputParcela(conta))
+//            return;
+//        shellHelper.printInfo("| %-16s : %-25s".formatted("Parcelas ", conta.getParcela() +"/"+ conta.getTotalParcela()));
+//
+//        //VALOR   ----------------------------------------------------
+//        conta.setValor(new BigDecimal(this.defaultComponent.inValor("Valor")));
+//        shellHelper.printInfo("| %-16s : %-25s".formatted("Valor ", Util.toCurrencyPtBr(conta.getValor())));
+//
+//        //OBSERVAÇÃO ----------------------------------------------------
+//        conta.setObs(this.defaultComponent.inputoObs());
+//        shellHelper.printInfo("| %-16s : %-25s".formatted("Observação",conta.getObs()));
+//
+//        if(this.defaultComponent.confirmationInput("Conta ja paga", false)){
+//            //FORMA PAGAMENTO ----------------------------------------------------
+//            conta.setFormaPagamento(this.defaultComponent.selectFormaPagamento(formaPagamentoService.findFormasPagamento()));
+//            shellHelper.printInfo("| %-16s : %-25s".formatted("Forma Pagamento",conta.getFormaPagamento().getNome()));
+//
+//            //DATA PAGAMENTO ----------------------------------------------------
+//            conta.setDataPagamento(Util.getData(this.defaultComponent.inData("Data Pagamento")));
+//            shellHelper.printInfo("| %-16s : %-25s".formatted("Data Pagamento", Util.toDatePtBr(conta.getDataPagamento())));
+//
+//            //VALOR PAGO/DESCONTO/MULTA ----------------------------------------------------
+//            inputCalcValuePgto(conta);
+//            shellHelper.printInfo("| %-16s : %-25s".formatted("Desconto ", Util.toCurrencyPtBr(conta.getDesconto())));
+//            shellHelper.printInfo("| %-16s : %-25s".formatted("Multa ", Util.toCurrencyPtBr(conta.getMulta())));
+//            shellHelper.printInfo("| %-16s : %-25s".formatted("Total Pago",
+//                    Util.toCurrencyPtBr(conta.getValor().subtract(conta.getDesconto()).add(conta.getMulta()))));
+//        }
+//
+//
+//        System.out.print("\033\143");
+//        ConsultaConta consultaConta = new ConsultaConta(this.defaultComponent, this.shellHelper);
+//        consultaConta.showConta(conta);
+//
+//        if(this.defaultComponent.confirmationInput("Salvar conta", true)){
+//            contaService.save(conta);
+//        }
+//    }
 
     public void inputCalcValuePgto(Conta conta){
         BigDecimal valorPago = new BigDecimal(this.defaultComponent.inValor("Valor Pago"));

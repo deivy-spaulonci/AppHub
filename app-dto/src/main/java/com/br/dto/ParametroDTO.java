@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Value;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -19,7 +18,7 @@ import java.math.BigInteger;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ParametroDto implements Serializable {
+public class ParametroDTO implements Serializable {
     @NotNull(message = "id paramentro inválido!")
     BigInteger id;
     @NotNull(message = "chave do paramentro inválido!")

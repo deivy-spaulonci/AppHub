@@ -18,7 +18,7 @@ import java.math.BigInteger;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TipoContaDto implements Serializable {
+public class TipoContaDTO implements Serializable {
     @NotNull(message = "nome tipo conta inválido!")
     @Size(message = "nome tipo conta muito extenso!", min = 3, max = 255)
     @NotEmpty(message = "nome tipo conta inválido!")

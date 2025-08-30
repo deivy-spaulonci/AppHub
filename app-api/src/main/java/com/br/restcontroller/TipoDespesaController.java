@@ -1,7 +1,7 @@
 package com.br.restcontroller;
 
 import com.br.business.service.TipoDespesaService;
-import com.br.dto.TipoDespesaDto;
+import com.br.dto.TipoDespesaDTO;
 import com.br.entity.TipoDespesa;
 import com.br.mapper.TipoDespesaMapper;
 import jakarta.transaction.Transactional;
@@ -24,32 +24,25 @@ public class TipoDespesaController {
     @Autowired
     private TipoDespesaService tipoDespesaService;
 
-    public static final TipoDespesaMapper tipoDespesaMapper = TipoDespesaMapper.INSTANCE;
+
 
     @GetMapping()
-    public ResponseEntity<List<TipoDespesaDto>> getTipoDespesa() {
-        List<TipoDespesa> result =  tipoDespesaService.findTipoDespesas();
-        if(result.isEmpty()){
-            return noContent().build();
-        }
-        return ok(tipoDespesaMapper.toDtoList(result));
+    @ResponseStatus(HttpStatus.OK)
+    public List<TipoDespesaDTO> getTipoDespesa() {
+        return tipoDespesaService.findTipoDespesas();
     }
 
     @PostMapping
     @Transactional
-    public ResponseEntity<TipoDespesaDto> saveTipoDespesa(@RequestBody @Valid TipoDespesaDto tipoDespesaDto) {
-        TipoDespesa tipoDespesa = tipoDespesaService.save(tipoDespesaMapper.toEntity(tipoDespesaDto));
-        return ok(tipoDespesaMapper.toDto(tipoDespesa));
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<TipoDespesaDTO> saveTipoDespesa(@RequestBody @Valid TipoDespesaDTO tipoDespesaDto) {
+        return new ResponseEntity<>(tipoDespesaService.save(tipoDespesaDto), HttpStatus.CREATED);
     }
 
     @PutMapping
     @Transactional
-    public ResponseEntity<?> update(@RequestBody @Valid TipoDespesaDto tipoDespesaDto){
-        Optional<TipoDespesa> tipoDespesaOptional = tipoDespesaService.findById(tipoDespesaDto.getId());
-        if(tipoDespesaOptional.isPresent()){
-            TipoDespesa tipoDespesa = tipoDespesaService.save(tipoDespesaMapper.toEntity(tipoDespesaDto));
-            return ok(tipoDespesaMapper.toDto(tipoDespesa));
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("nenhum tipo de despesa econtrado!");
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> update(@RequestBody @Valid TipoDespesaDTO tipoDespesaDto){
+        return new ResponseEntity<>(tipoDespesaService.save(tipoDespesaDto),  HttpStatus.OK);
      }
 }

@@ -1,6 +1,5 @@
 package com.br.dto;
 
-import com.br.entity.Cidade;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -16,7 +15,7 @@ import java.math.BigInteger;
 @NoArgsConstructor
 @AllArgsConstructor
 @Valid
-public class FornecedorDto implements Serializable {
+public class FornecedorDTO implements Serializable {
 
     private BigInteger id;
     @NotNull(message = "Nome fornecedor vazio!")
@@ -34,5 +33,5 @@ public class FornecedorDto implements Serializable {
     private String cnpj;
     private String cpf;
     @NotNull(message = "Cidade vazia!")
-    private CidadeDto cidade;
+    private CidadeDTO cidade;
 }

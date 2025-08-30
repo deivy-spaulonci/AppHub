@@ -1,7 +1,7 @@
 package com.br.restcontroller;
 
 import com.br.business.service.TipoContaService;
-import com.br.dto.TipoContaDto;
+import com.br.dto.TipoContaDTO;
 import com.br.entity.TipoConta;
 import com.br.mapper.TipoContaMapper;
 import jakarta.transaction.Transactional;
@@ -25,32 +25,23 @@ public class TipoContaController {
     @Autowired
     private TipoContaService tipoContaService;
 
-    public static final TipoContaMapper tipoContaMapper = TipoContaMapper.INSTANCE;
-
     @GetMapping()
-    public ResponseEntity<List<TipoContaDto>> getTipoConta(Sort sort) {
-        List<TipoConta> result =  tipoContaService.findTipoContas(sort);
-        if(result.isEmpty()){
-            return noContent().build();
-        }
-        return ok(tipoContaMapper.toDtoList(result));
+    @ResponseStatus(HttpStatus.OK)
+    public List<TipoContaDTO> getTipoConta(Sort sort) {
+        return tipoContaService.findTipoContas(sort);
     }
 
     @PostMapping
     @Transactional
-    public ResponseEntity<TipoContaDto> createTipoConta(@RequestBody @Valid TipoContaDto tipoContaDto) {
-        TipoConta tipoConta = tipoContaService.save(tipoContaMapper.toEntity(tipoContaDto));
-        return ok(tipoContaMapper.toDto(tipoConta));
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<TipoContaDTO> createTipoConta(@RequestBody @Valid TipoContaDTO tipoContaDto) {
+        return new ResponseEntity<>(tipoContaService.save(tipoContaDto), HttpStatus.CREATED);
     }
 
     @PutMapping
     @Transactional
-    public ResponseEntity<?> updateTipoConta(@RequestBody TipoContaDto tipoContaDto) {
-        Optional<TipoConta> tipoContaOptional = tipoContaService.findById(tipoContaDto.getId());
-        if(tipoContaOptional.isPresent()){
-            TipoConta tipoConta = tipoContaService.save(tipoContaMapper.toEntity(tipoContaDto));
-            return ok(tipoContaMapper.toDto(tipoConta));
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("nehum tipo de conta econtrado!");
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> updateTipoConta(@RequestBody TipoContaDTO tipoContaDto) {
+        return new ResponseEntity<>(tipoContaService.save(tipoContaDto), HttpStatus.OK);
     }
 }

@@ -1,6 +1,6 @@
 package com.br.dto;
 
-import com.br.entity.TipoConta;
+import com.br.entity.TipoDespesa;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +10,9 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContaByTipoDto {
-    private TipoConta tipoConta;
-    private BigDecimal valor;
+public class DespesaByTipoDTO {
+
+    private TipoDespesa tipoDespesa;
+
+    private BigDecimal subTotal;
 }

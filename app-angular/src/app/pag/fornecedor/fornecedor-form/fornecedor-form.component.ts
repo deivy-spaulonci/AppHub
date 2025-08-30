@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {CardModule} from 'primeng/card';
 import {InputMask, InputMaskModule} from 'primeng/inputmask';
-import {InputGroupAddon, InputGroupAddonModule} from 'primeng/inputgroupaddon';
+import {InputGroupAddonModule} from 'primeng/inputgroupaddon';
 import {InputGroupModule} from 'primeng/inputgroup';
 import {Button} from 'primeng/button';
 import {SelectButton} from 'primeng/selectbutton';
@@ -10,19 +10,13 @@ import {InputText} from 'primeng/inputtext';
 import {Select} from 'primeng/select';
 import {DefaultService} from '../../../service/default.service';
 import {MessageService} from 'primeng/api';
-import {Toast} from 'primeng/toast';
-import {JsonPipe, NgIf} from '@angular/common';
-import {BlockUI} from 'primeng/blockui';
-import {ProgressSpinner} from 'primeng/progressspinner';
-import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
 import {Fornecedor} from '../../../model/fornecedor';
 import {Util} from '../../../util/util';
-import {Panel} from "primeng/panel";
 import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-fornecedor-form',
-    imports: [CardModule, InputMask, InputMaskModule, InputGroupAddonModule, InputGroupModule, Button, SelectButton, FormsModule, InputText, Select, Toast, BlockUI, ProgressSpinner],
+  imports: [CardModule, InputMask, InputMaskModule, InputGroupAddonModule, InputGroupModule, Button, SelectButton, FormsModule, InputText, Select],
   templateUrl: './fornecedor-form.component.html',
   standalone: true,
   styleUrl: './fornecedor-form.component.css',
@@ -58,15 +52,13 @@ export class FornecedorFormComponent implements OnInit {
           this.estados.push({name: item, code: item})
         }
       },
-      error: error => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'consulta de estados'});
-      },
-      complete: () => {
-      }
+      error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: 'consulta de estados'}),
+      // complete: () => this.loading = false
     });
   }
 
   searchCities(cidadeSelect: any) {
+    this.loading=true;
     if (this.estadoSelect && this.estadoSelect.name) {
       this.defaultService.get('cidade/' + this.estadoSelect.name).subscribe({
         next: res => {
@@ -77,11 +69,8 @@ export class FornecedorFormComponent implements OnInit {
           if (cidadeSelect)
             this.cidadeSelect = cidadeSelect;
         },
-        error: error => {
-          this.messageService.add({severity: 'error', summary: 'Error', detail: 'consulta de cidades'});
-        },
-        complete: () => {
-        }
+        error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: 'consulta de cidades'}),
+        complete: () => this.loading=false
       });
     } else {
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao consultar cidades'});
@@ -98,7 +87,7 @@ export class FornecedorFormComponent implements OnInit {
 
   searchCNPJ() {
     if (['', null, undefined].indexOf(this.cnpj) != 0) {
-      this.loading = true;
+      this.loading=true;
       this.defaultService.get('fornecedor/consultaCnpj/' + this.cnpj.replace(/[^0-9]+/g, ''))
         .subscribe({
           next: async res => {
@@ -107,18 +96,14 @@ export class FornecedorFormComponent implements OnInit {
             this.nome = Util.capitalizeSentence(res.nome);
             this.razaoSocial = Util.capitalizeSentence(res.razaoSocial);
           },
-          error: error => {
-            this.messageService.add({severity: 'error', summary: 'Error', detail: error.error});
-          },
-          complete: () => {
-            this.loading = false;
-          }
+          error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: error.error}),
+          complete: () => this.loading = false
         });
     }
   }
 
   save() {
-    console.log('inciando validação')
+
     if (['', null, undefined].indexOf(this.nome.trim()) == 0)
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'Nome inválido!'});
     if (['', null, undefined].indexOf(this.razaoSocial.trim()) == 0)
@@ -140,12 +125,8 @@ export class FornecedorFormComponent implements OnInit {
       fornecedor.cidade = this.cidadeSelect;
 
       this.defaultService.save(fornecedor, 'fornecedor').subscribe({
-        next: res => {
-          this.messageService.add({severity: 'success', summary: 'Success', detail: 'Fornecedor salvo!'});
-        },
-        error: error => {
-          this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o fornecedor'});
-        },
+        next: res => this.messageService.add({severity: 'success', summary: 'Success', detail: 'Fornecedor salvo!'}),
+        error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o fornecedor'}),
         complete: () => {
           this.loading = false;
           this.cnpj = '';

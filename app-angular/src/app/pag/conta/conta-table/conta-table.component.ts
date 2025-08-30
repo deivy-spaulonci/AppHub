@@ -11,7 +11,7 @@ import {TipoConta} from '../../../model/tipo-conta';
 import {FormaPagamento} from '../../../model/forma-pagamento';
 import {Table, TableLazyLoadEvent, TableModule} from 'primeng/table';
 import {Util} from '../../../util/util';
-import {Button} from 'primeng/button';
+import {Button, ButtonDirective} from 'primeng/button';
 import {CurrencyPipe, DatePipe, JsonPipe, NgIf} from '@angular/common';
 import {Tooltip} from 'primeng/tooltip';
 import {InputMask} from 'primeng/inputmask';
@@ -23,6 +23,12 @@ import {Dialog} from 'primeng/dialog';
 import {ComboDefaultComponent} from '../../../shared/components/combo-default/combo-default.component';
 import {InputDateComponent} from '../../../shared/components/input-date/input-date.component';
 import {InputMoneyComponent} from '../../../shared/components/input-money/input-money.component';
+import {LoadingModalComponent} from '../../../shared/loading-modal/loading-modal.component';
+import {Drawer} from 'primeng/drawer';
+import {InputText} from 'primeng/inputtext';
+import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
+import {FileSizePipe} from '../../../pipe/file-size.pipe';
+import {Ripple} from 'primeng/ripple';
 
 @Component({
   selector: 'app-conta-table',
@@ -46,7 +52,13 @@ import {InputMoneyComponent} from '../../../shared/components/input-money/input-
     ComboDefaultComponent,
     InputDateComponent,
     InputMoneyComponent,
-    JsonPipe
+    JsonPipe,
+    LoadingModalComponent,
+    Drawer,
+    InputText,
+    ButtonDirective,
+    FileSizePipe,
+    Ripple
   ],
   templateUrl: './conta-table.component.html',
   providers: [MessageService,ConfirmationService],
@@ -79,15 +91,18 @@ export class ContaTableComponent implements OnInit{
   contaPagaFormaPgto:FormaPagamento=new FormaPagamento();
   contaPagaDataPgto:string='';
 
+  //documentos
+  docsVisible=false;
+  files!: String[];
+  selectedFile!: any;
+  conteudoBase64: SafeResourceUrl | null = null;
+  basePath:string='/media/d31vy/hd01/Pagamentos/Pagamentos_PF/2010/042010/';
+
   constructor(private confirmationService: ConfirmationService,
               private router: Router,
+              private sanitizer: DomSanitizer,
               private defaultService: DefaultService,
               private messageService: MessageService) {
-  }
-
-  onpage(event: Event | undefined){
-    console.log("ocorre o evento")
-    console.log(JSON.stringify(event))
   }
 
   ngOnInit(): void {
@@ -174,23 +189,20 @@ export class ContaTableComponent implements OnInit{
   delConta(event: Event, id:number){
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      rejectButtonProps: {
-        label: 'Cancelar',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'Excluir',
-        severity: 'warn',
-      },
+      message: "Confirma a exclusão da conta",
+      closable: true,
+      icon:"pi pi-exclamation-triangle",
+      rejectButtonProps: {label: 'Cancelar',severity: 'secondary',outlined: true,},
+      acceptButtonProps: {label: 'Excluir',severity: 'warn',},
       accept: () => {
+        this.loading = true;
         this.defaultService.delete(id,'conta').subscribe({
           next: res =>{
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'Conta excluída!'});
             this.table?._filter();
           },
           error: error => { this.messageService.add({ severity: 'error', summary: 'Error', detail: 'exlcuir conta' }); },
-          complete: () => {}
+          complete: () => this.loading=false
         })
       },
       reject: () => {},
@@ -215,7 +227,7 @@ export class ContaTableComponent implements OnInit{
   loadData(event: TableLazyLoadEvent) {
     let urlfiltros: string = '';
     // let prefix: string =''
-    this.loading = true;
+
 
     if(this.idFilter)
       urlfiltros += '&id='+this.idFilter;
@@ -253,25 +265,64 @@ export class ContaTableComponent implements OnInit{
             }
           })
         }
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Info',
-          detail: `${this.totalElements} contas carregadas`,
-          life: 3000
-        });
-
+        this.messageService.add({severity: 'info',summary: 'Info',detail: `${this.totalElements} contas carregadas`,life: 3000});
       },
-      error: error => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Erro ao carregar as contas',
-          life: 3000
-        });
-      },
+      error: error => this.messageService.add({severity: 'error',summary: 'Error',detail: 'Erro ao carregar as contas',life: 3000}),
       complete: () => {
         this.loading = false;
       }
+    });
+  }
+
+  carregarDocs(){
+    this.defaultService.get('documentos/diretorio?path='+this.basePath).subscribe({
+      next: res => {
+        this.files = res;
+      },
+      error: error => {
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'consulta de documentos'});
+      },
+      complete: () => {
+        this.loading=false;
+      }
+    });
+  }
+
+  aoSelecionarDocs(event: any) {
+    this.loading = true;
+    let url = 'documentos/base64?path='+this.basePath+this.selectedFile.nome;
+    this.defaultService.get(url).subscribe({
+      next: res => {
+        const dataUrl = `data:${res.mimeType};base64,${res.base64}`;
+        this.conteudoBase64 = this.sanitizer.bypassSecurityTrustResourceUrl(dataUrl);
+      },
+      error: err => this.messageService.add({severity: 'error', summary: 'Error', detail: err}),
+      complete: () => {
+        this.loading = false;
+      }
+    });
+  }
+
+  delDoc(event:any, file:any){
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: "Confirma a exclusão de documento",
+      closable: true,
+      icon:"pi pi-exclamation-triangle",
+      rejectButtonProps: {label: 'Cancelar',severity: 'secondary',outlined: true,},
+      acceptButtonProps: {label: 'Excluir',severity: 'warn',},
+      accept: () => {
+        // this.loading = true;
+        // let url = 'documentos/delete?path='+this.basePath+file.nome;
+        // this.defaultService.delFile(url).subscribe({
+        //   next: res => this.messageService.add({severity: 'success', summary: 'Success', detail: res}),
+        //   error: err => this.messageService.add({severity: 'error', summary: 'Error', detail: err}),
+        //   complete: () => {
+        //     this.carregarDocs();
+        //   }
+        // });
+      },
+      reject: () => {},
     });
   }
 

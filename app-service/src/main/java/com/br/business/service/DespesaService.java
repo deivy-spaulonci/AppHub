@@ -1,12 +1,19 @@
 package com.br.business.service;
 
+import com.br.dto.DespesaByTipoDTO;
+import com.br.dto.DespesaDTO;
+import com.br.dto.FornecedorDTO;
 import com.br.dto.LoteDespesaDto;
 import com.br.entity.Despesa;
 import com.br.entity.Fornecedor;
+import com.br.entity.TipoDespesa;
 import com.br.filter.DespesaFilter;
+import com.br.mapper.DespesaMapper;
+import com.br.mapper.FornecedorMapper;
 import com.br.repository.DespesaRepository;
 import com.br.repository.FornecedorRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,36 +42,52 @@ public class DespesaService {
     @Autowired
     private DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration;
 
-    public List<Despesa> findDespesas() {
-        return despesaRepository.findAll();
+    public static final DespesaMapper despesaMapper = DespesaMapper.INSTANCE;
+    @Autowired
+    private FornecedorMapper fornecedorMapper;
+
+    public List<DespesaDTO> findDespesas() {
+        return despesaMapper.toDtoList(despesaRepository.findAll());
     }
 
-    public Optional<Despesa> findById(BigInteger id) {
-        return despesaRepository.findById(id);
+    public DespesaDTO findById(BigInteger id) {
+        Despesa despesa = despesaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Despesa não encontrado com o ID: " + id));
+        return despesaMapper.toDto(despesa);
     }
 
-    public List<Despesa> listDespesasSorted(DespesaFilter despesaFilter, Sort sort) {
-        return despesaRepository.listDespesaSorted(sort, despesaFilter, em);
+    public List<DespesaDTO> listDespesasSorted(DespesaFilter despesaFilter, Sort sort) {
+        return despesaMapper.toDtoList(despesaRepository.listDespesaSorted(sort, despesaFilter, em));
     }
 
-    public Page<Despesa> listDespesasPaged(DespesaFilter despesaFilter, Pageable pageable) {
-        return despesaRepository.listDespesaPaged(pageable, despesaFilter, em);
+    public Page<DespesaDTO> listDespesasPaged(DespesaFilter despesaFilter, Pageable pageable) {
+        Page<Despesa> despesaPage = despesaRepository.listDespesaPaged(pageable, despesaFilter, em);
+        return despesaPage.map(despesaMapper::toDto);
     }
 
-    public Despesa save(Despesa despesa) {
+    public DespesaDTO save(DespesaDTO despesaDTO) {
+        Despesa despesa = despesaMapper.toEntity(despesaDTO);
         despesa.setLancamento(LocalDateTime.now());
-        return Optional.ofNullable(despesaRepository.save(despesa))
-                .orElseThrow(() -> new RuntimeException("Erro ao salvar a despesa"));
+        return despesaMapper.toDto(despesaRepository.save(despesa));
     }
 
-    public boolean deleteById(BigInteger idDespesa) {
-        Optional<Despesa> despesaOptional = findById(idDespesa);
-        despesaOptional.ifPresent(despesa -> despesaRepository.deleteById(idDespesa));
-        return despesaRepository.findById(idDespesa).isPresent();
+    public void deleteById(BigInteger idDespesa) {
+        if(Objects.nonNull(findById(idDespesa)))
+            despesaRepository.deleteById(idDespesa);
     }
 
     public List getDespesaByTipo() {
-        return despesaRepository.getDespesaByTipo(em);
+
+        List<DespesaByTipoDTO> lista = new ArrayList<>();
+
+        for(Object item : despesaRepository.getDespesaByTipo(em)){
+            DespesaByTipoDTO despesaByTipoDto = new DespesaByTipoDTO();
+            var subitem = (Object[]) item;
+            despesaByTipoDto.setTipoDespesa((TipoDespesa) subitem[0]);
+            despesaByTipoDto.setSubTotal(new BigDecimal(subitem[1].toString()));
+            lista.add(despesaByTipoDto);
+        }
+
+        return lista;
     }
 
     public BigDecimal getSumDespesa(DespesaFilter despesaFilter) {
@@ -80,18 +103,18 @@ public class DespesaService {
         List<String> listErro = new ArrayList<>();
         List<Despesa> listDespesa = new ArrayList<>();
 
-        loteDespesaDtos.getDespesaDtos().forEach(desp -> {
+        loteDespesaDtos.getDespesaDTOS().forEach(desp -> {
             log.info("VALIDANDO CNPJ..." + desp.getFornecedor().getCnpj());
             if(!fornecedorService.isCnpjValido(desp.getFornecedor().getCnpj())){
                 log.error("CNPJ INVÁLIDO!..." + desp.getFornecedor().getCnpj());
                 listErro.add(
                         String.format("erro item: %s (cnpj inváslido %s)",
-                                loteDespesaDtos.getDespesaDtos().indexOf(desp),
+                                loteDespesaDtos.getDespesaDTOS().indexOf(desp),
                                 desp.getFornecedor().getCnpj())
                 );
             }
 
-            Fornecedor f = null;
+            FornecedorDTO f = null;
 
             log.info("BUSCANDO FORNECEDOR NO BANCO...");
             f = fornecedorService.findByCnpj(desp.getFornecedor().getCnpj());
@@ -104,7 +127,7 @@ public class DespesaService {
                     log.warn("FORNECEDOR NAO ECONTRADO NA WEB TAMBÉM!");
                     listErro.add(
                             String.format("erro item: %s (cnpj não econtrado %s)",
-                                    loteDespesaDtos.getDespesaDtos().indexOf(desp),
+                                    loteDespesaDtos.getDespesaDTOS().indexOf(desp),
                                     desp.getFornecedor().getCnpj())
                     );
                 }else{
@@ -116,12 +139,12 @@ public class DespesaService {
             if (Objects.isNull(f) || f.getCnpj().isEmpty()) {
                 log.error("FORNECEDOR NAO ECONTRADDO REJEITANDO INCLUSAO.. ");
                 String.format("erro item: %s (fornecedor/cnpj não econtrado %s)",
-                        loteDespesaDtos.getDespesaDtos().indexOf(desp),
+                        loteDespesaDtos.getDespesaDTOS().indexOf(desp),
                         desp.getFornecedor().getCnpj());
             }else{
                 Despesa despesa = Despesa.builder()
                         .tipoDespesa(desp.getTipoDespesa())
-                        .fornecedor(f)
+                        .fornecedor(fornecedorMapper.toEntity(f))
                         .valor(desp.getValor())
                         .dataPagamento(desp.getDataPagamento())
                         .lancamento(LocalDateTime.now())

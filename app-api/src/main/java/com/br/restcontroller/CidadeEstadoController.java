@@ -1,17 +1,15 @@
 package com.br.restcontroller;
 
 import com.br.business.service.CidadeService;
-import com.br.dto.CidadeDto;
+import com.br.dto.CidadeDTO;
 import com.br.entity.Cidade;
 import com.br.entity.Estado;
 import com.br.mapper.CidadeMapper;
-import com.br.mapper.FornecedorMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,11 +30,12 @@ public class CidadeEstadoController {
     }
 
     @GetMapping("/{uf}")
-    public ResponseEntity<List<CidadeDto>> getEstados(@PathVariable("uf") String uf) {
-        List<Cidade> cidades = cidadeService.listCidadeByUf(uf);
-        if(cidades.isEmpty()) {
-            return ResponseEntity.noContent().build();
+    @ResponseStatus(HttpStatus.OK)
+    public List<CidadeDTO> getEstados(@PathVariable("uf") String uf) {
+        List<CidadeDTO> cidades = cidadeService.listCidadeByUf(uf);
+        if (cidades.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhuma cidade encontrada para a UF: " + uf);
         }
-        return ok(cidadeMapper.toDtoList(cidades));
+        return cidades;
     }
 }

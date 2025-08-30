@@ -53,9 +53,9 @@ public class FinanceiroCommands extends AbstractShellComponent {
 
     @ShellMethod("Consulta Fornecedor")
     public void findFornecedor() {
-        this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
-        ConsultaFornecedor consultaFornecedor = new ConsultaFornecedor(this.defaultComponent, this.shellHelper);
-        consultaFornecedor.consulta(fornecedorService);
+//        this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
+//        ConsultaFornecedor consultaFornecedor = new ConsultaFornecedor(this.defaultComponent, this.shellHelper);
+//        consultaFornecedor.consulta(fornecedorService);
     }
 
 
@@ -75,38 +75,38 @@ public class FinanceiroCommands extends AbstractShellComponent {
         shellHelper.printInfo("-".repeat(50));
     }
 
-    @ShellMethod("Consulta Despesas")
-    public void despesas(){
-        this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
-        ConsultaDespesa consultaDespesa = new ConsultaDespesa(this.defaultComponent,
-                this.shellHelper,
-                this.fornecedorComp);
-        consultaDespesa.consulta(despesaService, fornecedorService, tipoDespesaService, formaPagamentoService);
-    }
+//    @ShellMethod("Consulta Despesas")
+//    public void despesas(){
+//        this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
+//        ConsultaDespesa consultaDespesa = new ConsultaDespesa(this.defaultComponent,
+//                this.shellHelper,
+//                this.fornecedorComp);
+//        consultaDespesa.consulta(despesaService, fornecedorService, tipoDespesaService, formaPagamentoService);
+//    }
 
-    @ShellMethod("Cadastro Despesas")
-    public void addDespesa() {
-        this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
-        CadastroDespesa cadastroDespesa = new CadastroDespesa(this.defaultComponent, this.shellHelper);
-        cadastroDespesa.cadastrar(tipoDespesaService,
-                formaPagamentoService,
-                despesaService,
-                fornecedorService,
-                cidadeService);
-    }
+//    @ShellMethod("Cadastro Despesas")
+//    public void addDespesa() {
+//        this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
+//        CadastroDespesa cadastroDespesa = new CadastroDespesa(this.defaultComponent, this.shellHelper);
+//        cadastroDespesa.cadastrar(tipoDespesaService,
+//                formaPagamentoService,
+//                despesaService,
+//                fornecedorService,
+//                cidadeService);
+//    }
 
-    @ShellMethod("Consulta Contas")
-    public void contas(){
-        this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
-        ConsultaConta consultaConta = new ConsultaConta(this.defaultComponent, shellHelper);
-        consultaConta.consulta(contaService, tipoContaService, formaPagamentoService);
-    }
+//    @ShellMethod("Consulta Contas")
+//    public void contas(){
+//        this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
+//        ConsultaConta consultaConta = new ConsultaConta(this.defaultComponent, shellHelper);
+//        consultaConta.consulta(contaService, tipoContaService, formaPagamentoService);
+//    }
 
     @ShellMethod("Cadastro Contas")
     public void addContas(){
         this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
         CadastroContas cadastroContas = new CadastroContas(this.defaultComponent, shellHelper);
-        cadastroContas.cadastrar(contaService, tipoContaService, formaPagamentoService, fornecedorService);
+//        cadastroContas.cadastrar(contaService, tipoContaService, formaPagamentoService, fornecedorService);
     }
 
     @ShellMethod("Status Contas")

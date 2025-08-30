@@ -28,15 +28,14 @@
   <div>
     <p-select [options]="estados" size="small" optionLabel="name" (onChange)="searchCities(null)" [(ngModel)]="estadoSelect" placeholder="Estado" [disabled]="tipoPessoa=='pj'" [showClear]="true"/>
 
-    <p-select [options]="cidades" [loading]="loading" optionLabel="nome" size="small" [disabled]="tipoPessoa=='pj'" [style]="{width: '300px', marginLeft: '30px'}" [(ngModel)]="cidadeSelect" [filter]="true" filterBy="nome" [showClear]="true" [placeholder]="cidadeSelect.nome"/>
+    <p-select [options]="cidades" optionLabel="nome" size="small" [disabled]="tipoPessoa=='pj'" [style]="{width: '300px', marginLeft: '30px'}" [(ngModel)]="cidadeSelect" [filter]="true" filterBy="nome" [showClear]="true" [placeholder]="cidadeSelect.nome"/>
   </div>
 
   <label></label>
   <p-button label="Salvar" icon="pi pi-save" iconPos="top" [style]="{width: '120px'}" [raised]="true" (onClick)="save()"/>
 </div>
 
-<p-blockui [blocked]="loading" class="flex justify-center">
-  <p-progress-spinner ariaLabel="loading"/>
-</p-blockui>
-<p-toast/>
+<!--<app-loading-modal [visible]="loading" message="Processando sua requisição..."></app-loading-modal>-->
+
+<!--<p-toast/>-->
 

@@ -1,34 +1,51 @@
 <p-toolbar>
   <span><i class="pi pi-file-o" style="font-size: 1rem"></i> Documentos</span>
 </p-toolbar>
+<p-toolbar [style]="{'border-top':'1px solid black'}">
 
-<input type="text" pInputText [(ngModel)]="basePath" style="width: 50%"/>
-<p-button label="Carregar" icon="pi pi-sync" size="small" (onClick)="carregar()"/>
+  <input type="text" pInputText [(ngModel)]="basePath" style="width: 90%; font-size: 18px;"/>
 
-<div id="gridDoc">
+  <ng-template #end>
+    <p-button label="Carregar" icon="pi pi-sync" size="small" (onClick)="carregar()"/>
+    <p-divider layout="vertical"></p-divider>
+    <p-button label="Excluir Selecionados" icon="pi pi-trash" severity="danger" size="small" (onClick)="deletSelected($event)"/>
+  </ng-template>
+</p-toolbar>
 
-  <p-table
-    [scrollable]="true"
-    selectionMode="single"
-    [(selection)]="selectedFile"
-    scrollHeight="800px"
-    (onRowSelect)="aoSelecionar($event)"
-    [value]="files">
-    <ng-template #header>
-      <tr>
-        <th pSortableColumn="file">Nome</th>
-      </tr>
-    </ng-template>
-    <ng-template #body let-file>
-      <tr [pSelectableRow]="file">
-        <td>{{ file }}</td>
-      </tr>
-    </ng-template>
-  </p-table>
+<div id="gridListFiles">
 
-  <iframe *ngIf="conteudoBase64" [src]="conteudoBase64" style="height: 100%; width: 100%;"></iframe>
+  <div *ngFor="let f of files;" class="itemPdf">
 
+    <span>{{f.nome}}</span>
+
+    <iframe *ngIf="f.ext=='pdf'" [src]="getPdf(f.base64, f.ext)" ></iframe>
+
+    <div *ngIf="f.ext!='pdf'" class="image-container">
+      <img [src]="getPdf(f.base64, f.ext)" alt="sem imagem" loading="lazy"/>
+    </div>
+
+    <div class="footer">
+      <p-button icon="pi pi-pencil" label="Renomear" severity="info" class="w-full" styleClass="w-full" (click)="initRename(f)" size="small"/>
+      <p-button icon="pi pi-trash" label="Excluir" severity="danger" class="w-full" styleClass="w-full" (click)="delDoc($event, f)" size="small"/>
+      <p-togglebutton onLabel="Selecionado" offLabel="Selecionar" onIcon="pi pi-check-circle" size="small"
+                      offIcon="pi pi-circle" styleClass="w-full" (click)="addSelect(f)"/>
+    </div>
+
+  </div>
 </div>
 
+<app-loading-modal [visible]="loading"></app-loading-modal>
 
 <p-toast/>
+
+<p-dialog header="Renomear Arquivo" [modal]="true" [(visible)]="popupRenShow" [style]="{ width: '50rem' }">
+  <div class="flex items-center gap-4 mb-4">
+    <input pInputText id="username" class="flex-auto" [(ngModel)]="newNameFile" />
+  </div>
+  <div class="flex justify-end gap-2">
+    <p-button label="Cancel" severity="secondary" (click)="popupRenShow = false" />
+    <p-button label="Save" (click)="rename($event)" />
+  </div>
+</p-dialog>
+
+<p-confirmdialog />

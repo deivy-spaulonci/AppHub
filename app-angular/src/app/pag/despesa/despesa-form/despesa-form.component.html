@@ -31,7 +31,13 @@
 <!--    <p-button label="Cancelar" icon="pi pi-times" iconPos="top" [style]="{width: '120px'}" [raised]="true"-->
 <!--              severity="danger" (onClick)="goParaDespesalist()"/>-->
   </div>
+
 </div>
 
-<p-message severity="secondary">Total: {{valorTotal | currency}}</p-message>
+<div style="width: 750px">
+  <p-message severity="secondary">Total: {{valorTotal | currency}}</p-message>
+</div>
+
 <p-toast/>
+
+<app-loading-modal [visible]="loading" message="Processando sua requisição..."></app-loading-modal>

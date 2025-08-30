@@ -2,9 +2,8 @@ package com.br.fornecedor;
 
 import com.br.dao.CidadeDAO;
 import com.br.dao.FornecedorDAO;
-import com.br.dto.FornecedorCloudDto;
+import com.br.dto.FornecedorCloudDTO;
 import com.br.entity.Cidade;
-import com.br.entity.Despesa;
 import com.br.entity.Estado;
 import com.br.entity.Fornecedor;
 import com.br.shared.Botao;
@@ -15,7 +14,6 @@ import com.br.util.Util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jiconfont.icons.font_awesome.FontAwesome;
-import jiconfont.swing.IconFontSwing;
 import lombok.extern.log4j.Log4j2;
 import net.miginfocom.swing.MigLayout;
 
@@ -23,10 +21,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 @Log4j2
@@ -151,7 +147,7 @@ public class FornecedorForm extends JPanel {
         String json = getFornecedorApiWeb(cnpj);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            FornecedorCloudDto fornecedorAWS = objectMapper.readValue(json, FornecedorCloudDto.class);
+            FornecedorCloudDTO fornecedorAWS = objectMapper.readValue(json, FornecedorCloudDTO.class);
             Cidade cidade = cidadeDAO.buscarPorCodIbge(fornecedorAWS.getIbgeCod());
 
             Fornecedor fornecedor = Fornecedor.builder()

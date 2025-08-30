@@ -1,14 +1,17 @@
 package com.br.business.service;
 
 
+import com.br.dto.FornecedorDTO;
 import com.br.entity.Cidade;
 import com.br.entity.Fornecedor;
-import com.br.dto.FornecedorCloudDto;
+import com.br.dto.FornecedorCloudDTO;
+import com.br.mapper.FornecedorMapper;
 import com.br.repository.CidadeRepository;
 import com.br.repository.FornecedorRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,7 +25,7 @@ import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 
 @Service
@@ -35,47 +38,50 @@ public class FornecedorService {
     @Autowired
     private CidadeRepository cidadeRepository;
 
-    public Fornecedor findByCnpj(String cnpj) {
-        return fornecedorRepository.findByCnpj(cnpj);
+    private static final FornecedorMapper fornecedorMapper = FornecedorMapper.INSTANCE;
+
+    public FornecedorDTO findByCnpj(String cnpj) {
+        Fornecedor fonecedor = fornecedorRepository.findByCnpj(cnpj).orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado com o CNPJ: " + cnpj));
+        return fornecedorMapper.toDto(fonecedor);
     }
 
-    public List<Fornecedor> findFornecedores() {
-        return fornecedorRepository.findAll();
+    public FornecedorDTO findById(BigInteger id) {
+        Fornecedor fonecedor = fornecedorRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado com o id: " + id));
+        return fornecedorMapper.toDto(fonecedor);
     }
 
-    public Optional<Fornecedor> findById(BigInteger id) {
-        return fornecedorRepository.findById(id);
+    public List<FornecedorDTO> findFornecedores() {
+        return fornecedorMapper.toDtoList(fornecedorRepository.findAll());
     }
 
-    public List<Fornecedor> listFornecedoresSorted(String busca, Sort sort) {
-        return fornecedorRepository.listFornecedorSorted(sort, busca, em);
+    public List<FornecedorDTO> listFornecedoresSorted(String busca, Sort sort) {
+        return fornecedorMapper.toDtoList(fornecedorRepository.listFornecedorSorted(sort, busca, em));
     }
 
-    public List<Fornecedor> listFornecedores(String busca) {
-        return fornecedorRepository.listFornecedor(busca, em);
+    public List<FornecedorDTO> listFornecedores(String busca) {
+        return fornecedorMapper.toDtoList(fornecedorRepository.listFornecedor(busca, em));
     }
 
-    public Page<Fornecedor> listFornecedoresPaged(String busca, Pageable pageable) {
-        return fornecedorRepository.listFornecedorPaged(pageable, busca, em);
+    public Page<FornecedorDTO> listFornecedoresPaged(String busca, Pageable pageable) {
+        Page<Fornecedor> fornecedorPage = fornecedorRepository.listFornecedorPaged(pageable, busca, em);
+        return fornecedorPage.map(fornecedorMapper::toDto);
     }
 
-    public Fornecedor save(Fornecedor fornecedor) {
-        return Optional.ofNullable(fornecedorRepository.save(fornecedor))
-                .orElseThrow(()-> new RuntimeException("Erro ao salvar o fornecedor"));
+    public FornecedorDTO save(FornecedorDTO fornecedorDTO) {
+        Fornecedor fornecedor = fornecedorMapper.toEntity(fornecedorDTO);
+        return fornecedorMapper.toDto(fornecedorRepository.save(fornecedor));
     }
 
-//    public boolean deleteById(BigInteger idFornecedor) {
-//        Optional<Fornecedor> fornecedorOptional = findById(idFornecedor);
-//        fornecedorOptional.ifPresent(fornecedor -> fornecedorRepository.deleteById(idFornecedor));
-//        return fornecedorRepository.findById(idFornecedor).isPresent();
-//    }
+    public void deleteById(BigInteger idFornecedor) {
+        if(Objects.isNull(findById(idFornecedor)))
+            fornecedorRepository.deleteById(idFornecedor);
+    }
 
-    public Fornecedor getFornecedorFromWeb(String cnpj){
+    public FornecedorDTO getFornecedorFromWeb(String cnpj){
         String json = getFornecedorApiWeb(cnpj);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            FornecedorCloudDto fornecedorAWS = objectMapper.readValue(json, FornecedorCloudDto.class);
-
+            FornecedorCloudDTO fornecedorAWS = objectMapper.readValue(json, FornecedorCloudDTO.class);
             Cidade cidade = cidadeRepository.findCidadeByIbgeCod(fornecedorAWS.getIbgeCod());
 
             Fornecedor fornecedor = Fornecedor.builder()
@@ -87,7 +93,7 @@ public class FornecedorService {
                     .cidade(cidade)
                     .build();
 
-            return fornecedor;
+            return fornecedorMapper.toDto(fornecedor);
 
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

@@ -21,11 +21,12 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Repository
 public interface FornecedorRepository extends JpaRepository<Fornecedor, BigInteger>, JpaSpecificationExecutor<Fornecedor> {
 
-    Fornecedor findByCnpj(String cnpj);
+    Optional<Fornecedor> findByCnpj(String cnpj);
 
     default Page<Fornecedor> listFornecedorPaged(Pageable pageable,
                                                  String busca,

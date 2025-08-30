@@ -22,6 +22,7 @@ import {Message} from 'primeng/message';
 import {ComboDefaultComponent} from '../../../shared/components/combo-default/combo-default.component';
 import {InputDateComponent} from '../../../shared/components/input-date/input-date.component';
 import {InputMoneyComponent} from '../../../shared/components/input-money/input-money.component';
+import {LoadingModalComponent} from '../../../shared/loading-modal/loading-modal.component';
 
 @Component({
   selector: 'app-despesa-form',
@@ -35,7 +36,8 @@ import {InputMoneyComponent} from '../../../shared/components/input-money/input-
     CurrencyPipe,
     ComboDefaultComponent,
     InputDateComponent,
-    InputMoneyComponent
+    InputMoneyComponent,
+    LoadingModalComponent
   ],
   templateUrl: './despesa-form.component.html',
   standalone: true,
@@ -110,21 +112,13 @@ export class DespesaFormComponent implements OnInit{
         this.fornecedores = [];
         this.fornecedores = res;
       },
-      error: error => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'consulta de fornecedores'});
-      },
-      complete: () => {
-        this.loading=false;
-      }
+      error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: 'consulta de fornecedores'}),
+      complete: () => this.loading=false
     });
   }
 
-  goParaDespesalist(){
-    this.router.navigate(['/despesa-table'])
-  }
-
   save(){
-    console.log(this.data)
+
     if(!Util.dataIsValida(this.data))
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'Data inválida!'});
     else if(['0,00','0','', null, undefined].indexOf(this.valor.trim()) == 0)
@@ -144,12 +138,8 @@ export class DespesaFormComponent implements OnInit{
       despesa.obs = this.obs;
 
       this.defaultService.save(despesa, 'despesa').subscribe({
-        next: res => {
-          this.messageService.add({severity: 'success', summary: 'Success', detail: 'Despesa salva!'});
-        },
-        error: error => {
-          this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o despesa'});
-        },
+        next: res => this.messageService.add({severity: 'success', summary: 'Success', detail: 'Despesa salva!'}),
+        error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o despesa'}),
         complete: () => {
           if(this.idEdicao)
             this.router.navigate(['/despesa-table'])

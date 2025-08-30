@@ -45,10 +45,11 @@
          [sortField]="sortField"
          [paginator]="true"
          [rows]="pageSize"
-         [rowsPerPageOptions]="[15, 20, 25,35,45]"
+         [rowsPerPageOptions]="[10, 20, 30, 40]"
          [(selection)]="despesaSelecinada"
          (onLazyLoad)="loadData($event)"
          [paginatorPosition]="'top'"
+         [style]="{width:'1000px'}"
          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
          dataKey="id"
          editMode="row"
@@ -84,7 +85,7 @@
     </tr>
   </ng-template>
 </p-table>
-<p-confirmdialog message="Confirma a exclusão da despesa" header="Confirmação" closable="true" icon="pi pi-exclamation-triangle" closeOnEscape="true">
 
-</p-confirmdialog>
+<p-confirmdialog message="Confirma a exclusão da despesa" header="Confirmação" closable="true" icon="pi pi-exclamation-triangle" closeOnEscape="true"></p-confirmdialog>
 <p-toast/>
+<app-loading-modal [visible]="loading" message="Processando sua requisição..."></app-loading-modal>

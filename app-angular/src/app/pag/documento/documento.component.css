@@ -1,5 +1,34 @@
 #gridDoc {
   display: grid;
-  grid-template-columns: 600px 1fr;
+  grid-template-columns: 500px 1fr;
   height: 90%;
+}
+
+#gridListFiles{
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 15px;
+}
+
+.itemPdf{
+  width: 100%;
+  display: inline-block;
+}
+
+.itemPdf iframe, .image-container{
+  height: 600px;
+  width: 100%;
+  overflow: auto;
+}
+.image-container img{
+  width: 100%;
+}
+
+
+.itemPdf .footer{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 10px;
+  padding-top: 5px;
 }

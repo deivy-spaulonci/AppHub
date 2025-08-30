@@ -17,10 +17,11 @@ import {Message} from "primeng/message";
 import {Panel} from "primeng/panel";
 import {Router} from '@angular/router';
 import {Toolbar} from 'primeng/toolbar';
+import {LoadingModalComponent} from '../../../shared/loading-modal/loading-modal.component';
 
 @Component({
   selector: 'app-fornecedor-table',
-  imports: [ToastModule, TableModule, CardModule, ButtonModule, InputGroupModule, FormsModule, InputTextModule, InputGroupAddonModule, NgIf, Tooltip, Message, Toolbar],
+  imports: [ToastModule, TableModule, CardModule, ButtonModule, InputGroupModule, FormsModule, InputTextModule, InputGroupAddonModule, NgIf, Tooltip, Message, Toolbar, LoadingModalComponent],
   templateUrl: './fornecedor-table.component.html',
   styleUrl: './fornecedor-table.component.css',
   providers: [MessageService],
@@ -31,7 +32,7 @@ export class FornecedorTableComponent implements OnInit {
   filtroTexto: string = '';
   totalElements = 0;
   sortField: string = 'nome';
-  pageSize = 15;
+  pageSize = 10;
   loading: boolean = false;
   fornecedorSelecionado!: Fornecedor;
   clonedFornecedors: { [s: number]: Fornecedor } = {};
@@ -43,14 +44,9 @@ export class FornecedorTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.defaultService.get('fornecedor/page').subscribe({
-      next: res => {
-        this.fornecedores = res.content;
-      },
-      error: error => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'consulta de fornecedoress'});
-      },
-      complete: () => {
-      }
+      next: res => this.fornecedores = res.content,
+      error: err => this.messageService.add({severity: 'error', summary: 'Error', detail: 'consulta de fornecedores'}),
+      // complete: () => this.loading=false
     });
   }
 
@@ -65,25 +61,22 @@ export class FornecedorTableComponent implements OnInit {
   }
 
   updateFornecedor(fornecedor: Fornecedor) {
+    this.loading=true;
     this.defaultService.update(fornecedor, 'fornecedor').subscribe({
-      next: res => {
-        this.messageService.add({severity: 'success', summary: 'Success', detail: 'Fornecedor atualizado'});
-      },
-      error: error => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'salvar fornecedor'});
-      },
+      next: res => this.messageService.add({severity: 'success', summary: 'Success', detail: 'Fornecedor atualizado'}),
+      error: err => this.messageService.add({severity: 'error', summary: 'Error', detail: 'salvar fornecedor'}),
       complete: () => {
         delete this.clonedFornecedors[fornecedor.id as number];
+        this.loading=false;
       }
     });
   }
 
   onRowEditSave(fornecedor: Fornecedor) {
-    if (fornecedor.nome.trim().length > 0 && fornecedor.razaoSocial.trim().length > 0) {
+    if (fornecedor.nome.trim().length > 0 && fornecedor.razaoSocial.trim().length > 0)
       this.updateFornecedor(fornecedor)
-    } else {
+    else
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'Nome ou Razão Social inválido(s)'});
-    }
   }
 
   onRowEditCancel(fornecedor: Fornecedor, index: number) {
@@ -96,6 +89,7 @@ export class FornecedorTableComponent implements OnInit {
     // let prefix: string =''
     this.loading = true;
 
+    console.log('passou pelo load data')
     if (this.filtroTexto)
       urlfiltros = '&busca=' + this.filtroTexto;
 
@@ -106,34 +100,24 @@ export class FornecedorTableComponent implements OnInit {
       + '&size=' + event.rows
       + '&sort=' + event.sortField + ',' + (event.sortOrder == 1 ? 'asc' : 'desc')
       + urlfiltros;
+
     console.log(url);
+
     this.defaultService.get(url).subscribe({
       next: resultado => {
+        console.log('passou pelo load data next')
         if(resultado){
           this.fornecedores = resultado.content;
           this.totalElements = resultado.totalElements;
-          this.messageService.add({
-            severity: 'info',
-            summary: 'Info',
-            detail: `${this.totalElements} fornecedores carregados`,
-            life: 3000
-          });
+          this.messageService.add({severity: 'info',summary: 'Info',detail: `${this.totalElements} fornecedores carregados`,life: 3000});
         }else{
           this.fornecedores = [];
           this.totalElements = 0;
         }
+
       },
-      error: error => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Erro ao carregar fornecedores',
-          life: 3000
-        });
-      },
-      complete: () => {
-        this.loading = false;
-      }
+      error: error => this.messageService.add({severity: 'error',summary: 'Error',detail: 'Erro ao carregar fornecedores',life: 3000}),
+      complete: () =>  this.loading = false
     });
   }
 }

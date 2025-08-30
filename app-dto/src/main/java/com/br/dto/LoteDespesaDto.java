@@ -15,5 +15,5 @@ import java.util.ArrayList;
 public class LoteDespesaDto  implements Serializable  {
     private static final long serialVersionUID = 1L;
     @Valid
-    private ArrayList<DespesaDto> despesaDtos;
+    private ArrayList<DespesaDTO> despesaDTOS;
 }

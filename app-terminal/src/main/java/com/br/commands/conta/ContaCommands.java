@@ -105,12 +105,13 @@ public class ContaCommands  extends AbstractShellComponent {
 
 
     public TipoConta comboTipoConta(){
-        List<SelectorItem<String>> tipos = new ArrayList<>();
-        tipoContaService.findTipoContas(Sort.by("nome")).forEach(tipoConta -> {
-            tipos.add(SelectorItem.of(tipoConta.getNome(), tipoConta.getId().toString()));
-        });
-        String id = this.defaultComponent.selectDefault(tipos, "Selecionar Tipo Conta");
-        return tipoContaService.findById(new BigInteger(id)).get();
+//        List<SelectorItem<String>> tipos = new ArrayList<>();
+//        tipoContaService.findTipoContas(Sort.by("nome")).forEach(tipoConta -> {
+//            tipos.add(SelectorItem.of(tipoConta.getNome(), tipoConta.getId().toString()));
+//        });
+//        String id = this.defaultComponent.selectDefault(tipos, "Selecionar Tipo Conta");
+//        return tipoContaService.findById(new BigInteger(id)).get();
+        return null;
     }
 
 //    public void addFaturas(Conta conta){
@@ -221,23 +222,23 @@ public class ContaCommands  extends AbstractShellComponent {
         } while (valid ? false :  this.defaultComponent.confirmationInput("Data pagamento inválida! Continuar", true));
         return valid;
     }
-
-    public Optional<Conta> comboConta(ContaFilter contaFilter){
-        List<SelectorItem<String>> tipos = new ArrayList<>();
-        contaService.listContaSorted(contaFilter, Sort.by("vencimento").descending())
-                .forEach(conta -> {
-                    String label = String.format("%-7s | %-60s | %-10s | %-10s | %10s | %8s | %20s | %-30s",
-                            conta.getId(),
-                            conta.getTipoConta().getNome(),
-                            conta.getVencimento(),
-                            conta.getEmissao(),
-                            conta.getValor(),
-                            (conta.getParcela()+"/"+conta.getTotalParcela()),
-//                            conta.getStatus(),
-                            (conta.getObs()==null ? "" : conta.getObs()));
-                    tipos.add(SelectorItem.of(label, conta.getId().toString()));
-                });
-        String id = this.defaultComponent.selectDefault(tipos, "Selecionar Conta");
-        return contaService.findById(new BigInteger(id));
-    }
+//
+//    public Optional<Conta> comboConta(ContaFilter contaFilter){
+//        List<SelectorItem<String>> tipos = new ArrayList<>();
+//        contaService.listContaSorted(contaFilter, Sort.by("vencimento").descending())
+//                .forEach(conta -> {
+//                    String label = String.format("%-7s | %-60s | %-10s | %-10s | %10s | %8s | %20s | %-30s",
+//                            conta.getId(),
+//                            conta.getTipoConta().getNome(),
+//                            conta.getVencimento(),
+//                            conta.getEmissao(),
+//                            conta.getValor(),
+//                            (conta.getParcela()+"/"+conta.getTotalParcela()),
+////                            conta.getStatus(),
+//                            (conta.getObs()==null ? "" : conta.getObs()));
+//                    tipos.add(SelectorItem.of(label, conta.getId().toString()));
+//                });
+//        String id = this.defaultComponent.selectDefault(tipos, "Selecionar Conta");
+//        return contaService.findById(new BigInteger(id));
+//    }
 }

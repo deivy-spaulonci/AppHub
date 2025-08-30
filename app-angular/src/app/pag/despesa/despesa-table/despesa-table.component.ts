@@ -29,6 +29,7 @@ import {TipoConta} from '../../../model/tipo-conta';
 import {Panel} from "primeng/panel";
 import {ComboDefaultComponent} from '../../../shared/components/combo-default/combo-default.component';
 import {InputDateComponent} from '../../../shared/components/input-date/input-date.component';
+import {LoadingModalComponent} from '../../../shared/loading-modal/loading-modal.component';
 
 @Component({
   selector: 'app-despesa-table',
@@ -47,7 +48,8 @@ import {InputDateComponent} from '../../../shared/components/input-date/input-da
     ConfirmDialogModule,
     Message,
     ComboDefaultComponent,
-    InputDateComponent
+    InputDateComponent,
+    LoadingModalComponent
   ],
   templateUrl: './despesa-table.component.html',
   providers: [MessageService,ConfirmationService],
@@ -58,7 +60,7 @@ export class DespesaTableComponent implements OnInit{
   despesas:Despesa[]=[];
   totalElements = 0;
   sortField:string='dataPagamento';
-  pageSize = 20;
+  pageSize = 10;
   valorTotal:number=0;
   loading:boolean=false;
   despesaSelecinada!:Despesa;
@@ -109,23 +111,17 @@ export class DespesaTableComponent implements OnInit{
   delDespesa(event: Event, id:number){
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      rejectButtonProps: {
-        label: 'Cancelar',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'Excluir',
-        severity: 'warn',
-      },
+      rejectButtonProps: {label: 'Cancelar',severity: 'secondary',outlined: true,},
+      acceptButtonProps: {label: 'Excluir',severity: 'warn',},
       accept: () => {
+        this.loading=true;
         this.defaultService.delete(id,'despesa').subscribe({
           next: res =>{
             this.messageService.add({severity: 'success', summary: 'Success', detail: 'Despesa excluída!'});
             this.table?._filter();
           },
-          error: error => { this.messageService.add({ severity: 'error', summary: 'Error', detail: 'exlcuir despesa' }); },
-          complete: () => {}
+          error: error => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'exlcuir despesa' }),
+          complete: () => this.loading=true
         })
       },
       reject: () => {},
@@ -176,31 +172,13 @@ export class DespesaTableComponent implements OnInit{
           this.despesas = resultado.content;
           this.totalElements = resultado.totalElements;
           this.defaultService.get('despesa/valorTotal?'+urlfiltros).subscribe({
-            next: resultado => {
-              this.valorTotal = resultado;
-            }
+            next: resultado => this.valorTotal = resultado
           })
         }
-          this.messageService.add({
-            severity: 'info',
-            summary: 'Info',
-            detail: `${this.totalElements} despesas carregadas`,
-            life: 3000
-          });
-
+        this.messageService.add({severity: 'info',summary: 'Info',detail: `${this.totalElements} despesas carregadas`,life: 3000});
       },
-      error: error => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Erro ao carregar as despesas',
-          life: 3000
-        });
-      },
-      complete: () => {
-        this.loading = false;
-      }
+      error: error => this.messageService.add({severity: 'error',summary: 'Error',detail: 'Erro ao carregar as despesas',life: 3000}),
+      complete: () => this.loading = false
     });
   }
-
 }
