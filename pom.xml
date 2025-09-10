@@ -22,6 +22,7 @@
         <module>app-terminal</module>
         <module>AppSw</module>
         <module>app-teste</module>
+        <module>app-sp-fx</module>
     </modules>
 
     <properties>

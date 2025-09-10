@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      style="-fx-padding: 50 0 0 0"
+      styleClass="backBlue"
+      stylesheets="@../css/menu.css"
+      fx:controller="com.br.appspfx.controller.MenuController">
+    <Button text="Home"       onAction="#loadHomePanel" styleClass="btMenu" alignment="BASELINE_LEFT" layoutX="11.0" layoutY="323.0" prefHeight="50.0" prefWidth="222.0" textAlignment="LEFT" textFill="WHITE"/>
+    <Button text="Conta"      onAction="#loadHomePanel" styleClass="btMenu" alignment="BASELINE_LEFT" layoutX="11.0" layoutY="323.0" prefHeight="50.0" prefWidth="222.0" textAlignment="LEFT" textFill="WHITE"/>
+    <Button text="Despesa"    onAction="#loadListDespesa" styleClass="btMenu" alignment="BASELINE_LEFT" layoutX="11.0" layoutY="323.0" prefHeight="50.0" prefWidth="222.0" textAlignment="LEFT" textFill="WHITE"/>
+    <Button text="Fornecedor" onAction="#loadHomePanel" styleClass="btMenu" alignment="BASELINE_LEFT" layoutX="11.0" layoutY="323.0" prefHeight="50.0" prefWidth="222.0" textAlignment="LEFT" textFill="WHITE"/>
+    <Button text="Sair"       onAction="#exit" styleClass="btMenu" alignment="BASELINE_LEFT" layoutX="11.0" layoutY="323.0" prefHeight="50.0" prefWidth="222.0" textAlignment="LEFT" textFill="WHITE"/>
+</VBox>

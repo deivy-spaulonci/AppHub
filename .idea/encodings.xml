@@ -7,7 +7,11 @@
     <file url="file://$PROJECT_DIR$/app-dto/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app-entity/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app-entity/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app-fx/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app-fx/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app-kt/src/main/kotlin" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app-sp-fx/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app-terminal/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app-teste/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dto/src/main/java" charset="UTF-8" />

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane minHeight="1030.0" minWidth="1830.0" style="-fx-background-color: WHITE;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.br.appspfx.controller.ListDespesaController">
+    <left>
+        <fx:include source="menu.fxml" />
+    </left>
+    <center>
+        <BorderPane>
+            <top>
+                <VBox alignment="BASELINE_LEFT" minHeight="60.0" style="-fx-background-color: #efefef;" BorderPane.alignment="BOTTOM_LEFT">
+                    <Label alignment="BASELINE_LEFT" text="Despesas" textFill="#2b579a">
+                        <font>
+                            <Font size="30.0" />
+                        </font>
+                    </Label>
+                    <padding>
+                        <Insets left="10.0" />
+                    </padding>
+                </VBox>
+            </top>
+            <center>
+                <HBox prefWidth="400.0" style="-fx-background-color: WHITE;">
+
+                    <TableView fx:id="tableDespesa" style="-fx-background-color: WHITE;" BorderPane.alignment="CENTER">
+                        <columns>
+                            <TableColumn fx:id="idColumn" prefWidth="75.0" style="-fx-alignment: CENTER; -fx-end-margin: 10;" text="Id" />
+                            <TableColumn fx:id="tipoColumn" prefWidth="200.0" text="Tipo" />
+                            <TableColumn fx:id="dataColumn" prefWidth="100.0" style="-fx-alignment: CENTER;" text="Data" />
+                            <TableColumn fx:id="fornecColumn" prefWidth="500.0" text="Fornecedor" />
+                            <TableColumn fx:id="valorColumn" prefWidth="70.0" style="-fx-alignment: CENTER-RIGHT;" text="Valor" />
+                            <TableColumn fx:id="formaColumn" prefWidth="250.0" text="Forma Pgto" />
+                        </columns>
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </padding>
+                    </TableView>
+
+                    <VBox prefHeight="855.0" prefWidth="370.0" spacing="15.0" style="-fx-background-color: WHITE;">
+                        <children>
+                            <Label minWidth="300.0" style="-fx-background-color: WHITE;" text="Filtros" textFill="#2b579a">
+                                <font>
+                                    <Font size="28.0" />
+                                </font>
+                                <padding>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                </padding>
+                                <opaqueInsets>
+                                    <Insets />
+                                </opaqueInsets>
+                            </Label>
+                     <Separator prefWidth="200.0" />
+                            <ComboBox fx:id="cbFilterTipo" editable="true" minHeight="35.0" prefWidth="360.0" promptText="Despesa" />
+                            <ComboBox fx:id="cbFilterForma" editable="true" minHeight="35.0" prefWidth="360.0" promptText="Forma Pagamento" />
+                            <ComboBox fx:id="cbFilterFornec" editable="true" minHeight="35.0" prefWidth="360.0" promptText="Fornecedor" />
+                            <HBox alignment="CENTER" prefHeight="35.0" prefWidth="300.0">
+                                <children>
+                                    <TextField fx:id="dataFinal" alignment="CENTER" minHeight="35.0" prefWidth="200.0" promptText="Data Inicial" />
+                                    <TextField fx:id="dataInicial" alignment="CENTER" minHeight="35.0" prefWidth="200.0" promptText="Data Final" />
+                                </children>
+                            </HBox>
+                     <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="15.0">
+                        <children>
+                           <Button minHeight="35.0" mnemonicParsing="false" prefWidth="150.0" styleClass="btMenu" text="Filtrar" textFill="WHITE"/>
+                           <Button minHeight="35.0" mnemonicParsing="false" prefWidth="150.0" styleClass="btMenu" text="Limpar" textFill="WHITE"/>
+                        </children>
+                     </HBox>
+                        </children>
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </padding>
+                    </VBox>
+                </HBox>
+            </center>
+            <bottom>
+                <HBox alignment="CENTER" BorderPane.alignment="TOP_CENTER">
+                    <children>
+                        <Label fx:id="registros" text="Registro: 0" textFill="#2b579a">
+                            <font>
+                                <Font size="18.0" />
+                            </font>
+                        </Label>
+                        <Separator orientation="VERTICAL">
+                            <HBox.margin>
+                                <Insets left="10.0" right="10.0" />
+                            </HBox.margin>
+                        </Separator>
+                        <Label fx:id="total" text="R$ 0,00" textFill="#2b579a">
+                            <font>
+                                <Font size="18.0" />
+                            </font>
+                        </Label>
+                    </children>
+                    <opaqueInsets>
+                        <Insets />
+                    </opaqueInsets>
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </padding>
+                </HBox>
+            </bottom>
+
+        </BorderPane>
+    </center>
+</BorderPane>

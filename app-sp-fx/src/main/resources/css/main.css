@@ -1,0 +1,64 @@
+/* Remover bordas arredondadas de todos os botões */
+.button {
+    -fx-background-radius: 0;
+}
+
+/* Remover bordas arredondadas de todos os campos de texto */
+.text-field,
+.text-area {
+    -fx-background-radius: 0;
+}
+
+/* Remover bordas arredondadas de todos os labels (se aplicável) */
+.label {
+    -fx-text-fill: #333;
+}
+
+/* Remover bordas arredondadas de outras áreas que podem ter */
+.pane,
+.vbox,
+.hbox,
+.border-pane {
+    -fx-background-radius: 0;
+}
+
+
+*{
+    -fx-background-radius: 0;
+    -fx-font-family: "JetBrains Mono";
+}
+
+.combo-box{
+    -fx-background-color: white;
+    -fx-border-color: #a1a1a1;
+}
+
+
+.backBlue{
+    -fx-background-color: #2b579a;
+}
+.btMenu{
+    -fx-background-radius: 0;
+    -fx-font-size: 16;
+    -fx-border-radius: 0;
+    -fx-background-color: #2b579a;
+}
+.btMenu:focused{
+    -fx-background-color: rgba(0,0,0,0.1);
+}
+.btMenu:hover{
+    -fx-background-color: rgba(0,0,0,0.1);
+}
+.btMenu:disabled, .btMenu:default:disabled{
+    -fx-background-color: rgba(0,0,0,0.1);
+}
+.btMenu:default{
+    -fx-background-color:rgba(0,0,0,0.1);
+}
+.btMenu:pressed, .btMenu:hover:pressed{
+    -fx-background-color: rgba(0,0,0,0.1);
+}
+
+.btMenu:default:hover{
+    -fx-background-color: rgba(0,0,0,0.1);
+}

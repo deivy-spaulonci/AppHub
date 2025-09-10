@@ -1,7 +1,6 @@
 package com.br.business.service;
 
 import com.br.dto.TipoDespesaDTO;
-import com.br.entity.TipoConta;
 import com.br.entity.TipoDespesa;
 import com.br.entity.TipoDespesa_;
 import com.br.mapper.TipoDespesaMapper;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Log4j2

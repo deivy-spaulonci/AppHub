@@ -41,4 +41,9 @@ public class Fornecedor implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(name = "IBGE_COD", referencedColumnName = "IBGE_COD"/*, insertable = false, updatable = false*/)
     private Cidade cidade;
+
+    @Override
+    public String toString() {
+        return getNome();
+    }
 }
