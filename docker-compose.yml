@@ -6,7 +6,10 @@ services:
     container_name: app-hub-api
     ports:
       - "8081:8081"
-
+    environment:
+      - URLH2=jdbc:h2:tcp://192.168.10.6:9092/~/h2/bin/data/app-db
+      - USRH2=deivy
+      - PWDH2=duocore
   frontend:
     build:
       context: .
