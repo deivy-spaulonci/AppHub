@@ -1,13 +1,10 @@
 package com.br.appspfx.config;
 
 import javafx.stage.Stage;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-
-import java.io.IOException;
 
 @Configuration
 public class ApplicationConfig {
@@ -22,7 +19,7 @@ public class ApplicationConfig {
 
     @Bean
     @Lazy
-    public StageManager stageManager(Stage stage) throws IOException {
+    public StageManager stageManager(Stage stage) {
         return new StageManager(fxmlLoader, stage, eventPublisher);
     }
 }

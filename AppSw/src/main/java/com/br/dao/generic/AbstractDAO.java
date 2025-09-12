@@ -12,8 +12,6 @@ import java.util.List;
 @Log4j2
 public abstract class AbstractDAO<T> implements GenericDAO<T> {
 
-    private static final Logger logger = LogManager.getLogger(AbstractDAO.class);
-
     protected abstract String getTableName();
 
     protected abstract T mapResultSet(ResultSet rs) throws SQLException;

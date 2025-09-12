@@ -10,7 +10,4 @@ import java.util.List;
 
 @Repository
 public interface TipoContaRepository extends JpaRepository<TipoConta, BigInteger> {
-    
-    @Cacheable("tipos-conta")
-    List<TipoConta> findAllActive();
 }

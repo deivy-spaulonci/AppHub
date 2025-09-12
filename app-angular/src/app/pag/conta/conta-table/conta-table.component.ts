@@ -52,7 +52,6 @@ import {Ripple} from 'primeng/ripple';
     ComboDefaultComponent,
     InputDateComponent,
     InputMoneyComponent,
-    JsonPipe,
     LoadingModalComponent,
     Drawer,
     InputText,

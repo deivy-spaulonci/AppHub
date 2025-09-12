@@ -12,7 +12,6 @@ import java.util.ArrayList;
 public class AutoCompleteFornecedor extends JComboBox {
 
     private FornecedorDAO fornecedorDAO = new FornecedorDAO();
-    private Fornecedor fornecedorSelected = null;
 
     public AutoCompleteFornecedor() {
         init();
@@ -25,12 +24,9 @@ public class AutoCompleteFornecedor extends JComboBox {
         textField.setMargin(new Insets(3,3,3,3));
         textField.setColumns(30);
         textField.addKeyListener(new KeyAdapter() {
+            @Override
             public void keyReleased(KeyEvent ke) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        comboFilter(textField.getText());
-                    }
-                });
+                SwingUtilities.invokeLater(() -> comboFilter(textField.getText()));
             }
         });
     }

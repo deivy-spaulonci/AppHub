@@ -7,6 +7,7 @@
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/app-fx/pom.xml" />
         <option value="$PROJECT_DIR$/app-sp-fx/pom.xml" />
+        <option value="$PROJECT_DIR$/teste/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
@@ -14,6 +15,7 @@
         <option value="$PROJECT_DIR$/app-api-web/pom.xml" />
         <option value="$PROJECT_DIR$/app-fx/pom.xml" />
         <option value="$PROJECT_DIR$/app-kt/pom.xml" />
+        <option value="$PROJECT_DIR$/app-teste/pom.xml" />
         <option value="$PROJECT_DIR$/dto/pom.xml" />
       </set>
     </option>

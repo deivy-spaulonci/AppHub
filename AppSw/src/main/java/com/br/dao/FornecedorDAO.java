@@ -2,23 +2,21 @@ package com.br.dao;
 
 import com.br.dao.generic.AbstractDAO;
 import com.br.dao.generic.ConnectionFactory;
-import com.br.entity.Cidade;
-import com.br.entity.Despesa;
 import com.br.entity.Fornecedor;
 import lombok.extern.log4j.Log4j2;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Log4j2
-public class FornecedorDAO extends AbstractDAO<Fornecedor> {
-    private final String SELECT_ALL = "SELECT * FROM FORNECEDOR F INNER JOIN CIDADE C ON C.IBGE_COD = F.IBGE_COD";
+public class FornecedorDAO extends AbstractDAO<Fornecedor> implements Serializable {
+
     @Override
     protected String getTableName() {
         return "FORNECEDOR";
@@ -26,13 +24,7 @@ public class FornecedorDAO extends AbstractDAO<Fornecedor> {
 
     @Override
     protected Fornecedor mapResultSet(ResultSet rs) throws SQLException {
-//        Cidade cidade = Cidade.builder()
-//                .id(new BigInteger(String.valueOf(rs.getInt("C.ID"))))
-//                .ibgeCod(rs.getString("C.IBGE_COD"))
-//                .nome(rs.getString("C.NOME"))
-//                .uf(rs.getString("C.UF"))
-//                .build();
-        Fornecedor fornecedor = Fornecedor.builder()
+        return Fornecedor.builder()
                 .id(new BigInteger(String.valueOf(rs.getInt("ID"))))
                 .nome(rs.getString("NOME"))
                 .razaoSocial(rs.getString("RAZAO_SOCIAL"))
@@ -40,11 +32,10 @@ public class FornecedorDAO extends AbstractDAO<Fornecedor> {
                 .cpf(rs.getString("CPF")!=null ? rs.getString("CPF") : "")
 //                .cidade(cidade)
                 .build();
-        return fornecedor;
     }
 
     public List<Fornecedor> getFornecedorByFilter(String busca) {
-        String sql = SELECT_ALL;
+        String sql = "SELECT * FROM FORNECEDOR F INNER JOIN CIDADE C ON C.IBGE_COD = F.IBGE_COD";
         if(busca !=null && !busca.trim().isEmpty())
             sql += " WHERE LOWER(F.NOME) LIKE ? OR LOWER(F.RAZAO_SOCIAL) LIKE ? OR LOWER(F.CNPJ) LIKE ? OR LOWER(F.CPF) LIKE ?";
         sql += " ORDER BY F.NOME";

@@ -1,0 +1,26 @@
+# =========================
+# Etapa 1: Build com Maven
+# =========================
+FROM maven:3.9.9-eclipse-temurin-21 AS build
+WORKDIR /app
+
+# Copia todo o projeto
+COPY . .
+
+# Build do módulo específico (modulo-app) e seus dependentes
+RUN mvn clean package -pl app-api -am -DskipTests
+
+# =========================
+# Etapa 2: Runtime
+# =========================
+FROM eclipse-temurin:21-jdk
+WORKDIR /app
+
+# Copia o JAR gerado do módulo para a imagem final
+COPY --from=build /app/app-api/target/app-api-1.0.jar app.jar
+
+# Expondo a porta padrão do Spring Boot
+EXPOSE 8081
+
+# Comando para rodar a aplicação
+ENTRYPOINT ["java", "-jar", "app.jar"]
