@@ -26,8 +26,12 @@ import static org.springframework.http.ResponseEntity.ok;
 @RestController
 @RequestMapping("/api/v1/fornecedor")
 public class FornecedorRestController {
-    @Autowired
     private FornecedorService fornecedorService;
+
+    @Autowired
+    public FornecedorRestController(FornecedorService fornecedorService) {
+        this.fornecedorService = fornecedorService;
+    }
 
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -54,21 +58,18 @@ public class FornecedorRestController {
     }
 
     @PostMapping
-    @Transactional
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<FornecedorDTO> create(@RequestBody @Valid FornecedorDTO fornecedorDTO) {
         return new ResponseEntity<>(fornecedorService.save(fornecedorDTO), HttpStatus.CREATED);
     }
 
     @PutMapping
-    @Transactional
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<FornecedorDTO> update(@RequestBody @Valid FornecedorDTO fornecedorDTO) {
         return new ResponseEntity<>(fornecedorService.save(fornecedorDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    @Transactional
     public ResponseEntity<?> delete(@PathVariable Long id) {
         return ok("Não ha permissão de exclusão do fornecedor até o momentod!");
     }

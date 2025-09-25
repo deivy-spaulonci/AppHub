@@ -1,5 +1,7 @@
 @import "primeicons/primeicons.css";
 @import "primeflex/primeflex.css";
+@import "tailwindcss/tailwind.css";
+
 @import url("https://unpkg.com/primeflex@latest/primeflex.css");
 /* You can add global styles to this file, and also import other style files */
 html, body{
@@ -10,6 +12,8 @@ html, body{
   Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
   "Segoe UI Symbol";
   height: 100%;
+
+  background-color: var(--p-sky-900);
 }
 
 

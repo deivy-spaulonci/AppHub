@@ -1,38 +1,87 @@
-<div class="panelTop">
+<div id="panelTipoConta">
+  <p-card>
+    <p-table #dt
+             [value]="tiposConta"
+             [size]="'small'"
+             [scrollable]="true"
+             [style]="{ width: '670px' }"
+             dataKey="id"
+             editMode="row"
+             responsiveLayout="stack"
+             scrollHeight="800px"
+             showGridlines
+             stripedRows>
+      <ng-template #header>
+        <tr>
+          <th pSortableColumn="id">Id<p-sortIcon field="id"/></th>
+          <th pSortableColumn="nome">Conta<p-sortIcon field="nome"/></th>
+          <th pSortableColumn="cartaoCredito">Cartão de Crédito<p-sortIcon field="cartaoCredito"/></th>
+          <th pSortableColumn="ativo">Ativo<p-sortIcon field="ativo"/></th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-tipo let-editing="editing" let-ri="rowIndex">
+        <tr [pEditableRow]="tipo">
+          <td>{{ tipo.id }}</td>
+          <td [ngStyle]="rowStyle(tipo.ativo)">
+            <p-cellEditor>
+              <ng-template #input>
+                  <input pInputText type="text" [(ngModel)]="tipo.nome" fluid />
+              </ng-template>
+              <ng-template #output>{{ tipo.nome }}</ng-template>
+            </p-cellEditor>
+          </td>
+          <td class="text-center" style="padding: 0;  width: 130px;">
+            <p-cellEditor>
+              <ng-template #input>
+                <p-checkbox [(ngModel)]="tipo.cartaoCredito" [binary]="true" />
+              </ng-template>
+              <ng-template #output>
+                <i *ngIf="tipo.cartaoCredito" class="pi pi-credit-card" style="color: var(--p-blue-500)"></i>
+              </ng-template>
+            </p-cellEditor>
+          </td>
+          <td class="text-center" style="padding: 0; width: 80px">
+            <p-cellEditor>
+              <ng-template #input>
+                <p-checkbox [(ngModel)]="tipo.ativo" [binary]="true" />
+              </ng-template>
+              <ng-template #output>
+                <i *ngIf="tipo.ativo" class="pi pi-check-square" style="color: var(--p-blue-500)"></i>
+              </ng-template>
+            </p-cellEditor>
+          </td>
+          <td style="width: 80px;">
+              <i class="pi pi-pencil" *ngIf="!editing" [pTooltip]="'Editar'" (click)="onRowEditInit(tipo)" pInitEditableRow style="color: var(--p-blue-500); padding: 0 10px;"></i>
+              <i class="pi pi-check"  *ngIf="editing"  [pTooltip]="'Confirmar'" (click)="onRowEditSave(tipo)" pSaveEditableRow style="color: var(--p-green-500); padding: 0 10px;"></i>
+              <i class="pi pi-times"  *ngIf="editing"  [pTooltip]="'Cancelar'" (click)="onRowEditCancel(tipo, ri)" pCancelEditableRow style="color: var(--p-red-500); padding: 0 10px;"></i>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
 
+  <p-card header="Cadastro">
+    <div class="formTipoConta">
+      <span> Nome: </span>
+      <input pInputText type="text" [(ngModel)]="tipoCadastro.nome"  fluid />
+
+      <div></div>
+      <div>
+        <label class="ml-2" for="cartaoCredito"> Cartão de Crédito </label>
+        <p-checkbox name="group" inputId="cartaoCredito" [(ngModel)]="tipoCadastro.cartaoCredito" [binary]="true" />
+      </div>
+    </div>
+
+    <ng-template #footer >
+      <div class="text-center">
+      <p-button label="Salvar" icon="pi pi-save" iconPos="top" [style]="{width: '120px'}" [raised]="true" (onClick)="save(tipoCadastro)" />
+      </div>
+    </ng-template>
+
+  </p-card>
 </div>
+<p-confirmdialog></p-confirmdialog>
+<p-toast/>
+<app-loading-modal [visible]="loading" message="Processando sua requisição..."></app-loading-modal>
 
-<p-table #dt
-         [value]="tiposConta"
-         [size]="'small'"
-
-         [scrollable]="true"
-         [style]="{ width: '600px' }"
-         responsiveLayout="stack"
-         scrollHeight="600px"
-         showGridlines
-         stripedRows>
-  <ng-template #header>
-    <tr>
-      <th pSortableColumn="id">Id<p-sortIcon field="id"/></th>
-      <th pSortableColumn="nome">Conta<p-sortIcon field="nome"/></th>
-      <th pSortableColumn="cartaoCredito">Cartão de Crédito<p-sortIcon field="cartaoCredito"/></th>
-      <th pSortableColumn="ativo">Ativo<p-sortIcon field="ativo"/></th>
-    </tr>
-  </ng-template>
-  <ng-template #body let-tipo>
-    <tr>
-      <td>{{ tipo.id }}</td>
-      <td>
-        <div [ngStyle]="rowStyle(tipo.ativo)">{{ tipo.nome }}</div>
-      </td>
-      <td class="text-center" style="padding: 0;  width: 150px;" >
-        <i *ngIf="tipo.cartaoCredito" class="pi pi-credit-card" style="color: var(--p-blue-500)"></i>
-      </td>
-      <td class="text-center" style="padding: 0; width: 100px">
-        <i *ngIf="tipo.ativo" class="pi pi-check-square" style="color: var(--p-blue-500)"></i>
-        <i *ngIf="!tipo.ativo" class="pi pi-times-circle" style="color: var(--p-red-500)"></i>
-      </td>
-    </tr>
-  </ng-template>
-</p-table>

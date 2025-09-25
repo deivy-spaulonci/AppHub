@@ -12,8 +12,12 @@ import java.util.List;
 
 @Service
 public class CidadeService {
-    @Autowired
     private CidadeRepository cidadeRepository;
+
+    @Autowired
+    public CidadeService(CidadeRepository cidadeRepository) {
+        this.cidadeRepository = cidadeRepository;
+    }
 
     private static final CidadeMapper cidadeMapper = CidadeMapper.INSTANCE;
 

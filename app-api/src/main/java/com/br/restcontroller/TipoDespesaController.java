@@ -21,10 +21,12 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequestMapping("/api/v1/tipo-despesa")
 public class TipoDespesaController {
 
-    @Autowired
     private TipoDespesaService tipoDespesaService;
 
-
+    @Autowired
+    public TipoDespesaController(TipoDespesaService tipoDespesaService) {
+        this.tipoDespesaService = tipoDespesaService;
+    }
 
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -33,14 +35,12 @@ public class TipoDespesaController {
     }
 
     @PostMapping
-    @Transactional
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<TipoDespesaDTO> saveTipoDespesa(@RequestBody @Valid TipoDespesaDTO tipoDespesaDto) {
         return new ResponseEntity<>(tipoDespesaService.save(tipoDespesaDto), HttpStatus.CREATED);
     }
 
     @PutMapping
-    @Transactional
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> update(@RequestBody @Valid TipoDespesaDTO tipoDespesaDto){
         return new ResponseEntity<>(tipoDespesaService.save(tipoDespesaDto),  HttpStatus.OK);

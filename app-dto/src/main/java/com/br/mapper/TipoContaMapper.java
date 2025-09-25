@@ -7,9 +7,14 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        componentModel = MappingConstants.ComponentModel.SPRING,
+        builder = @Builder(disableBuilder = true)
+)
 public interface TipoContaMapper {
     TipoContaMapper INSTANCE = Mappers.getMapper(TipoContaMapper.class);
+    @Mapping(source = "nome", target = "nome")
     TipoConta toEntity(TipoContaDTO tipoContaDto);
 
     TipoContaDTO toDto(TipoConta tipoConta);

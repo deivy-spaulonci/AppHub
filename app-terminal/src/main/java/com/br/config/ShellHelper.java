@@ -1,6 +1,8 @@
 package com.br.config;
 
 
+import lombok.Getter;
+import lombok.Setter;
 import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
@@ -15,6 +17,8 @@ public class ShellHelper {
     public String warningColor;
     @Value("${shell.out.error}")
     public String errorColor;
+    @Setter
+    @Getter
     private Terminal terminal;
     
     public ShellHelper(Terminal terminal) {
@@ -36,22 +40,22 @@ public class ShellHelper {
         return getColored(message, PromptColor.valueOf(errorColor));
     }
 
-    public void print(String message) {
-        print(message, null);
+    public void pr(String message) {
+        pr(message, null);
     }
-    public void printSuccess(String message) {
-        print(message, PromptColor.valueOf(successColor));
+    public void prSuccess(String message) {
+        pr(message, PromptColor.valueOf(successColor));
     }
-    public void printInfo(String message) {
-        print(message, PromptColor.valueOf(infoColor));
+    public void prInfo(String message) {
+        pr(message, PromptColor.valueOf(infoColor));
     }
-    public void printWarning(String message) {
-        print(message, PromptColor.valueOf(warningColor));
+    public void prWarning(String message) {
+        pr(message, PromptColor.valueOf(warningColor));
     }
-    public void printError(String message) {
-        print(message, PromptColor.valueOf(errorColor));
+    public void prError(String message) {
+        pr(message, PromptColor.valueOf(errorColor));
     }
-    public void print(String message, PromptColor color) {
+    public void pr(String message, PromptColor color) {
         String toPrint = message;
         if (color != null) {
             toPrint = getColored(message, color);
@@ -61,11 +65,4 @@ public class ShellHelper {
     }
     //--- set / get methods ---------------------------------------------------
 
-    public Terminal getTerminal() {
-        return terminal;
-    }
-
-    public void setTerminal(Terminal terminal) {
-        this.terminal = terminal;
-    }
 }

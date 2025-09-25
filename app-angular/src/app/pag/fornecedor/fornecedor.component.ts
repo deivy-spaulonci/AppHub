@@ -3,13 +3,15 @@ import {Toolbar} from 'primeng/toolbar';
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 import {FornecedorTableComponent} from './fornecedor-table/fornecedor-table.component';
 import {FornecedorFormComponent} from './fornecedor-form/fornecedor-form.component';
+import {Divider} from 'primeng/divider';
 
 @Component({
   selector: 'app-fornecedor',
   imports: [
     Toolbar,
     FornecedorTableComponent,
-    FornecedorFormComponent
+    FornecedorFormComponent,
+    Divider
   ],
   templateUrl: './fornecedor.component.html',
   styleUrl: './fornecedor.component.css'

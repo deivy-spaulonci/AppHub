@@ -10,11 +10,11 @@ import java.util.Objects;
 @Log4j2
 public class Validate {
     public static boolean isValidDate(String data){
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");
         try {
-            return Objects.nonNull(LocalDate.parse(data, formatter));
+            final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");
+            LocalDate.parse(data, formatter);
+            return true;
         } catch (DateTimeParseException e) {
-            //throw new RuntimeException("Your custom exception");
             log.error(e.getMessage());
             return false;
         }

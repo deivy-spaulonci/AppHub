@@ -81,7 +81,6 @@ export class DespesaFormComponent implements OnInit{
           this.fornecedorSelecionado = res.fornecedor;
           this.formaPgtoSelecionado = res.formaPagamento;
           this.data = Util.dateToDataBR(res.dataPagamento);
-          console.log(this.data)
           this.valor = Util.formatFloatToReal(res.valor.toFixed(2).toString());
           this.obs = res.obs
         },

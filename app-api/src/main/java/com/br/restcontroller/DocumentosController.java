@@ -28,8 +28,12 @@ import static org.springframework.http.ResponseEntity.*;
 @RequestMapping("/api/v1/documentos")
 public class DocumentosController {
 
-    @Autowired
     private DocumentoService documentoService;
+
+    @Autowired
+    public DocumentosController(DocumentoService documentoService) {
+        this.documentoService = documentoService;
+    }
 
     @GetMapping("/listar-arquivos")
     public ResponseEntity<List<Diretorio>> documentos(){

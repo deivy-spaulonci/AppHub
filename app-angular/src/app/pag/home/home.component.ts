@@ -3,14 +3,16 @@ import {CardModule} from 'primeng/card';
 import {MessageModule} from 'primeng/message';
 import {DefaultService} from '../../service/default.service';
 import {FormsModule} from '@angular/forms';
-import {CurrencyPipe, DatePipe, isPlatformBrowser, NgForOf, NgIf} from '@angular/common';
+import {CurrencyPipe, DatePipe, isPlatformBrowser, NgClass, NgForOf, NgIf, NgStyle} from '@angular/common';
 import {ChartModule, UIChart} from 'primeng/chart';
 import {forkJoin} from 'rxjs';
 import {DataView} from 'primeng/dataview';
+import {TableModule} from 'primeng/table';
+import {Select, SelectChangeEvent} from 'primeng/select';
 
 @Component({
   selector: 'app-home',
-  imports: [CardModule, MessageModule, FormsModule, CurrencyPipe, UIChart, ChartModule, DataView, NgForOf, DatePipe, NgIf],
+  imports: [CardModule, MessageModule, FormsModule, CurrencyPipe, UIChart, ChartModule, DataView, NgForOf, DatePipe, NgIf, TableModule, NgClass, NgStyle, Select],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
   standalone: true,
@@ -40,6 +42,13 @@ export class HomeComponent implements OnInit{
 
   optionsContas: any;
   optionsDespesa: any;
+
+  dataGastos: any;
+  optionsGastos: any;
+  dataGastosDespesa: any;
+  dataGastosConta: any;
+
+  selectedYear: number = 2025;
 
   platformId = inject(PLATFORM_ID);
 
@@ -114,20 +123,43 @@ export class HomeComponent implements OnInit{
     this.defaultService.get(this.DESPESA_POR_TIPO_URL).subscribe({
       next: (res) => {
         this.dataDespesas = res;
-        // console.log(this.dataDespesas);
         this.initChartDespesas();
       },
-      error: erro => {
-        console.error('Falhou alguma chamada', erro);
-      }
-
-    })
+      error: erro => console.error('Falhou alguma chamada', erro)
+    });
+    this.loadGastos();
   }
 
-  getStatus(status:string){
-    this.defaultService.get(this.CT_STATUS_URL+status).subscribe(res =>{
-      this.totalContaAvencer$ = res;
+  loadGastos(){
+    forkJoin({
+      gastoD:this.defaultService.get("despesa/gastoAno/"+this.selectedYear),
+      gastoC:this.defaultService.get("conta/gastoAno/"+this.selectedYear),
+    }).subscribe({
+      next: ({gastoD,gastoC}) => {
+        this.dataGastosDespesa = gastoD;
+        this.dataGastosConta = gastoC;
+        this.initChartGastos();
+      },
+      error: erro => console.error('Falhou alguma chamada', erro)
     });
+  }
+
+  rowStyle(item:any) {
+    switch (item.status) {
+      case 'Atrasado': return { color: 'var(--p-red-500)', backgroundColor: 'var(--p-red-50)' }; break;
+      case 'Em Aberto': return { color: 'var(--p-green-500)', backgroundColor: 'var(--p-green-50)' }; break;
+      case 'Vencimento Hoje': return { color: 'var(--p-yellow-500)', backgroundColor: 'var(--p-yellow-50)' }; break;
+      default: return {};
+    }
+  }
+
+  rowClassIcon(item:any) {
+    switch (item.status) {
+      case 'Atrasado': return 'pi pi-exclamation-circle'; break;
+      case 'Em Aberto': return 'pi pi-calendar-clock'; break;
+      case 'Vencimento Hoje': return 'pi pi-exclamation-circle'; break;
+      default: return '';
+    }
   }
 
   getMoneyFormat(valor:number){
@@ -170,7 +202,6 @@ export class HomeComponent implements OnInit{
         }
       };
       this.cd.markForCheck()
-
     }
   }
 
@@ -222,5 +253,73 @@ export class HomeComponent implements OnInit{
       };
       this.cd.markForCheck()
     }
+  }
+
+
+  initChartGastos() {
+    if (isPlatformBrowser(this.platformId)) {
+
+      const documentStyle = getComputedStyle(document.documentElement);
+      const textColor = documentStyle.getPropertyValue('--p-text-color');
+      const textColorSecondary = documentStyle.getPropertyValue('--p-text-muted-color');
+      const surfaceBorder = documentStyle.getPropertyValue('--p-content-border-color');
+
+      this.dataGastos = {
+        labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+        datasets: [
+          {
+            label: 'Despesas',
+            data: this.dataGastosDespesa,
+            fill: false,
+            borderColor: documentStyle.getPropertyValue('--p-cyan-500'),
+            tension: 0.4
+          },
+          {
+            label: 'Contas',
+            data: this.dataGastosConta,
+            fill: false,
+            borderColor: documentStyle.getPropertyValue('--p-green-500'),
+            tension: 0.4
+          }
+        ]
+      };
+
+      this.optionsGastos = {
+        maintainAspectRatio: false,
+        aspectRatio: 0.6,
+        plugins: {
+          legend: {
+            labels: {
+              color: textColor
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: textColorSecondary
+            },
+            grid: {
+              color: surfaceBorder,
+              drawBorder: false
+            }
+          },
+          y: {
+            ticks: {
+              color: textColorSecondary
+            },
+            grid: {
+              color: surfaceBorder,
+              drawBorder: false
+            }
+          }
+        }
+      };
+      this.cd.markForCheck()
+    }
+  }
+
+  aoAnoSelecionado($event: SelectChangeEvent) {
+    this.loadGastos();
   }
 }

@@ -1,4 +1,4 @@
-package com.br.commands;
+package com.br.commands.fornecedor;
 
 import com.br.entity.Fornecedor;
 import lombok.Getter;

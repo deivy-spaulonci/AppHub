@@ -12,7 +12,7 @@ import {FormaPagamento} from '../../../model/forma-pagamento';
 import {Table, TableLazyLoadEvent, TableModule} from 'primeng/table';
 import {Util} from '../../../util/util';
 import {Button, ButtonDirective} from 'primeng/button';
-import {CurrencyPipe, DatePipe, JsonPipe, NgIf} from '@angular/common';
+import {CurrencyPipe, DatePipe, JsonPipe, NgIf, NgStyle} from '@angular/common';
 import {Tooltip} from 'primeng/tooltip';
 import {InputMask} from 'primeng/inputmask';
 import {Select} from 'primeng/select';
@@ -57,7 +57,8 @@ import {Ripple} from 'primeng/ripple';
     InputText,
     ButtonDirective,
     FileSizePipe,
-    Ripple
+    Ripple,
+    NgStyle
   ],
   templateUrl: './conta-table.component.html',
   providers: [MessageService,ConfirmationService],
@@ -325,6 +326,9 @@ export class ContaTableComponent implements OnInit{
     });
   }
 
+  rowStyle(conta: Conta) {
+    return conta.tipoConta.ativo ? {'text-decoration': 'none'}:{'text-decoration': 'line-through', 'color':'red'};
+  }
 
   // getStatusTheme(conta:Conta){
   //   switch (conta.status){

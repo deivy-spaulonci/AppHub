@@ -8,6 +8,7 @@ import com.br.repository.TipoDespesaRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -19,12 +20,16 @@ import java.util.List;
 @Service
 @Log4j2
 public class TipoDespesaService {
-    @Autowired
-    TipoDespesaRepository tipoDespesaRepository;
     @PersistenceContext
     private EntityManager em;
 
+    private TipoDespesaRepository tipoDespesaRepository;
     public static final TipoDespesaMapper tipoDespesaMapper = TipoDespesaMapper.INSTANCE;
+
+    @Autowired
+    public TipoDespesaService(TipoDespesaRepository tipoDespesaRepository) {
+        this.tipoDespesaRepository = tipoDespesaRepository;
+    }
 
     public List<TipoDespesaDTO> findTipoDespesas() {
         return tipoDespesaMapper.toDtoList(tipoDespesaRepository.findAll(Sort.by(TipoDespesa_.NOME)));
@@ -35,6 +40,7 @@ public class TipoDespesaService {
         return tipoDespesaMapper.toDto(tipoDespesa);
     }
 
+    @Transactional
     public TipoDespesaDTO save(TipoDespesaDTO tipoDespesaDTO) {
         TipoDespesa tipoDespesa = tipoDespesaMapper.toEntity(tipoDespesaDTO);
         return tipoDespesaMapper.toDto(tipoDespesaRepository.save(tipoDespesa));

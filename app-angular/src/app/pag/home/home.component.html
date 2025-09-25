@@ -1,61 +1,40 @@
 <div id="frameHome">
 
-  <p-card header="Despesas" [style]="{width: '100%', height:'100%'} ">
-    <p-chart type="bar" [data]="dataDespesas" [options]="optionsDespesa" height="450"/>
-    <p-message severity="info" icon="pi pi-money-bill" styleClass="h-full">
-      Total: {{totalDespesa$ | currency}}
-    </p-message>
-  </p-card>
-
-  <p-card header="Contas" [style]="{width: '100%'} ">
-    <p-chart type="pie" [data]="dataContas" [options]="optionsContas" height="440"/>
-    <p-message severity="info" icon="pi pi-money-bill" styleClass="h-full">
-      Total: {{totalConta$ | currency}}
-    </p-message>
+  <p-card header="Despesas" [style]="{width: '100%',height:'100%'}">
+    <p-chart type="bar" [data]="dataDespesas" [options]="optionsDespesa" height="420"/>
     <ng-template #footer>
-      <div class="flex gap-4 mt-1"></div>
+      <p-message severity="info" icon="pi pi-money-bill" styleClass="h-full">
+        Total: {{totalDespesa$ | currency}}
+      </p-message>
     </ng-template>
   </p-card>
 
-
-
-
-</div>
-
-<p-card header="Vencimentos" [style]="{width: '100%'} ">
-
-  <p-dataView [value]="contasEmAberto" [layout]="'grid'">
-    <ng-template #grid let-items>
-
-      <div class="grid grid-cols-12 gap-4">
-        <div *ngFor="let item of items; let first = first">
-          <p-card [style]="{width: '300px'}">
-            <p-message *ngIf="item.intStatus==1" severity="info" icon="pi pi-calendar-clock" styleClass="h-full">
-              {{item.tipoConta.nome}} - {{item.status}}
-            </p-message>
-            <p-message *ngIf="item.intStatus==-1" severity="error" icon="pi pi-exclamation-circle" styleClass="h-full">
-              {{item.tipoConta.nome}} - {{item.status}}
-            </p-message>
-            <p-message *ngIf="item.intStatus==0" severity="error" icon="pi pi-bell" styleClass="h-full">
-              {{item.tipoConta.nome}} - {{item.status}}
-            </p-message>
-
-            <p-message severity="success" [style]="{display:grid}">
-              <div>Vencimento: {{item.vencimento | date: 'dd/MM/yyyy' }}</div>
-              <div>Valor: {{item.valor | currency}}</div>
-            </p-message>
-
-          </p-card>
-
-        </div>
-
-
-      </div>
-
+  <p-card header="Contas" [style]="{width: '100%',height:'100%'}">
+    <p-chart type="pie" [data]="dataContas" [options]="optionsContas" height="420"/>
+    <ng-template #footer>
+      <p-message severity="info" icon="pi pi-money-bill" styleClass="h-full">
+        Total: {{totalConta$ | currency}}
+      </p-message>
     </ng-template>
-  </p-dataView>
+  </p-card>
 
-  <ng-template #footer>
-    <div class="flex gap-4 mt-1"></div>
-  </ng-template>
-</p-card>
+  <p-card header="Vencimentos Contas" [style]="{width: '100%'}">
+    <p-table [value]="contasEmAberto" >
+      <ng-template #body let-item>
+        <tr [ngStyle]="rowStyle(item)" >
+          <td><i [ngClass]="rowClassIcon(item)"></i> {{ item.tipoConta.nome }}</td>
+          <td>{{ item.status}}</td>
+          <td>{{ item.vencimento | date: 'dd/MM/yyyy' }}</td>
+          <td>{{item.valor | currency}}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <p-card header="Gastos" [style]="{width: '100%'} ">
+    <p-select [options]="[2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026]"
+              [(ngModel)]="selectedYear" (onChange)="aoAnoSelecionado($event)"/>
+
+    <p-chart type="line" [data]="dataGastos" [options]="optionsGastos" class="h-[25rem]" />
+  </p-card>
+</div>

@@ -1,11 +1,9 @@
 package com.br.business.service;
 
-import com.br.dto.DespesaByTipoDTO;
-import com.br.dto.DespesaDTO;
-import com.br.dto.FornecedorDTO;
-import com.br.dto.LoteDespesaDto;
+import com.br.dto.*;
 import com.br.entity.Despesa;
 import com.br.entity.Fornecedor;
+import com.br.entity.TipoConta;
 import com.br.entity.TipoDespesa;
 import com.br.filter.DespesaFilter;
 import com.br.mapper.DespesaMapper;
@@ -15,6 +13,7 @@ import com.br.repository.FornecedorRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -31,20 +30,30 @@ import java.util.*;
 @Log4j2
 @Service
 public class DespesaService {
-    @Autowired
-    private DespesaRepository despesaRepository;
-    @Autowired
-    private FornecedorService fornecedorService;
+
+
     @PersistenceContext
     private EntityManager em;
-    @Autowired
-    private FornecedorRepository fornecedorRepository;
-    @Autowired
-    private DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration;
 
+    private DespesaRepository despesaRepository;
+    private FornecedorService fornecedorService;
+    private FornecedorRepository fornecedorRepository;
+    private DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration;
     public static final DespesaMapper despesaMapper = DespesaMapper.INSTANCE;
-    @Autowired
     private FornecedorMapper fornecedorMapper;
+
+    @Autowired
+    public DespesaService(DespesaRepository despesaRepository,
+                          FornecedorRepository fornecedorRepository,
+                          FornecedorService fornecedorService,
+                          FornecedorMapper fornecedorMapper,
+                          DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration) {
+        this.despesaRepository = despesaRepository;
+        this.fornecedorRepository = fornecedorRepository;
+        this.fornecedorMapper = fornecedorMapper;
+        this.fornecedorService = fornecedorService;
+        this.dataSourceTransactionManagerAutoConfiguration = dataSourceTransactionManagerAutoConfiguration;
+    }
 
     public List<DespesaDTO> findDespesas() {
         return despesaMapper.toDtoList(despesaRepository.findAll());
@@ -64,12 +73,14 @@ public class DespesaService {
         return despesaPage.map(despesaMapper::toDto);
     }
 
+    @Transactional
     public DespesaDTO save(DespesaDTO despesaDTO) {
         Despesa despesa = despesaMapper.toEntity(despesaDTO);
         despesa.setLancamento(LocalDateTime.now());
         return despesaMapper.toDto(despesaRepository.save(despesa));
     }
 
+    @Transactional
     public void deleteById(BigInteger idDespesa) {
         if(Objects.nonNull(findById(idDespesa)))
             despesaRepository.deleteById(idDespesa);
@@ -163,6 +174,11 @@ public class DespesaService {
         }
         return listStatus;
     }
+
+    public List gastosDespesaAnual(int ano){
+        return despesaRepository.findGastoPorAno(ano);
+    }
+
 // AJUSTAR DEPOIS PORUQE O TIPO DE DESPESA E A FORMA DE PAGAMENTO NAO SAO MAIS ENUNS
 //    public String importFromResource() {
 //        CSVFormat csvFormat = CSVFormat.DEFAULT.builder().build();

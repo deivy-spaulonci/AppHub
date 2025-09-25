@@ -42,7 +42,7 @@ export const appConfig: ApplicationConfig = {
           }
         }),
         options: {
-          //darkModeSelector: false || 'none'
+          darkModeSelector: false || 'none'
         },
       }
     })

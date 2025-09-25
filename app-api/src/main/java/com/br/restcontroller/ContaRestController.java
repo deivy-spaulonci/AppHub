@@ -22,8 +22,12 @@ import java.util.List;
 @RequestMapping("/api/v1/conta")
 public class ContaRestController {
 
-    @Autowired
     private ContaService contaService;
+
+    @Autowired
+    public ContaRestController(ContaService contaService) {
+        this.contaService = contaService;
+    }
 
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -50,21 +54,18 @@ public class ContaRestController {
     }
 
     @PostMapping
-    @Transactional
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<ContaDTO> create(@RequestBody @Valid ContaDTO contaDTO){
         return new ResponseEntity<>(contaService.save(contaDTO), HttpStatus.CREATED);
     }
 
     @PutMapping
-    @Transactional
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ContaDTO> update(@RequestBody @Valid ContaDTO contaDTO){
         return new ResponseEntity<>(contaService.save(contaDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    @Transactional
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable BigInteger id){
         contaService.deleteById(id);
@@ -74,5 +75,11 @@ public class ContaRestController {
     @ResponseStatus(HttpStatus.OK)
     public List<ContaByTipoDTO> getContaByType(){
         return contaService.getContaByTipo();
+    }
+
+    @GetMapping("/gastoAno/{ano}")
+    @ResponseStatus(HttpStatus.OK)
+    public List contaFindById(@PathVariable(name = "ano") Integer ano){
+        return contaService.gastosContaAnual(ano);
     }
 }

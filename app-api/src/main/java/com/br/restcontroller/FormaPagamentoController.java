@@ -19,8 +19,12 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequestMapping("/api/v1/forma-pagamento")
 public class FormaPagamentoController {
 
-    @Autowired
     private FormaPagamentoService formaPagamentoService;
+
+    @Autowired
+    public FormaPagamentoController(FormaPagamentoService formaPagamentoService) {
+        this.formaPagamentoService = formaPagamentoService;
+    }
 
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)

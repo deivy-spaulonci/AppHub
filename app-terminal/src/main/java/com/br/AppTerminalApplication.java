@@ -8,4 +8,6 @@ public class AppTerminalApplication {
     public static void main(String[] args) {
         SpringApplication.run(AppTerminalApplication.class, args);
     }
+
+
 }

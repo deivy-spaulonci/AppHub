@@ -1,0 +1,15 @@
+#panelTipoConta{
+  display: grid;
+  grid-template-columns: 700px 500px;
+  padding: 10px;
+  column-gap: 10px;
+  row-gap: 10px;
+}
+
+.formTipoConta{
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 10px;
+}

@@ -10,6 +10,7 @@ import com.br.repository.ContaRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,11 +27,15 @@ import java.util.Objects;
 @Service
 public class ContaService {
 
-    @Autowired
     private ContaRepository contaRepository;
     @PersistenceContext
     private EntityManager em;
     public static final ContaMapper contaMapper = ContaMapper.INSTANCE;
+
+    @Autowired
+    public ContaService(ContaRepository contaRepository) {
+        this.contaRepository = contaRepository;
+    }
 
     public List<ContaDTO> listContas() {
         return contaMapper.toDtoList(contaRepository.findAll());
@@ -46,12 +51,14 @@ public class ContaService {
         Page<Conta> contaPage = contaRepository.listContaPaged(pageable, contaFilter, em);
         return contaPage.map(contaMapper::toDto);
     }
+    @Transactional
     public ContaDTO save(ContaDTO contaDTO) {
         Conta conta = contaMapper.toEntity(contaDTO);
         conta.setLancamento(LocalDateTime.now());
         Conta newConta =  contaRepository.save(conta);
         return contaMapper.toDto(newConta);
     }
+    @Transactional
     public void deleteById(BigInteger idConta) {
         if(Objects.nonNull(findById(idConta)))
             contaRepository.deleteById(idConta);
@@ -69,6 +76,11 @@ public class ContaService {
 
         return lista;
     }
+
+    public List gastosContaAnual(int ano){
+        return contaRepository.findGastoPorAno(ano);
+    }
+
     public BigDecimal getSumConta(ContaFilter contaFilter){
         return contaRepository.getSumConta(contaFilter, em);
     }

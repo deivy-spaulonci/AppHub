@@ -22,8 +22,12 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequestMapping("/api/v1/tipo-conta")
 public class TipoContaController {
 
-    @Autowired
     private TipoContaService tipoContaService;
+
+    @Autowired
+    public TipoContaController(TipoContaService tipoContaService) {
+        this.tipoContaService = tipoContaService;
+    }
 
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -32,14 +36,12 @@ public class TipoContaController {
     }
 
     @PostMapping
-    @Transactional
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<TipoContaDTO> createTipoConta(@RequestBody @Valid TipoContaDTO tipoContaDto) {
         return new ResponseEntity<>(tipoContaService.save(tipoContaDto), HttpStatus.CREATED);
     }
 
     @PutMapping
-    @Transactional
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> updateTipoConta(@RequestBody TipoContaDTO tipoContaDto) {
         return new ResponseEntity<>(tipoContaService.save(tipoContaDto), HttpStatus.OK);

@@ -4,7 +4,6 @@ import com.br.business.service.DespesaService;
 import com.br.dto.DespesaByTipoDTO;
 import com.br.dto.DespesaDTO;
 import com.br.filter.DespesaFilter;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,13 +16,18 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/despesa")
 public class DespesaRestController {
 
-    @Autowired
     private DespesaService despesaService;
+
+    @Autowired
+    public DespesaRestController(DespesaService despesaService) {
+        this.despesaService = despesaService;
+    }
 
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -48,22 +52,25 @@ public class DespesaRestController {
         return despesaService.getSumDespesa(despesaFilter);
     }
 
+    @GetMapping("/gastoAno/{ano}")
+    @ResponseStatus(HttpStatus.OK)
+    public List despesaFindById(@PathVariable(name = "ano") Integer ano){
+        return despesaService.gastosDespesaAnual(ano);
+    }
+
     @PostMapping
-    @Transactional
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<DespesaDTO> create(@RequestBody @Valid DespesaDTO despesaDTO){
         return new ResponseEntity<>(despesaService.save(despesaDTO), HttpStatus.CREATED);
     }
 
     @PutMapping
-    @Transactional
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<DespesaDTO> update(@RequestBody @Valid DespesaDTO despesaDTO){
         return new ResponseEntity<>(despesaService.save(despesaDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    @Transactional
     public void delete(@PathVariable BigInteger id){
         despesaService.deleteById(id);
     }

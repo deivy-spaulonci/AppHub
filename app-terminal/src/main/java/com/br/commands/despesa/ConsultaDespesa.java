@@ -1,28 +1,8 @@
 package com.br.commands.despesa;
 
-import com.br.business.service.DespesaService;
-import com.br.business.service.FormaPagamentoService;
-import com.br.business.service.FornecedorService;
-import com.br.business.service.TipoDespesaService;
 import com.br.commands.DefaultComponent;
-import com.br.commands.FornecedorComp;
+import com.br.commands.fornecedor.FornecedorComp;
 import com.br.config.ShellHelper;
-import com.br.entity.Despesa;
-import com.br.entity.Fornecedor;
-import com.br.filter.DespesaFilter;
-import com.br.util.Util;
-import com.br.util.Validate;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.shell.component.support.SelectorItem;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public class ConsultaDespesa {
 

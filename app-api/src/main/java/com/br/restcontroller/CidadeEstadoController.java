@@ -20,9 +20,14 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequestMapping("/api/v1/cidade")
 public class CidadeEstadoController {
 
-    @Autowired
+
     private CidadeService cidadeService;
     private static final CidadeMapper cidadeMapper = CidadeMapper.INSTANCE;
+
+    @Autowired
+    public CidadeEstadoController(CidadeService cidadeService) {
+        this.cidadeService=cidadeService;
+    }
 
     @GetMapping("/estados")
     public List<Estado> getEstados() {

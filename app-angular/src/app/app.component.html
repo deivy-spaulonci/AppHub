@@ -1,14 +1,13 @@
-<div id="frame">
-  <div id="topbar" class="shadow-2">
-    <a href="/" style="text-decoration: none; color: white">AppHub</a>
-  </div>
-  <div id="sidebar" class="shadow-2">
-      <a href="conta"><i class="pi pi-barcode" style="font-size: 1rem; margin-right: 5px;"></i>Contas</a>
-      <a href="despesa"><i class="pi pi-money-bill" style="font-size: 1rem; margin-right: 5px;"></i> Despesas</a>
-      <a href="fornecedor"><i class="pi pi-box" style="font-size: 1rem; margin-right: 5px;"></i> Forncedores</a>
-      <a href="documentos"><i class="pi pi-file-o" style="font-size: 1rem; margin-right: 5px;"></i> Documentos</a>
-  </div>
-  <div>
-    <router-outlet />
-  </div>
+<p-tabs value="/dashboard">
+  <p-tablist>
+    @for(tab of tabs; track tab.route){
+      <p-tab [value]="tab.route" [routerLink]="tab.route" class="flex items-center !gap-2 text-inherit">
+        <i [class]="tab.icon"></i>
+        <span>{{ tab.label }}</span>
+      </p-tab>
+    }
+  </p-tablist>
+</p-tabs>
+<div style="padding: 5px; border-top: 5px solid var(--p-green-50);">
+  <router-outlet />
 </div>

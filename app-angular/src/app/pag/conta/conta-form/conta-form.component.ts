@@ -24,6 +24,7 @@ import {ComboDefaultComponent} from '../../../shared/components/combo-default/co
 import {Toolbar} from 'primeng/toolbar';
 import {Dialog} from 'primeng/dialog';
 import {Conta} from '../../../model/conta';
+import {LoadingModalComponent} from '../../../shared/loading-modal/loading-modal.component';
 
 @Component({
   selector: 'app-conta-form',
@@ -41,7 +42,8 @@ import {Conta} from '../../../model/conta';
     InputParcelasComponent,
     InputMoneyComponent,
     ComboDefaultComponent,
-    Toolbar
+    Toolbar,
+    LoadingModalComponent
   ],
   templateUrl: './conta-form.component.html',
   standalone: true,

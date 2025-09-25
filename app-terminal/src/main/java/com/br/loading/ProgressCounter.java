@@ -2,81 +2,94 @@ package com.br.loading;
 
 import org.jline.terminal.Terminal;
 
+/**
+ *
+ */
 public class ProgressCounter {
-	private static final String CUU = "\u001B[A";
+    private static final String CUU = "\u001B[A";
 
-	private Terminal terminal;
-	private char[] spinner = { '|', '/', '-', '\\' };
-	private String pattern = " %s: %d ";
-	private int spinCounter = 0;
+    private Terminal terminal;
+    private char[] spinner = {'|', '/', '-', '\\'};
 
-	private boolean started;
+    private String pattern = " %s: %d ";
 
-	public ProgressCounter(Terminal terminal) {
-		this(terminal, null);
-	}
+    private boolean started = false;
+    private int spinCounter = 0;
 
-	public ProgressCounter(Terminal terminal, String pattern) {
-		this(terminal, pattern, null);
-	}
+    public ProgressCounter(Terminal terminal) {
+        this(terminal, null);
+    }
 
-	public ProgressCounter(Terminal terminal, String pattern, char[] spinner) {
-		this.terminal = terminal;
-		if (pattern != null) {
-			this.pattern = pattern;
-		}
-		if (spinner != null) {
-			this.spinner = spinner;
-		}
-	}
+    public ProgressCounter(Terminal terminal, String pattern) {
+        this(terminal, pattern, null);
+    }
 
-	public void display(int count, String message) {
-		if (!started) {
-			terminal.writer().println();
-			started = true;
-		}
-		String progress = String.format(pattern, message, count);
-		terminal.writer().println(CUU + "\r" + getSpinnerChar() + progress);
-		terminal.flush();
-	}
+    public ProgressCounter(Terminal terminal, String pattern, char[] spinner) {
+        this.terminal = terminal;
 
-	public void display() {
-		if (!started) {
-			terminal.writer().println();
-			started = true;
-		}
-		terminal.writer().println(CUU + "\r" + getSpinnerChar());
-		terminal.flush();
-	}
+        if (pattern != null) {
+            this.pattern = pattern;
+        }
+        if (spinner != null) {
+            this.spinner = spinner;
+        }
+    }
 
-	public void reset() {
-		spinCounter = 0;
-		started = false;
-	}
+    public void display(int count, String message) {
+        if (!started) {
+            terminal.writer().println();
+            started = true;
+        }
+        String progress = String.format(pattern, message, count);
 
-	private char getSpinnerChar() {
-		char spinChar = spinner[spinCounter];
-		spinCounter++;
-		if (spinCounter == spinner.length) {
-			spinCounter = 0;
-		}
-		return spinChar;
-	}
+        terminal.writer().println(CUU + "\r" + getSpinnerChar() + progress);
+        terminal.flush();
+    }
 
-	// --- set / get methods ---------------------------------------------------
-	public char[] getSpinner() {
-		return spinner;
-	}
+    public void display() {
+        if (!started) {
+            terminal.writer().println();
+            started = true;
+        }
+        terminal.writer().println(CUU + "\r" + getSpinnerChar());
+        terminal.flush();
+    }
 
-	public void setSpinner(char[] spinner) {
-		this.spinner = spinner;
-	}
+    public void run(){
+        do{
+            this.display();
+        }while (started);
+    }
 
-	public String getPattern() {
-		return pattern;
-	}
+    public void reset() {
+        spinCounter = 0;
+        started = false;
+    }
 
-	public void setPattern(String pattern) {
-		this.pattern = pattern;
-	}
+    private char getSpinnerChar() {
+        char spinChar = spinner[spinCounter];
+        spinCounter++;
+        if (spinCounter == spinner.length) {
+            spinCounter = 0;
+        }
+        return spinChar;
+    }
+
+    //--- set / get methods ---------------------------------------------------
+
+    public char[] getSpinner() {
+        return spinner;
+    }
+
+    public void setSpinner(char[] spinner) {
+        this.spinner = spinner;
+    }
+
+    public String getPattern() {
+        return pattern;
+    }
+
+    public void setPattern(String pattern) {
+        this.pattern = pattern;
+    }
 }

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,15 +31,21 @@ import java.util.Objects;
 
 @Service
 public class FornecedorService {
-    private String RECEITA_AWS = "https://publica.cnpj.ws/cnpj/";
-    @Autowired
-    private FornecedorRepository fornecedorRepository;
+
     @PersistenceContext
     private EntityManager em;
-    @Autowired
-    private CidadeRepository cidadeRepository;
 
+    private String RECEITA_AWS = "https://publica.cnpj.ws/cnpj/";
+    private FornecedorRepository fornecedorRepository;
+    private CidadeRepository cidadeRepository;
     private static final FornecedorMapper fornecedorMapper = FornecedorMapper.INSTANCE;
+
+    @Autowired
+    public FornecedorService(FornecedorRepository fornecedorRepository,
+                             CidadeRepository cidadeRepository) {
+        this.fornecedorRepository = fornecedorRepository;
+        this.cidadeRepository = cidadeRepository;
+    }
 
     public FornecedorDTO findByCnpj(String cnpj) {
         Fornecedor fonecedor = fornecedorRepository.findByCnpj(cnpj).orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado com o CNPJ: " + cnpj));
@@ -67,11 +74,13 @@ public class FornecedorService {
         return fornecedorPage.map(fornecedorMapper::toDto);
     }
 
+    @Transactional
     public FornecedorDTO save(FornecedorDTO fornecedorDTO) {
         Fornecedor fornecedor = fornecedorMapper.toEntity(fornecedorDTO);
         return fornecedorMapper.toDto(fornecedorRepository.save(fornecedor));
     }
 
+    @Transactional
     public void deleteById(BigInteger idFornecedor) {
         if(Objects.isNull(findById(idFornecedor)))
             fornecedorRepository.deleteById(idFornecedor);

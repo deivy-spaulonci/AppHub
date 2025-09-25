@@ -13,10 +13,12 @@ import {MessageService} from 'primeng/api';
 import {Fornecedor} from '../../../model/fornecedor';
 import {Util} from '../../../util/util';
 import {Router} from '@angular/router';
+import {LoadingModalComponent} from '../../../shared/loading-modal/loading-modal.component';
+import {Toast} from 'primeng/toast';
 
 @Component({
   selector: 'app-fornecedor-form',
-  imports: [CardModule, InputMask, InputMaskModule, InputGroupAddonModule, InputGroupModule, Button, SelectButton, FormsModule, InputText, Select],
+  imports: [CardModule, InputMask, InputMaskModule, InputGroupAddonModule, InputGroupModule, Button, SelectButton, FormsModule, InputText, Select, LoadingModalComponent, Toast],
   templateUrl: './fornecedor-form.component.html',
   standalone: true,
   styleUrl: './fornecedor-form.component.css',

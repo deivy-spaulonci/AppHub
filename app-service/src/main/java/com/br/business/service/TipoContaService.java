@@ -7,6 +7,7 @@ import com.br.repository.TipoContaRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -20,12 +21,16 @@ import java.util.Optional;
 @Log4j2
 public class TipoContaService {
 
-    @Autowired
     private TipoContaRepository tipoContaRepository;
+    public static final TipoContaMapper tipoContaMapper = TipoContaMapper.INSTANCE;
+
     @PersistenceContext
     private EntityManager em;
 
-    public static final TipoContaMapper tipoContaMapper = TipoContaMapper.INSTANCE;
+    @Autowired
+    public TipoContaService(TipoContaRepository tipoContaRepository) {
+        this.tipoContaRepository = tipoContaRepository;
+    }
 
     public List<TipoContaDTO> findTipoContas(Sort sort) {
         return tipoContaMapper.toDtoList(tipoContaRepository.findAll(sort));
@@ -40,6 +45,7 @@ public class TipoContaService {
         return tipoContaMapper.toDto(tipoConta);
     }
 
+    @Transactional
     public TipoContaDTO save(TipoContaDTO tipoContaDTO) {
         TipoConta tipoConta = tipoContaMapper.toEntity(tipoContaDTO);
         return tipoContaMapper.toDto(tipoContaRepository.save(tipoConta));

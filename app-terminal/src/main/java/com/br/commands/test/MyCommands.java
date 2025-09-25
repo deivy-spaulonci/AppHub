@@ -1,45 +1,27 @@
-package com.br.commands;
+package com.br.commands.test;
 
-import java.util.*;
-
-import com.br.business.service.ContaService;
-import com.br.business.service.TipoContaService;
-import com.br.config.ShellHelper;
-import com.br.entity.TipoDespesa;
-import com.br.loading.ProgressBar;
-import com.br.loading.ProgressCounter;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.shell.component.SingleItemSelector;
-import org.springframework.shell.component.SingleItemSelector.SingleItemSelectorContext;
-import org.springframework.shell.component.flow.ComponentFlow;
-import org.springframework.shell.component.flow.ResultMode;
-import org.springframework.shell.component.flow.SelectItem;
-import org.springframework.shell.component.support.SelectorItem;
 import org.springframework.shell.standard.AbstractShellComponent;
 import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
-import org.springframework.shell.standard.ShellOption;
-import org.springframework.shell.component.flow.ComponentFlow.ComponentFlowResult;
 
 @Log4j2
 @ShellComponent
 public class MyCommands extends AbstractShellComponent {
 
-	@Autowired
-	ShellHelper shellHelper;
-
-	@Autowired
-	ProgressCounter progressCounter;
-
-	@Autowired
-	ProgressBar progressBar;
-	
-	@Autowired
-	private ComponentFlow.Builder componentFlowBuilder;
-
-	@Autowired
-	private TipoContaService tipoContaService;
+//	@Autowired
+//	ShellHelper shellHelper;
+//
+//	@Autowired
+//	ProgressCounter progressCounter;
+//
+//	@Autowired
+//	ProgressBar progressBar;
+//
+//	@Autowired
+//	private ComponentFlow.Builder componentFlowBuilder;
+//
+//	@Autowired
+//	private TipoContaService tipoContaService;
 
 //	@ShellMethod("Displays progress counter (with spinner)")
 //	public void progressCounter() throws InterruptedException {

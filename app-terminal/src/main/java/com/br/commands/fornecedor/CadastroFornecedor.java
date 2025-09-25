@@ -4,16 +4,9 @@ import com.br.business.service.CidadeService;
 import com.br.business.service.FornecedorService;
 import com.br.commands.DefaultComponent;
 import com.br.config.ShellHelper;
-import com.br.entity.Estado;
 import com.br.entity.Fornecedor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Sort;
-import org.springframework.shell.component.support.SelectorItem;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 @Log4j2
@@ -30,19 +23,19 @@ public class CadastroFornecedor {
     }
 
     public void printFornecedorApi(Fornecedor f){
-        shellHelper.printInfo("Fornecedor da api!");
-        shellHelper.printInfo("Nome_________: " + f.getNome());
-        shellHelper.printInfo("Razão Social_: " + f.getRazaoSocial());
-        shellHelper.printInfo("CNPJ / CPF __: " + (Objects.nonNull(f.getCnpj()) ? f.getCnpj() : f.getCpf()));
-        shellHelper.printInfo("Ibge_________: " + f.getCidade().getIbgeCod());
+        shellHelper.prInfo("Fornecedor da api!");
+        shellHelper.prInfo("Nome_________: " + f.getNome());
+        shellHelper.prInfo("Razão Social_: " + f.getRazaoSocial());
+        shellHelper.prInfo("CNPJ / CPF __: " + (Objects.nonNull(f.getCnpj()) ? f.getCnpj() : f.getCpf()));
+        shellHelper.prInfo("Ibge_________: " + f.getCidade().getIbgeCod());
     }
 
     public void printFornecedor(Fornecedor f){
-        shellHelper.printInfo("Fornecedor já cadastrado!");
-        shellHelper.printInfo("Nome_________: " + f.getNome());
-        shellHelper.printInfo("Razão Social_: " + f.getRazaoSocial());
-        shellHelper.printInfo("CNPJ / CPF __: " + (Objects.nonNull(f.getCnpj()) ? f.getCnpj() : f.getCpf()));
-        shellHelper.printInfo("Cidade_______: " + f.getCidade().getNome());
+        shellHelper.prInfo("Fornecedor já cadastrado!");
+        shellHelper.prInfo("Nome_________: " + f.getNome());
+        shellHelper.prInfo("Razão Social_: " + f.getRazaoSocial());
+        shellHelper.prInfo("CNPJ / CPF __: " + (Objects.nonNull(f.getCnpj()) ? f.getCnpj() : f.getCpf()));
+        shellHelper.prInfo("Cidade_______: " + f.getCidade().getNome());
     }
 
     public Fornecedor cadastro(FornecedorService fornecedorService,

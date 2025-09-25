@@ -1,7 +1,6 @@
 package com.br.loading;
 
 import com.br.config.ShellHelper;
-import org.jline.terminal.Terminal;
 
 public class ProgressBar {
     private static final String CUU = "\u001B[A";
@@ -21,32 +20,63 @@ public class ProgressBar {
     }
 
     public void display(int percentage) {
-        if (!started) {
-            started = true;
-            shellHelper.getTerminal().writer().println();
-        }
-        int x = (percentage / 5);
-        int y = 20 - x;
-        String done = shellHelper.getSuccessMessage(new String(new char[x]).replace("\0", doneMarker));
-        String remains = new String(new char[y]).replace("\0", remainsMarker);
-        String progressBar = String.format("%s%s%s%s %d", leftDelimiter, done, remains, rightDelimiter, percentage);
-        shellHelper.getTerminal().writer().println(CUU + "\r" + DL + progressBar + "% ");
-        shellHelper.getTerminal().flush();
+        display(percentage, null);
     }
 
-    public void display() {
+    public void display(int percentage, String statusMessage) {
         if (!started) {
             started = true;
             shellHelper.getTerminal().writer().println();
         }
-        String done = shellHelper.getSuccessMessage(new String(new char[0]).replace("\0", doneMarker));
-        String remains = new String(new char[0]).replace("\0", remainsMarker);
-        String progressBar = String.format("%s%s%s%s", leftDelimiter, done, remains, rightDelimiter);
-        shellHelper.getTerminal().writer().println(CUU + "\r" + DL + progressBar + "% ");
+        int x = (percentage/5);
+        int y = 20-x;
+        String message = ((statusMessage == null) ? "" : statusMessage);
+
+        String done = shellHelper.getSuccessMessage(new String(new char[x]).replace("\0", doneMarker));
+        String remains = new String(new char[y]).replace("\0", remainsMarker);
+
+        String progressBar = String.format("%s%s%s%s %d", leftDelimiter, done, remains, rightDelimiter, percentage);
+
+        shellHelper.getTerminal().writer().println(CUU + "\r" + DL + progressBar + "% " + message);
         shellHelper.getTerminal().flush();
     }
 
     public void reset() {
         started = false;
     }
+
+    //--- set / get methods ---------------------------------------------------
+
+    public String getDoneMarker() {
+        return doneMarker;
+    }
+
+    public void setDoneMarker(String doneMarker) {
+        this.doneMarker = doneMarker;
+    }
+
+    public String getRemainsMarker() {
+        return remainsMarker;
+    }
+
+    public void setRemainsMarker(String remainsMarker) {
+        this.remainsMarker = remainsMarker;
+    }
+
+    public String getLeftDelimiter() {
+        return leftDelimiter;
+    }
+
+    public void setLeftDelimiter(String leftDelimiter) {
+        this.leftDelimiter = leftDelimiter;
+    }
+
+    public String getRightDelimiter() {
+        return rightDelimiter;
+    }
+
+    public void setRightDelimiter(String rightDelimiter) {
+        this.rightDelimiter = rightDelimiter;
+    }
+
 }
