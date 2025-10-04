@@ -4,7 +4,6 @@ import com.br.business.service.ContaService;
 import com.br.dto.ContaByTipoDTO;
 import com.br.dto.ContaDTO;
 import com.br.filter.ContaFilter;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

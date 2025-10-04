@@ -84,10 +84,6 @@ public class DocumentoService {
             }
         }
     }
-
-
-
-
 //    public static void main(String[] args) {
 //        // Substitua o caminho pelo diretório que você deseja passar
 //        String caminhoDaPasta = "/media/deivy/hd01/Pagamentos/Pagamentos_PF"; // Caminho do diretório

@@ -62,15 +62,15 @@ public class FornecedorService {
     }
 
     public List<FornecedorDTO> listFornecedoresSorted(String busca, Sort sort) {
-        return fornecedorMapper.toDtoList(fornecedorRepository.listFornecedorSorted(sort, busca, em));
+        return fornecedorMapper.toDtoList(fornecedorRepository.listFornecedorSorted(sort, busca));
     }
 
     public List<FornecedorDTO> listFornecedores(String busca) {
-        return fornecedorMapper.toDtoList(fornecedorRepository.listFornecedor(busca, em));
+        return fornecedorMapper.toDtoList(fornecedorRepository.listFornecedor(busca));
     }
 
     public Page<FornecedorDTO> listFornecedoresPaged(String busca, Pageable pageable) {
-        Page<Fornecedor> fornecedorPage = fornecedorRepository.listFornecedorPaged(pageable, busca, em);
+        Page<Fornecedor> fornecedorPage = fornecedorRepository.listFornecedorPaged(pageable, busca);
         return fornecedorPage.map(fornecedorMapper::toDto);
     }
 

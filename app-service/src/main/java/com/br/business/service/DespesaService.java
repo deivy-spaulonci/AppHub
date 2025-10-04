@@ -2,8 +2,6 @@ package com.br.business.service;
 
 import com.br.dto.*;
 import com.br.entity.Despesa;
-import com.br.entity.Fornecedor;
-import com.br.entity.TipoConta;
 import com.br.entity.TipoDespesa;
 import com.br.filter.DespesaFilter;
 import com.br.mapper.DespesaMapper;
@@ -37,22 +35,17 @@ public class DespesaService {
 
     private DespesaRepository despesaRepository;
     private FornecedorService fornecedorService;
-    private FornecedorRepository fornecedorRepository;
-    private DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration;
     public static final DespesaMapper despesaMapper = DespesaMapper.INSTANCE;
     private FornecedorMapper fornecedorMapper;
 
     @Autowired
     public DespesaService(DespesaRepository despesaRepository,
-                          FornecedorRepository fornecedorRepository,
                           FornecedorService fornecedorService,
                           FornecedorMapper fornecedorMapper,
                           DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration) {
         this.despesaRepository = despesaRepository;
-        this.fornecedorRepository = fornecedorRepository;
         this.fornecedorMapper = fornecedorMapper;
         this.fornecedorService = fornecedorService;
-        this.dataSourceTransactionManagerAutoConfiguration = dataSourceTransactionManagerAutoConfiguration;
     }
 
     public List<DespesaDTO> findDespesas() {
@@ -65,11 +58,11 @@ public class DespesaService {
     }
 
     public List<DespesaDTO> listDespesasSorted(DespesaFilter despesaFilter, Sort sort) {
-        return despesaMapper.toDtoList(despesaRepository.listDespesaSorted(sort, despesaFilter, em));
+        return despesaMapper.toDtoList(despesaRepository.listDespesaSorted(sort, despesaFilter));
     }
 
     public Page<DespesaDTO> listDespesasPaged(DespesaFilter despesaFilter, Pageable pageable) {
-        Page<Despesa> despesaPage = despesaRepository.listDespesaPaged(pageable, despesaFilter, em);
+        Page<Despesa> despesaPage = despesaRepository.listDespesaPaged(pageable, despesaFilter);
         return despesaPage.map(despesaMapper::toDto);
     }
 

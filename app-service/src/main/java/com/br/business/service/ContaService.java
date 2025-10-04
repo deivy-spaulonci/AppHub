@@ -45,10 +45,10 @@ public class ContaService {
         return contaMapper.toDto(conta);
     }
     public List<ContaDTO> listContaSorted(ContaFilter contaFilter, Sort sort) {
-        return contaMapper.toDtoList(contaRepository.listContaSorted(sort, contaFilter, em));
+        return contaMapper.toDtoList(contaRepository.listContaSorted(sort, contaFilter));
     }
     public Page<ContaDTO> listContaPaged(ContaFilter contaFilter, Pageable pageable) {
-        Page<Conta> contaPage = contaRepository.listContaPaged(pageable, contaFilter, em);
+        Page<Conta> contaPage = contaRepository.listContaPaged(pageable, contaFilter);
         return contaPage.map(contaMapper::toDto);
     }
     @Transactional

@@ -20,6 +20,7 @@ public enum ContaStatus implements Serializable {
         this.nome = nome;
         this.value = this.toString();
     }
+
     public static ContaStatus forValues(String value) {
         for (ContaStatus contaStatus : ContaStatus.values()) {
             if (contaStatus.value.equals(value)) {

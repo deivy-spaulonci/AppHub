@@ -21,6 +21,6 @@ public class FormaPagamento extends Tipo implements Serializable {
 
     @Override
     public String toString() {
-        return getNome(); // O JComboBox exibirá o nome
+        return getNome();
     }
 }

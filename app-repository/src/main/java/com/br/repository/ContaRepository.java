@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.br.entity.ContaStatus.ABERTO;
-
 @Repository
 public interface ContaRepository extends JpaRepository<Conta, BigInteger>, JpaSpecificationExecutor<Conta> {
 

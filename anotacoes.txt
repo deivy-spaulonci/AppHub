@@ -1,7 +1,7 @@
 
 COMMANDOS
  > LEVANTA O BANCO H2 PARA ACEITAR CONNECÇÕES DE FORA DO LOCALHOST
- > java -jar h2-*.jar -tcp -tcpAllowOthers -tcpPort 9092 -web -webAllowOthers -webPort 8082
+ > java -jar h2/bin/h2-*.jar -tcp -tcpAllowOthers -tcpPort 9092 -web -webAllowOthers -webPort 8082
 
  > PARTE DO ROOT E ATUA SOMENTE EM CIMA DO MODULO
  > mvn clean package spring-boot:repackage -pl modulo-app -am -DskipTests

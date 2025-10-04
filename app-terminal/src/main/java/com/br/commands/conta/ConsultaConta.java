@@ -1,29 +1,8 @@
 package com.br.commands.conta;
 
-import com.br.business.service.ContaService;
-import com.br.business.service.FormaPagamentoService;
-import com.br.business.service.TipoContaService;
 import com.br.commands.DefaultComponent;
 import com.br.config.ShellHelper;
-import com.br.entity.Conta;
-import com.br.entity.ContaStatus;
-import com.br.entity.FormaPagamento;
-import com.br.filter.ContaFilter;
-import com.br.util.Util;
-import com.br.util.Validate;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.shell.component.support.SelectorItem;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Log4j2
 public class ConsultaConta {

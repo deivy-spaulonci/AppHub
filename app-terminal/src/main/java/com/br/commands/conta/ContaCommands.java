@@ -7,7 +7,6 @@ import com.br.business.service.TipoContaService;
 import com.br.commands.DefaultComponent;
 import com.br.config.ShellHelper;
 import com.br.entity.*;
-import com.br.filter.ContaFilter;
 import com.br.util.Util;
 import com.br.util.Validate;
 import lombok.Getter;
@@ -15,21 +14,9 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.jline.terminal.Terminal;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.shell.component.flow.ComponentFlow;
-import org.springframework.shell.component.support.SelectorItem;
 import org.springframework.shell.standard.AbstractShellComponent;
 import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Log4j2
 @ShellComponent
