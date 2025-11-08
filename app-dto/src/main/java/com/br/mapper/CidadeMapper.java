@@ -1,6 +1,6 @@
 package com.br.mapper;
 
-import com.br.dto.CidadeDTO;
+import com.br.dto.response.CidadeResponseDTO;
 import com.br.entity.Cidade;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -10,12 +10,12 @@ import java.util.List;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CidadeMapper {
     CidadeMapper INSTANCE = Mappers.getMapper(CidadeMapper.class);
-    Cidade toEntity(CidadeDTO cidadeDto);
+    Cidade toEntity(CidadeResponseDTO cidadeResponseDto);
 
-    CidadeDTO toDto(Cidade cidade);
+    CidadeResponseDTO toDto(Cidade cidade);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Cidade partialUpdate(CidadeDTO cidadeDto, @MappingTarget Cidade cidade);
+    Cidade partialUpdate(CidadeResponseDTO cidadeResponseDto, @MappingTarget Cidade cidade);
 
-    List<CidadeDTO> toDtoList(List<Cidade> cidades);
+    List<CidadeResponseDTO> toDtoList(List<Cidade> cidades);
 }

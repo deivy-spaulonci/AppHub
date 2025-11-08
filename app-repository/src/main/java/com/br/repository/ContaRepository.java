@@ -1,8 +1,6 @@
 package com.br.repository;
 
-import com.br.entity.Conta;
-import com.br.entity.ContaStatus;
-import com.br.entity.Conta_;
+import com.br.entity.*;
 import com.br.filter.ContaFilter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -34,7 +32,7 @@ public interface ContaRepository extends JpaRepository<Conta, BigInteger>, JpaSp
         final CriteriaQuery<Object> query = cb.createQuery(Object.class);
         final Root<Conta> root = query.from(Conta.class);
 
-        query.multiselect(root.get(Conta_.tipoConta),cb.sum(root.get(Conta_.valor)));
+        query.multiselect(root.get(Conta_.tipoConta).get(TipoConta_.nome),cb.sum(root.get(Conta_.valor)));
         query.groupBy(root.get(Conta_.tipoConta));
 
         Query qry = entityManager.createQuery(query);
@@ -69,8 +67,8 @@ public interface ContaRepository extends JpaRepository<Conta, BigInteger>, JpaSp
                 if(contaFilter!=null){
                     if (Objects.nonNull(contaFilter.getId()))
                         predicates.add(criteriaBuilder.equal(root.get(Conta_.ID), contaFilter.getId()));
-                    if (Objects.nonNull(contaFilter.getTipoConta()) && Objects.nonNull(contaFilter.getTipoConta().getId()))
-                        predicates.add(criteriaBuilder.equal(root.get(Conta_.tipoConta), contaFilter.getTipoConta()));
+                    if (Objects.nonNull(contaFilter.getIdTipoConta()))
+                        predicates.add(criteriaBuilder.equal(root.get(Conta_.tipoConta).get(TipoConta_.id), contaFilter.getIdTipoConta()));
 
                     if (Objects.nonNull(contaFilter.getEmissaoInicial()) && Objects.nonNull(contaFilter.getEmissaoFinal()))
                         predicates.add(criteriaBuilder.between(root.get(Conta_.emissao), contaFilter.getEmissaoInicial(), contaFilter.getEmissaoFinal()));

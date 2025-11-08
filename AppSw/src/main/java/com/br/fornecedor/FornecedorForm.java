@@ -2,7 +2,7 @@ package com.br.fornecedor;
 
 import com.br.dao.CidadeDAO;
 import com.br.dao.FornecedorDAO;
-import com.br.dto.FornecedorCloudDTO;
+import com.br.dto.response.FornecedorCloudResponseDTO;
 import com.br.entity.Cidade;
 import com.br.entity.Estado;
 import com.br.entity.Fornecedor;
@@ -147,7 +147,7 @@ public class FornecedorForm extends JPanel {
         String json = getFornecedorApiWeb(cnpj);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            FornecedorCloudDTO fornecedorAWS = objectMapper.readValue(json, FornecedorCloudDTO.class);
+            FornecedorCloudResponseDTO fornecedorAWS = objectMapper.readValue(json, FornecedorCloudResponseDTO.class);
             Cidade cidade = cidadeDAO.buscarPorCodIbge(fornecedorAWS.getIbgeCod());
 
             Fornecedor fornecedor = Fornecedor.builder()

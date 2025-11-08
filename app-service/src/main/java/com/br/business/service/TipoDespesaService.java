@@ -1,6 +1,7 @@
 package com.br.business.service;
 
-import com.br.dto.TipoDespesaDTO;
+import com.br.dto.request.TipoDespesaRequestDTO;
+import com.br.dto.response.TipoDespesaResponseDTO;
 import com.br.entity.TipoDespesa;
 import com.br.entity.TipoDespesa_;
 import com.br.mapper.TipoDespesaMapper;
@@ -31,18 +32,18 @@ public class TipoDespesaService {
         this.tipoDespesaRepository = tipoDespesaRepository;
     }
 
-    public List<TipoDespesaDTO> findTipoDespesas() {
+    public List<TipoDespesaResponseDTO> findTipoDespesas() {
         return tipoDespesaMapper.toDtoList(tipoDespesaRepository.findAll(Sort.by(TipoDespesa_.NOME)));
     }
 
-    public TipoDespesaDTO findById(BigInteger id) {
+    public TipoDespesaResponseDTO findById(BigInteger id) {
         TipoDespesa tipoDespesa = tipoDespesaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Tipo de despesa não encontrado com o id: " + id));
         return tipoDespesaMapper.toDto(tipoDespesa);
     }
 
     @Transactional
-    public TipoDespesaDTO save(TipoDespesaDTO tipoDespesaDTO) {
-        TipoDespesa tipoDespesa = tipoDespesaMapper.toEntity(tipoDespesaDTO);
+    public TipoDespesaResponseDTO save(TipoDespesaRequestDTO tipoDespesaRequestDTO) {
+        TipoDespesa tipoDespesa = tipoDespesaMapper.toEntity(tipoDespesaRequestDTO);
         return tipoDespesaMapper.toDto(tipoDespesaRepository.save(tipoDespesa));
     }
 }

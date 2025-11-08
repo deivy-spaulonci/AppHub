@@ -1,7 +1,6 @@
 package com.br.repository;
 
-import com.br.entity.Despesa;
-import com.br.entity.Despesa_;
+import com.br.entity.*;
 import com.br.filter.DespesaFilter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -44,7 +43,7 @@ public interface DespesaRepository extends JpaRepository<Despesa, BigInteger>, J
         final CriteriaQuery<Object> query = cb.createQuery(Object.class);
         final Root<Despesa> root = query.from(Despesa.class);
         query.multiselect(
-                root.get(Despesa_.tipoDespesa),
+                root.get(Despesa_.tipoDespesa).get(TipoDespesa_.nome),
                 cb.sum(root.get(Despesa_.valor)));
         query.groupBy(root.get(Despesa_.tipoDespesa));
         Query qry = entityManager.createQuery(query);
@@ -67,18 +66,18 @@ public interface DespesaRepository extends JpaRepository<Despesa, BigInteger>, J
 
                 if (Objects.nonNull(despesaFilter.getId()))
                     predicates.add(criteriaBuilder.equal(root.get(Despesa_.id), despesaFilter.getId()));
-                if (Objects.nonNull(despesaFilter.getTipoDespesa()))
-                    predicates.add(criteriaBuilder.equal(root.get(Despesa_.tipoDespesa), despesaFilter.getTipoDespesa()));
-                if (Objects.nonNull(despesaFilter.getFornecedor()))
-                    predicates.add(criteriaBuilder.equal(root.get(Despesa_.fornecedor), despesaFilter.getFornecedor()));
+                if (Objects.nonNull(despesaFilter.getIdTipoDespesa()))
+                    predicates.add(criteriaBuilder.equal(root.get(Despesa_.tipoDespesa).get(TipoDespesa_.id), despesaFilter.getIdTipoDespesa()));
+                if (Objects.nonNull(despesaFilter.getIdFornecedor()))
+                    predicates.add(criteriaBuilder.equal(root.get(Despesa_.fornecedor).get(Fornecedor_.id), despesaFilter.getIdFornecedor()));
                 if (Objects.nonNull(despesaFilter.getDataInicial()) && Objects.nonNull(despesaFilter.getDataFinal()))
                     predicates.add(criteriaBuilder.between(root.get(Despesa_.dataPagamento), despesaFilter.getDataInicial(), despesaFilter.getDataFinal()));
                 if (Objects.nonNull(despesaFilter.getDataInicial()))
                     predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(Despesa_.dataPagamento), despesaFilter.getDataInicial()));
                 if (Objects.nonNull(despesaFilter.getDataFinal()))
                     predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(Despesa_.dataPagamento), despesaFilter.getDataFinal()));
-                if (Objects.nonNull(despesaFilter.getFormaPagamento()))
-                    predicates.add(criteriaBuilder.equal(root.get(Despesa_.formaPagamento), despesaFilter.getFormaPagamento()));
+                if (Objects.nonNull(despesaFilter.getIdFornecedor()))
+                    predicates.add(criteriaBuilder.equal(root.get(Despesa_.formaPagamento).get(FormaPagamento_.id), despesaFilter.getIdFormaPagamento()));
 
                 return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
             }

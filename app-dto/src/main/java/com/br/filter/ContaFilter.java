@@ -7,14 +7,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 @Getter
 @Setter
 @Builder
 public class ContaFilter {
-    private Long id;
-    private TipoConta tipoConta;
+    private BigInteger id;
+    private BigInteger idTipoConta;
     private LocalDate vencimentoInicial;
     private LocalDate vencimentoFinal;
     private LocalDate emissaoInicial;

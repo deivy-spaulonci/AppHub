@@ -1,8 +1,26 @@
 package com.br.commands.despesa;
 
+import com.br.business.service.DespesaService;
+import com.br.business.service.FormaPagamentoService;
+import com.br.business.service.FornecedorService;
+import com.br.business.service.TipoDespesaService;
 import com.br.commands.DefaultComponent;
 import com.br.commands.fornecedor.FornecedorComp;
 import com.br.config.ShellHelper;
+import com.br.dto.response.DespesaResponseDTO;
+import com.br.filter.DespesaFilter;
+import com.br.util.Util;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.shell.component.support.SelectorItem;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConsultaDespesa {
 
@@ -19,49 +37,49 @@ public class ConsultaDespesa {
         this.fornecedorComp = fornecedorComp;
     }
 
-//    public void consulta(DespesaService despesaService,
-//                         FornecedorService fornecedorService,
-//                         TipoDespesaService tipoDespesaService,
-//                         FormaPagamentoService formaPagamentoService){
-////        this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
-//        //this.fornecedorComp = new FornecedorComp(terminal, getTemplateExecutor(), getResourceLoader());
+    public void consulta(DespesaService despesaService,
+                         FornecedorService fornecedorService,
+                         TipoDespesaService tipoDespesaService,
+                         FormaPagamentoService formaPagamentoService){
+
+//    this.fornecedorComp = new FornecedorComp(terminal, getTemplateExecutor(), getResourceLoader());
 //
-//        boolean contEdtDespesa = true;
-//        DespesaFilter despesaFilter = DespesaFilter.builder().build();
-//        int size = 30;
-//        int numberPage = 1;
-//        int order = 1;
-//        String campoOrder = "dataPagamento";
-//        Page<Despesa> pg;
-//        do{
-//            Sort.Direction direction = (order==0 ? Sort.Direction.ASC : Sort.Direction.DESC);
-//            Pageable pageable = PageRequest.of(numberPage-1, size, Sort.by(direction, campoOrder));
-//            pg = despesaService.listDespesasPaged(despesaFilter, pageable);
-//            String header = String.format(" %-6s | %-25s | %-80s | %-10s | %15s | %34s |  %-30s","id", "Tipo Despesa", "Fonrecedor", "Data", "Valor", "Forma Pagamento", "Obs");
-//            System.out.print("\033\143");
-//            shellHelper.printInfo("-".repeat(230));
-//            shellHelper.printInfo(header);
-//            shellHelper.printInfo("-".repeat(230));
-//            if(pg.hasContent()){
-//                pg.getContent().forEach(despesa -> {
-//                    String label = String.format(" %-6s | %-25s | %-80s | %-10s | %15s | %34s |  %-30s",
+        String mensagem = "";
+        boolean contEdtDespesa = true;
+        DespesaFilter despesaFilter = DespesaFilter.builder().build();
+        int size = 30;
+        int numberPage = 1;
+        int order = 1;
+        String campoOrder = "dataPagamento";
+        Page<DespesaResponseDTO> pg;
+        do{
+            Sort.Direction direction = (order==0 ? Sort.Direction.ASC : Sort.Direction.DESC);
+            Pageable pageable = PageRequest.of(numberPage-1, size, Sort.by(direction, campoOrder));
+            pg = despesaService.listDespesasPaged(despesaFilter, pageable);
+            String cols = " %-25s | %-50s | %-10s | %15s | %-34s |  %-50s";
+            final int LARG = 200;
+            String header = String.format(cols,"Tipo Despesa", "Fonrecedor", "Data", "Valor", "Forma Pagamento", "Obs");
+            System.out.print("\033\143");
+            shellHelper.prInfo("-".repeat(LARG));
+            shellHelper.prInfo(header);
+            shellHelper.prInfo("-".repeat(LARG));
+            if(pg.hasContent()){
+                pg.getContent().forEach(despesa -> {
+                    String label = String.format(cols,
 //                            despesa.getId(),
-//                            despesa.getTipoDespesa().getNome(),
-//                            despesa.getFornecedor().getNome(),
-//                            Util.toDatePtBr(despesa.getDataPagamento()),
-//                            Util.toCurrencyPtBr(despesa.getValor()),
-//                            despesa.getFormaPagamento().getNome(),
-//                            despesa.getObs());
-//                    shellHelper.printInfo(label);
-//                });
-//            }else
-//                shellHelper.printInfo(" !!! nenhum despesa encontrado... !!!");
-//            shellHelper.printInfo("-".repeat(230));
-//            BigDecimal total = despesaService.getSumDespesa(despesaFilter);
-//            shellHelper.printInfo("");
-//            shellHelper.printInfo(String.format(" pagina: %-10s  paginas: %-10s tamanho: %-10s  registros: %-10s  total: %-10s",
-//                    numberPage, pg.getTotalPages(), size, pg.getTotalElements(), Util.toCurrencyPtBr(total)));
-//            shellHelper.printInfo("");
+                            despesa.getTipoDespesa().getNome(),
+                            StringUtils.abbreviate(despesa.getFornecedor().getNome(), 50),
+                            Util.toDatePtBr(despesa.getDataPagamento()),
+                            Util.toCurrencyPtBr(despesa.getValor()),
+                            despesa.getFormaPagamento().getNome(),
+                            StringUtils.abbreviate(despesa.getObs(),40));
+                    shellHelper.prInfo(label);
+                });
+            }else
+                shellHelper.prInfo(" !!! nenhum despesa encontrado... !!!");
+                shellHelper.prInfo("-".repeat(LARG));
+                BigDecimal total = despesaService.getSumDespesa(despesaFilter);
+                shellHelper.prInfo("%n pagina: %-20s  paginas: %-20s tamanho: %-20s  registros: %-20s  total: %-20s %n".formatted(numberPage, pg.getTotalPages(), size, pg.getTotalElements(), Util.toCurrencyPtBr(total)));
 //            shellHelper.printInfo("Filtros:");
 //            if(despesaFilter.getId()!=null) shellHelper.printInfo("	-> id = " + despesaFilter.getId());
 //            if(despesaFilter.getTipoDespesa()!=null) shellHelper.printInfo("	-> Tipo despesa = " + despesaFilter.getTipoDespesa().getNome());
@@ -76,52 +94,54 @@ public class ConsultaDespesa {
 //            shellHelper.printInfo("comandos  > [clear]  [excluir xx]  [editar xx]");
 //            shellHelper.printInfo("");
 //
-//            String resposta = this.defaultComponent.inputTextDefault(" ->", "");
-//            if(resposta.equals("exit")){
-//                contEdtDespesa = false;
-//            }else{
-//                String[] resparr = resposta.split(" ");
-//                switch (resparr[0]){
-//                    case "size" :
-//                        size = this.defaultComponent.selectPageDefault();
-//                        break;
-//                    case "pag" : {
-//                        if(resparr[1]!=null && resparr[1].matches("[0-9]+")) {
-//                            Integer retInt = Integer.parseInt(resparr[1]);
-//                            if(retInt>=1 && retInt<=pg.getTotalPages()) {
-//                                numberPage = pg.getContent().size() < size ? 1 : retInt;
-//                            }else
-//                                shellHelper.printError(String.format("valor digitado tem que ser entre 1 e %d",pg.getTotalPages()));
-//                        }else
-//                            shellHelper.printError("valor digitado nao corresponde a um numero");
-//                        break;
-//                    }
-//                    case "order":{
-//                        List<SelectorItem<String>> ltOpc = new ArrayList<>(){{
-//                            add(SelectorItem.of("Id", "id"));
-//                            add(SelectorItem.of("Tipo Despesa", "tipoDespesa"));
-//                            add(SelectorItem.of("Forma Pagamento", "formaPagamento"));
-//                            add(SelectorItem.of("Data Pagamento", "dataPagamento"));
-//                            add(SelectorItem.of("Fonrecedor", "fornecedor.nome"));
-//                        }};
-//                        campoOrder = this.defaultComponent.selectDefault(ltOpc, "Selecionar Campo");
-//                        List<SelectorItem<String>> opcOrder = new ArrayList<>();
-//                        opcOrder.add(SelectorItem.of("Ascesdente", "0"));
-//                        opcOrder.add(SelectorItem.of("Descendente", "1"));
-//                        order = Integer.valueOf(this.defaultComponent.selectDefault(opcOrder, "Selecionar Ordem Campo"));
-//                        break;
-//                    }
-//                    case "id": {
-//                        //String id = re//this.defaultComponent.inputTextDefault(" id ->", "");
-//                        if ((resparr[1] != null && resparr[1].matches("[0-9]+"))) {
-//                            despesaFilter.setId(Long.valueOf(resparr[1]));
-//                        } else {
-//                            shellHelper.printError("valor digitado nao corresponde a um numero !");
-//                        }
-//                        break;
-//                    }
+
+            if(!mensagem.trim().isEmpty())
+                shellHelper.prWarning("%n%n  !!! %-20s... !!! %n%n".formatted(mensagem));
+            mensagem = "";
+
+            String resposta = this.defaultComponent.inputTextDefault(" ->", "");
+
+            if(resposta.equals("exit")){
+                contEdtDespesa = false;
+            }else{
+                String[] resparr = resposta.split(" ");
+                switch (resparr[0]){
+                    case "size" :
+                        size = this.defaultComponent.selectPageDefault();
+                        break;
+                    case "pag" : {
+                        Integer pagina = this.defaultComponent.inputInteger("Página : ", numberPage+"");
+                        if(pagina>=1 && pagina<=pg.getTotalPages())
+                            numberPage = pagina;
+                        else
+                            mensagem = String.format("valor digitado tem que ser entre 1 e %d",pg.getTotalPages());
+                        break;
+                    }
+                    case "sort":{
+                        List<SelectorItem<String>> ltOpc = new ArrayList<>(){{
+                            add(SelectorItem.of("Id", "id"));
+                            add(SelectorItem.of("Tipo Despesa", "tipoDespesa"));
+                            add(SelectorItem.of("Forma Pagamento", "formaPagamento"));
+                            add(SelectorItem.of("Data Pagamento", "dataPagamento"));
+                            add(SelectorItem.of("Fonrecedor", "fornecedor.nome"));
+                        }};
+                        campoOrder = this.defaultComponent.selectDefault(ltOpc, "Selecionar Campo");
+                        List<SelectorItem<String>> opcOrder = new ArrayList<>();
+                        opcOrder.add(SelectorItem.of("Ascesdente", "0"));
+                        opcOrder.add(SelectorItem.of("Descendente", "1"));
+                        order = Integer.valueOf(this.defaultComponent.selectDefault(opcOrder, "Selecionar Ordem Campo"));
+                        break;
+                    }
+                    case "id": {
+                        String id = this.defaultComponent.inputTextDefault(" id ->", "");
+                        if (!id.trim().isEmpty() && id.matches("[0-9]+"))
+                            despesaFilter.setId(new BigInteger(id));
+                        else
+                            mensagem = String.format("valor digitado nao corresponde a um numero !",pg.getTotalPages());
+                        break;
+                    }
 //					case "tipo":
-//                        despesaFilter.setTipoDespesa(this.defaultComponent.selectTipoDespesa(tipoDespesaService.findTipoDespesas()));
+//                        despesaFilter.setIdTipoDespesa(this.defaultComponent.selectTipoDespesa(tipoDespesaService.findTipoDespesas()).getId());
 //                        break;
 //					case "forma":
 //                        despesaFilter.setFormaPagamento(this.defaultComponent.selectFormaPagamento(formaPagamentoService.findFormasPagamento()));
@@ -159,15 +179,15 @@ public class ConsultaDespesa {
 //                        this.defaultComponent.confirmationInput("enter para continuar", true);
 //                        break;
 //                    }
-//                    case "clear": {
-//                        despesaFilter = DespesaFilter.builder().build();
-//                        break;
-//                    }
-//                    default: numberPage = pg.getContent().size() < size ? 1 : numberPage+1;
-//                }
-//            }
-//        }while (!!contEdtDespesa);
-//    }
+                    case "clear": {
+                        despesaFilter = DespesaFilter.builder().build();
+                        break;
+                    }
+                    default: numberPage = pg.getContent().size() < size ? 1 : numberPage+1;
+                }
+            }
+        }while (!!contEdtDespesa);
+    }
 //
 //    public void editar(Despesa despesa,
 //                       TipoDespesaService tipoDespesaService,

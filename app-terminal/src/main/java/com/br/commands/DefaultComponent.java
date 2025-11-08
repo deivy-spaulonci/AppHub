@@ -1,27 +1,22 @@
 package com.br.commands;
 
-import com.br.business.service.DespesaService;
-import com.br.business.service.FormaPagamentoService;
-import com.br.business.service.TipoDespesaService;
+import com.br.config.ShellHelper;
+import com.br.dto.response.TipoDespesaResponseDTO;
 import com.br.entity.FormaPagamento;
 import com.br.entity.Fornecedor;
 import com.br.entity.TipoConta;
-import com.br.entity.TipoDespesa;
 import com.br.util.Validate;
 import lombok.Getter;
 import lombok.Setter;
 import org.jline.terminal.Terminal;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.shell.component.ConfirmationInput;
 import org.springframework.shell.component.SingleItemSelector;
 import org.springframework.shell.component.StringInput;
 import org.springframework.shell.component.support.SelectorItem;
-import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.style.TemplateExecutor;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.*;
 
 @Getter
@@ -30,6 +25,7 @@ public class DefaultComponent {
     private Terminal terminal;
     private TemplateExecutor templateExecutor;
     private ResourceLoader resourceLoader;
+    private ShellHelper shellHelper;
 
     public DefaultComponent(Terminal terminal,
                             TemplateExecutor templateExecutor,
@@ -37,6 +33,7 @@ public class DefaultComponent {
         this.terminal = terminal;
         this.templateExecutor = templateExecutor;
         this.resourceLoader = resourceLoader;
+        this.shellHelper = new ShellHelper(terminal);
     }
 
     public FormaPagamento selectFormaPagamento(List<FormaPagamento> formas) {
@@ -62,13 +59,13 @@ public class DefaultComponent {
         return result;
     }
 
-    public TipoDespesa selectTipoDespesa(List<TipoDespesa> tipos) {
-        List<SelectorItem<TipoDespesa>> items = new ArrayList<>();//Arrays.asList(i1, i2, i3, i4);
+    public TipoDespesaResponseDTO selectTipoDespesa(List<TipoDespesaResponseDTO> tipos) {
+        List<SelectorItem<TipoDespesaResponseDTO>> items = new ArrayList<>();//Arrays.asList(i1, i2, i3, i4);
         tipos.forEach(tipo -> {
             items.add(SelectorItem.of(tipo.getNome(), tipo));
         });
         items.sort(Comparator.comparing(SelectorItem::getName));
-        SingleItemSelector<TipoDespesa, SelectorItem<TipoDespesa>> component = new SingleItemSelector<>(
+        SingleItemSelector<TipoDespesaResponseDTO, SelectorItem<TipoDespesaResponseDTO>> component = new SingleItemSelector<>(
                 getTerminal(),
                 items,
                 "Tipo Despesa: ",
@@ -77,10 +74,8 @@ public class DefaultComponent {
         component.setTemplateExecutor(getTemplateExecutor());
         component.setMaxItems(25);
         component.setPrintResults(false);
-        SingleItemSelector.SingleItemSelectorContext<TipoDespesa, SelectorItem<TipoDespesa>> context =
-                component.run(SingleItemSelector.SingleItemSelectorContext.empty());
-        TipoDespesa result = context.getResultItem().flatMap(si ->
-                Optional.ofNullable(si.getItem())).get();
+        SingleItemSelector.SingleItemSelectorContext<TipoDespesaResponseDTO, SelectorItem<TipoDespesaResponseDTO>> context = component.run(SingleItemSelector.SingleItemSelectorContext.empty());
+        TipoDespesaResponseDTO result = context.getResultItem().flatMap(si -> Optional.ofNullable(si.getItem())).get();
         return result;
     }
 
@@ -168,12 +163,14 @@ public class DefaultComponent {
         return result;
     }
 
-    public Integer inputInteger(String label){
-        StringInput component = new StringInput(getTerminal(), label, "");
+    public Integer inputInteger(String label, String deault){
+        StringInput component = new StringInput(getTerminal(), label, deault);
         component.setResourceLoader(getResourceLoader());
         component.setTemplateExecutor(getTemplateExecutor());
         StringInput.StringInputContext context = component.run(StringInput.StringInputContext.empty());
-        return Integer.valueOf(context.getResultValue());
+        if(context.getResultValue()!=null && context.getResultValue().matches("[0-9]+"))
+            return Integer.valueOf(context.getResultValue());
+        return Integer.valueOf(deault);
     }
 
     public String inputCnpjFornecedor(){
@@ -227,7 +224,7 @@ public class DefaultComponent {
         return context.getResultValue();
     }
 
-    public String inData(String label){
+    public String inputData(String label){
         boolean valid = false;
         String data = "";
         do{
@@ -243,7 +240,7 @@ public class DefaultComponent {
         return data;
     }
 
-    public String inValor(String label){
+    public String inputValor(String label){
         boolean valid = false;
         String valor = "";
         do{

@@ -1,10 +1,11 @@
 package com.br.business.service;
 
 
-import com.br.dto.FornecedorDTO;
+import com.br.dto.request.FornecedorRequestDTO;
+import com.br.dto.response.FornecedorResponseDTO;
 import com.br.entity.Cidade;
 import com.br.entity.Fornecedor;
-import com.br.dto.FornecedorCloudDTO;
+import com.br.dto.response.FornecedorCloudResponseDTO;
 import com.br.mapper.FornecedorMapper;
 import com.br.repository.CidadeRepository;
 import com.br.repository.FornecedorRepository;
@@ -47,36 +48,36 @@ public class FornecedorService {
         this.cidadeRepository = cidadeRepository;
     }
 
-    public FornecedorDTO findByCnpj(String cnpj) {
+    public FornecedorResponseDTO findByCnpj(String cnpj) {
         Fornecedor fonecedor = fornecedorRepository.findByCnpj(cnpj).orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado com o CNPJ: " + cnpj));
         return fornecedorMapper.toDto(fonecedor);
     }
 
-    public FornecedorDTO findById(BigInteger id) {
+    public FornecedorResponseDTO findById(BigInteger id) {
         Fornecedor fonecedor = fornecedorRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado com o id: " + id));
         return fornecedorMapper.toDto(fonecedor);
     }
 
-    public List<FornecedorDTO> findFornecedores() {
+    public List<FornecedorResponseDTO> findFornecedores() {
         return fornecedorMapper.toDtoList(fornecedorRepository.findAll());
     }
 
-    public List<FornecedorDTO> listFornecedoresSorted(String busca, Sort sort) {
+    public List<FornecedorResponseDTO> listFornecedoresSorted(String busca, Sort sort) {
         return fornecedorMapper.toDtoList(fornecedorRepository.listFornecedorSorted(sort, busca));
     }
 
-    public List<FornecedorDTO> listFornecedores(String busca) {
+    public List<FornecedorResponseDTO> listFornecedores(String busca) {
         return fornecedorMapper.toDtoList(fornecedorRepository.listFornecedor(busca));
     }
 
-    public Page<FornecedorDTO> listFornecedoresPaged(String busca, Pageable pageable) {
+    public Page<FornecedorResponseDTO> listFornecedoresPaged(String busca, Pageable pageable) {
         Page<Fornecedor> fornecedorPage = fornecedorRepository.listFornecedorPaged(pageable, busca);
         return fornecedorPage.map(fornecedorMapper::toDto);
     }
 
     @Transactional
-    public FornecedorDTO save(FornecedorDTO fornecedorDTO) {
-        Fornecedor fornecedor = fornecedorMapper.toEntity(fornecedorDTO);
+    public FornecedorResponseDTO save(FornecedorRequestDTO fornecedorRequestDTO) {
+        Fornecedor fornecedor = fornecedorMapper.toEntity(fornecedorRequestDTO);
         return fornecedorMapper.toDto(fornecedorRepository.save(fornecedor));
     }
 
@@ -86,11 +87,11 @@ public class FornecedorService {
             fornecedorRepository.deleteById(idFornecedor);
     }
 
-    public FornecedorDTO getFornecedorFromWeb(String cnpj){
+    public FornecedorResponseDTO getFornecedorFromWeb(String cnpj){
         String json = getFornecedorApiWeb(cnpj);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            FornecedorCloudDTO fornecedorAWS = objectMapper.readValue(json, FornecedorCloudDTO.class);
+            FornecedorCloudResponseDTO fornecedorAWS = objectMapper.readValue(json, FornecedorCloudResponseDTO.class);
             Cidade cidade = cidadeRepository.findCidadeByIbgeCod(fornecedorAWS.getIbgeCod());
 
             Fornecedor fornecedor = Fornecedor.builder()

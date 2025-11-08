@@ -1,6 +1,6 @@
 package com.br.business.service;
 
-import com.br.dto.CidadeDTO;
+import com.br.dto.response.CidadeResponseDTO;
 import com.br.entity.Cidade;
 import com.br.mapper.CidadeMapper;
 import com.br.repository.CidadeRepository;
@@ -24,11 +24,11 @@ public class CidadeService {
         return cidadeRepository.findAll();
     }
 
-    public List<CidadeDTO> listCidadeByUf(String uf) {
+    public List<CidadeResponseDTO> listCidadeByUf(String uf) {
         return cidadeMapper.toDtoList(cidadeRepository.findCidadeByUf(uf));
     }
 
-    public List<CidadeDTO> listCidadesByUfContainingNome(String uf, String nome) {
+    public List<CidadeResponseDTO> listCidadesByUfContainingNome(String uf, String nome) {
         return cidadeMapper.toDtoList(cidadeRepository.findCidadeByUfAndNomeContainingIgnoreCaseOrderByNome(uf, nome));
     }
 

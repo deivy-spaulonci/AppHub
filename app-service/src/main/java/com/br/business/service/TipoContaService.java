@@ -1,6 +1,7 @@
 package com.br.business.service;
 
-import com.br.dto.TipoContaDTO;
+import com.br.dto.request.TipoContaRequestDTO;
+import com.br.dto.response.TipoContaResponseDTO;
 import com.br.entity.TipoConta;
 import com.br.mapper.TipoContaMapper;
 import com.br.repository.TipoContaRepository;
@@ -31,22 +32,22 @@ public class TipoContaService {
         this.tipoContaRepository = tipoContaRepository;
     }
 
-    public List<TipoContaDTO> findTipoContas(Sort sort) {
+    public List<TipoContaResponseDTO> findTipoContas(Sort sort) {
         return tipoContaMapper.toDtoList(tipoContaRepository.findAll(sort));
     }
 
-    public List<TipoContaDTO> findTipoContas() {
+    public List<TipoContaResponseDTO> findTipoContas() {
         return tipoContaMapper.toDtoList(tipoContaRepository.findAll());
     }
 
-    public TipoContaDTO findById(BigInteger id) {
+    public TipoContaResponseDTO findById(BigInteger id) {
         TipoConta tipoConta = tipoContaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Tipo de conta não encontrado com o id: " + id));
         return tipoContaMapper.toDto(tipoConta);
     }
 
     @Transactional
-    public TipoContaDTO save(TipoContaDTO tipoContaDTO) {
-        TipoConta tipoConta = tipoContaMapper.toEntity(tipoContaDTO);
+    public TipoContaResponseDTO save(TipoContaRequestDTO tipoContaRequestDTO) {
+        TipoConta tipoConta = tipoContaMapper.toEntity(tipoContaRequestDTO);
         return tipoContaMapper.toDto(tipoContaRepository.save(tipoConta));
     }
 }

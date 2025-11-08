@@ -1,6 +1,7 @@
 package com.br.commands;
 
 import com.br.business.service.*;
+import com.br.commands.despesa.ConsultaDespesa;
 import com.br.commands.fornecedor.FornecedorComp;
 import com.br.config.ShellHelper;
 import com.br.filter.DespesaFilter;
@@ -8,12 +9,20 @@ import com.br.util.Util;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
+import org.jline.consoleui.prompt.ConsolePrompt;
+import org.jline.consoleui.prompt.PromptResultItemIF;
+import org.jline.consoleui.prompt.builder.PromptBuilder;
 import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.component.flow.ComponentFlow;
 import org.springframework.shell.standard.AbstractShellComponent;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
+
+
+import java.io.IOException;
+import java.util.Map;
 
 @Log4j2
 @ShellComponent
@@ -56,7 +65,34 @@ public class FinanceiroCommands extends AbstractShellComponent {
         this.formaPagamentoService = formaPagamentoService;
         this.contaService = contaService;
 //        this.fornecedorComp = new FornecedorComp(terminal, getTemplateExecutor(), getResourceLoader());
+
     }
+
+    @ShellMethod("teste")
+    public void listPrompt() throws IOException {
+
+        ConsolePrompt prompt = new ConsolePrompt(terminal);
+        PromptBuilder builder = prompt.getPromptBuilder();
+
+        // Create a list prompt for single selection
+        builder.createListPrompt()
+                .name("color")
+                .message("Choose your favorite color")
+                .newItem().text("Red").add()
+                .newItem("green").text("Green").add()
+                .newItem("blue").text("Blue").add()
+                .newItem("yellow").text("Yellow").add()
+                .pageSize(3) // Show 3 items at a time
+                .addPrompt();
+
+        try {
+            Map<String, PromptResultItemIF> result = prompt.prompt(builder.build());
+            System.out.println("Selected color: " + result.get("color").getResult());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @ShellMethod("Status Despesas")
     public void statusDespesa(){
@@ -85,14 +121,12 @@ public class FinanceiroCommands extends AbstractShellComponent {
 //
 //
 //
-////    @ShellMethod("Consulta Despesas")
-////    public void despesas(){
-////        this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
-////        ConsultaDespesa consultaDespesa = new ConsultaDespesa(this.defaultComponent,
-////                this.shellHelper,
-////                this.fornecedorComp);
-////        consultaDespesa.consulta(despesaService, fornecedorService, tipoDespesaService, formaPagamentoService);
-////    }
+    @ShellMethod("Consulta Despesas")
+    public void despesas(){
+        this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
+        ConsultaDespesa consultaDespesa = new ConsultaDespesa(this.defaultComponent,this.shellHelper, this.fornecedorComp);
+        consultaDespesa.consulta(despesaService, fornecedorService, tipoDespesaService, formaPagamentoService);
+    }
 //
 ////    @ShellMethod("Cadastro Despesas")
 ////    public void addDespesa() {

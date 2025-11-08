@@ -41,7 +41,21 @@
             <version>1.0</version>
             <scope>compile</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.16.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline</artifactId>
+            <version>3.30.0</version> <!-- ou o mais novo -->
+        </dependency>
+        <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline-console-ui</artifactId>
+            <version>3.30.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

@@ -10,6 +10,7 @@ import com.br.shared.*;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import java.math.BigInteger;
 
 public class DespesaSearch extends JPanel {
     private TipoDespesaDAO tipoDespesaDAO = new TipoDespesaDAO();
@@ -66,15 +67,15 @@ public class DespesaSearch extends JPanel {
         Fornecedor fornecedor = new Fornecedor();
         if(autoCompleteFornecedor.getSelectedItem()!=null)
             fornecedor = ((FornecedorCbx) autoCompleteFornecedor.getSelectedItem()).getFornecedor();
-        DespesaFilter despesaFilter = DespesaFilter.builder()
-                .tipoDespesa((TipoDespesa) comboTipo.getSelectedItem())
-                .formaPagamento((FormaPagamento) comboForma.getSelectedItem())
-                .fornecedor(fornecedor)
-                .dataInicial(inicio.getDateValor())
-                .dataFinal(termino.getDateValor())
-                .build();
-
-        despesaTable.pesquisar(despesaFilter);
+//        DespesaFilter despesaFilter = DespesaFilter.builder()
+//                .idTipoDespesa(new BigInteger(comboTipo.getSelectedItem()))
+//                .formaPagamento((FormaPagamento) comboForma.getSelectedItem())
+//                .fornecedor(fornecedor)
+//                .dataInicial(inicio.getDateValor())
+//                .dataFinal(termino.getDateValor())
+//                .build();
+//
+//        despesaTable.pesquisar(despesaFilter);
 
     }
 }

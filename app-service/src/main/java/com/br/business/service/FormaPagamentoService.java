@@ -1,6 +1,7 @@
 package com.br.business.service;
 
-import com.br.dto.FormaPagamentoDTO;
+import com.br.dto.request.FormaPagamentoRequestDTO;
+import com.br.dto.response.FormaPagamentoResponseDTO;
 import com.br.entity.FormaPagamento;
 import com.br.entity.FormaPagamento_;
 import com.br.mapper.FormaPagamentoMapper;
@@ -32,18 +33,18 @@ public class FormaPagamentoService {
         this.formaPagamentoRepository = formaPagamentoRepository;
     }
 
-    public List<FormaPagamentoDTO> findFormasPagamento() {
+    public List<FormaPagamentoResponseDTO> findFormasPagamento() {
         return formaPagamentoMapper.toDtoList(formaPagamentoRepository.findAll(Sort.by(FormaPagamento_.NOME)));
     }
 
-    public FormaPagamentoDTO findById(BigInteger id) {
+    public FormaPagamentoResponseDTO findById(BigInteger id) {
         FormaPagamento formaPagamento = formaPagamentoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Forma Pagagamento não encontrado com o ID: " + id));
         return formaPagamentoMapper.toDto(formaPagamento);
     }
 
     @Transactional
-    public FormaPagamentoDTO save(FormaPagamentoDTO formaPagamentoDTO) {
-        FormaPagamento formaPagamento = formaPagamentoMapper.toEntity(formaPagamentoDTO);
+    public FormaPagamentoResponseDTO save(FormaPagamentoRequestDTO formaPagamentoRequestDTO) {
+        FormaPagamento formaPagamento = formaPagamentoMapper.toEntity(formaPagamentoRequestDTO);
         return formaPagamentoMapper.toDto(formaPagamentoRepository.save(formaPagamento));
     }
 }

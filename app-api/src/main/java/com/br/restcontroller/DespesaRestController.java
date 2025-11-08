@@ -1,8 +1,9 @@
 package com.br.restcontroller;
 
 import com.br.business.service.DespesaService;
-import com.br.dto.DespesaByTipoDTO;
-import com.br.dto.DespesaDTO;
+import com.br.dto.response.DespesaByTipoResponseDTO;
+import com.br.dto.request.DespesaRequestDTO;
+import com.br.dto.response.DespesaResponseDTO;
 import com.br.filter.DespesaFilter;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,19 +31,19 @@ public class DespesaRestController {
 
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public List<DespesaDTO> findAll(@ModelAttribute DespesaFilter despesaFilter, Sort sort){
+    public List<DespesaResponseDTO> findAll(@ModelAttribute DespesaFilter despesaFilter, Sort sort){
         return despesaService.listDespesasSorted(despesaFilter, sort);
     }
 
     @GetMapping("/page")
     @ResponseStatus(HttpStatus.OK)
-    public Page<DespesaDTO> findAll(@ModelAttribute DespesaFilter despesaFilter, Pageable page){
+    public Page<DespesaResponseDTO> findAll(@ModelAttribute DespesaFilter despesaFilter, Pageable page){
         return despesaService.listDespesasPaged(despesaFilter, page);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public DespesaDTO despesaFindById(@PathVariable("id") BigInteger id){
+    public DespesaResponseDTO despesaFindById(@PathVariable("id") BigInteger id){
         return despesaService.findById(id);
     }
 
@@ -59,14 +60,14 @@ public class DespesaRestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<DespesaDTO> create(@RequestBody @Valid DespesaDTO despesaDTO){
-        return new ResponseEntity<>(despesaService.save(despesaDTO), HttpStatus.CREATED);
+    public ResponseEntity<DespesaResponseDTO> create(@RequestBody @Valid DespesaRequestDTO despesaRequestDTO){
+        return new ResponseEntity<>(despesaService.save(despesaRequestDTO), HttpStatus.CREATED);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<DespesaDTO> update(@RequestBody @Valid DespesaDTO despesaDTO){
-        return new ResponseEntity<>(despesaService.save(despesaDTO), HttpStatus.OK);
+    public ResponseEntity<DespesaResponseDTO> update(@RequestBody @Valid DespesaRequestDTO despesaRequestDTO){
+        return new ResponseEntity<>(despesaService.save(despesaRequestDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -76,7 +77,7 @@ public class DespesaRestController {
 
     @GetMapping("/despesaPorTipo")
     @ResponseStatus(HttpStatus.OK)
-    public List<DespesaByTipoDTO> getDespesaByType(){
+    public List<DespesaByTipoResponseDTO> getDespesaByType(){
         return despesaService.getDespesaByTipo();
     }
 

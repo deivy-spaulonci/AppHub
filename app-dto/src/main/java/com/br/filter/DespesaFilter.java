@@ -7,16 +7,17 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 @Builder
 @Setter
 @Getter
 public class DespesaFilter {
-    private Long id;
-    private TipoDespesa tipoDespesa;
+    private BigInteger id;
+    private BigInteger idTipoDespesa;
     private LocalDate dataInicial;
     private LocalDate dataFinal;
-    private Fornecedor fornecedor;
-    private FormaPagamento formaPagamento;
+    private BigInteger idFornecedor;
+    private BigInteger idFormaPagamento;
 }

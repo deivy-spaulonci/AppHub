@@ -1,8 +1,9 @@
 package com.br.restcontroller;
 
 import com.br.business.service.ContaService;
-import com.br.dto.ContaByTipoDTO;
-import com.br.dto.ContaDTO;
+import com.br.dto.request.ContaRequestDTO;
+import com.br.dto.response.ContaByTipoResponseDTO;
+import com.br.dto.response.ContaResponseDTO;
 import com.br.filter.ContaFilter;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/conta")
-public class ContaRestController {
+public class
+ContaRestController {
 
     private ContaService contaService;
 
@@ -30,19 +32,19 @@ public class ContaRestController {
 
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public List<ContaDTO> findAll(@ModelAttribute ContaFilter contaFilter, Sort sort){
+    public List<ContaResponseDTO> findAll(@ModelAttribute ContaFilter contaFilter, Sort sort){
         return contaService.listContaSorted(contaFilter, sort);
     }
 
     @GetMapping("/page")
     @ResponseStatus(HttpStatus.OK)
-    public Page<ContaDTO> findAll(@ModelAttribute ContaFilter contaFilter, Pageable page){
+    public Page<ContaResponseDTO> findAll(@ModelAttribute ContaFilter contaFilter, Pageable page){
         return contaService.listContaPaged(contaFilter, page);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ContaDTO ContaFindById(@PathVariable("id") BigInteger id){
+    public ContaResponseDTO ContaFindById(@PathVariable("id") BigInteger id){
         return contaService.findById(id);
     }
 
@@ -54,14 +56,14 @@ public class ContaRestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<ContaDTO> create(@RequestBody @Valid ContaDTO contaDTO){
-        return new ResponseEntity<>(contaService.save(contaDTO), HttpStatus.CREATED);
+    public ResponseEntity<ContaResponseDTO> create(@RequestBody @Valid ContaRequestDTO contaRequestDTO){
+        return new ResponseEntity<>(contaService.save(contaRequestDTO), HttpStatus.CREATED);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ContaDTO> update(@RequestBody @Valid ContaDTO contaDTO){
-        return new ResponseEntity<>(contaService.save(contaDTO), HttpStatus.OK);
+    public ResponseEntity<ContaResponseDTO> update(@RequestBody @Valid ContaRequestDTO contaRequestDTO){
+        return new ResponseEntity<>(contaService.save(contaRequestDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -72,7 +74,7 @@ public class ContaRestController {
 
     @GetMapping("/contaPorTipo")
     @ResponseStatus(HttpStatus.OK)
-    public List<ContaByTipoDTO> getContaByType(){
+    public List<ContaByTipoResponseDTO> getContaByType(){
         return contaService.getContaByTipo();
     }
 

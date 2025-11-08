@@ -1,6 +1,6 @@
 package com.br.business.service;
 
-import com.br.dto.Diretorio;
+import com.br.dto.response.DiretorioResponseDTO;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -33,13 +33,13 @@ public class DocumentoService {
 //        }
 //    }
 
-    public static List<Diretorio> listarArquivosEmFormatoDeArvore(String path) {
-        List<Diretorio> estrutura = new ArrayList<>();
+    public static List<DiretorioResponseDTO> listarArquivosEmFormatoDeArvore(String path) {
+        List<DiretorioResponseDTO> estrutura = new ArrayList<>();
         File pasta = new File(path);
 
         if (pasta.exists() && pasta.isDirectory()) {
-            Diretorio diretorioRaiz = listarArquivosEmFormatoDeArvore(pasta);
-            estrutura.add(diretorioRaiz);
+            DiretorioResponseDTO diretorioResponseDTORaiz = listarArquivosEmFormatoDeArvore(pasta);
+            estrutura.add(diretorioResponseDTORaiz);
         } else {
             System.out.println("Caminho não é uma pasta válida.");
         }
@@ -47,8 +47,8 @@ public class DocumentoService {
         return estrutura;
     }
 
-    private static Diretorio listarArquivosEmFormatoDeArvore(File pasta) {
-        Diretorio diretorio = new Diretorio(pasta.getName());
+    private static DiretorioResponseDTO listarArquivosEmFormatoDeArvore(File pasta) {
+        DiretorioResponseDTO diretorioResponseDTO = new DiretorioResponseDTO(pasta.getName());
 
         // Obtém todos os arquivos e subpastas na pasta atual
         File[] itens = pasta.listFiles();
@@ -57,30 +57,30 @@ public class DocumentoService {
             for (File item : itens) {
                 if (item.isDirectory()) {
                     // Adiciona subdiretório recursivamente
-                    diretorio.addSubDiretorio(listarArquivosEmFormatoDeArvore(item));
+                    diretorioResponseDTO.addSubDiretorio(listarArquivosEmFormatoDeArvore(item));
                 } else {
                     // Adiciona arquivo
-                    diretorio.addArquivo(item.getName());
+                    diretorioResponseDTO.addArquivo(item.getName());
                     //diretorio.setPath("file://"+pasta.getAbsolutePath() + "/" + item.getName());
                 }
             }
         }
 
-        return diretorio;
+        return diretorioResponseDTO;
     }
 
-    public static void imprimirEstrutura(List<Diretorio> estrutura, String indentacao) {
-        for (Diretorio diretorio : estrutura) {
-            System.out.println(indentacao + "[DIR] " + diretorio.getNome());
+    public static void imprimirEstrutura(List<DiretorioResponseDTO> estrutura, String indentacao) {
+        for (DiretorioResponseDTO diretorioResponseDTO : estrutura) {
+            System.out.println(indentacao + "[DIR] " + diretorioResponseDTO.getNome());
 
             // Imprime arquivos no diretório
-            for (String arquivo : diretorio.getArquivos()) {
+            for (String arquivo : diretorioResponseDTO.getArquivos()) {
                 System.out.println(indentacao + "  [ARQUIVO] " + arquivo);
             }
 
             // Imprime os subdiretórios
-            if (!diretorio.getSubDiretorios().isEmpty()) {
-                imprimirEstrutura(diretorio.getSubDiretorios(), indentacao + "  ");
+            if (!diretorioResponseDTO.getSubDiretorioResponsDTOS().isEmpty()) {
+                imprimirEstrutura(diretorioResponseDTO.getSubDiretorioResponsDTOS(), indentacao + "  ");
             }
         }
     }

@@ -1,9 +1,9 @@
 package com.br.business.service;
 
-import com.br.dto.ContaByTipoDTO;
-import com.br.dto.ContaDTO;
+import com.br.dto.request.ContaRequestDTO;
+import com.br.dto.response.ContaByTipoResponseDTO;
+import com.br.dto.response.ContaResponseDTO;
 import com.br.entity.Conta;
-import com.br.entity.TipoConta;
 import com.br.filter.ContaFilter;
 import com.br.mapper.ContaMapper;
 import com.br.repository.ContaRepository;
@@ -37,23 +37,23 @@ public class ContaService {
         this.contaRepository = contaRepository;
     }
 
-    public List<ContaDTO> listContas() {
+    public List<ContaResponseDTO> listContas() {
         return contaMapper.toDtoList(contaRepository.findAll());
     }
-    public ContaDTO findById(BigInteger id) {
+    public ContaResponseDTO findById(BigInteger id) {
         Conta conta = contaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Produto não encontrado com o ID: " + id));
         return contaMapper.toDto(conta);
     }
-    public List<ContaDTO> listContaSorted(ContaFilter contaFilter, Sort sort) {
+    public List<ContaResponseDTO> listContaSorted(ContaFilter contaFilter, Sort sort) {
         return contaMapper.toDtoList(contaRepository.listContaSorted(sort, contaFilter));
     }
-    public Page<ContaDTO> listContaPaged(ContaFilter contaFilter, Pageable pageable) {
+    public Page<ContaResponseDTO> listContaPaged(ContaFilter contaFilter, Pageable pageable) {
         Page<Conta> contaPage = contaRepository.listContaPaged(pageable, contaFilter);
         return contaPage.map(contaMapper::toDto);
     }
     @Transactional
-    public ContaDTO save(ContaDTO contaDTO) {
-        Conta conta = contaMapper.toEntity(contaDTO);
+    public ContaResponseDTO save(ContaRequestDTO contaRequestDTO) {
+        Conta conta = contaMapper.toEntity(contaRequestDTO);
         conta.setLancamento(LocalDateTime.now());
         Conta newConta =  contaRepository.save(conta);
         return contaMapper.toDto(newConta);
@@ -63,15 +63,15 @@ public class ContaService {
         if(Objects.nonNull(findById(idConta)))
             contaRepository.deleteById(idConta);
     }
-    public List<ContaByTipoDTO> getContaByTipo(){
-        List<ContaByTipoDTO> lista = new ArrayList<>();
+    public List<ContaByTipoResponseDTO> getContaByTipo(){
+        List<ContaByTipoResponseDTO> lista = new ArrayList<>();
 
         for(Object item : contaRepository.getContaByTipo(em)){
-            ContaByTipoDTO contaByTipoDto = new ContaByTipoDTO();
+            ContaByTipoResponseDTO contaByTipoResponseDto = new ContaByTipoResponseDTO();
             var subitem = (Object[]) item;
-            contaByTipoDto.setTipoConta((TipoConta) subitem[0]);
-            contaByTipoDto.setValor(new BigDecimal(subitem[1].toString()));
-            lista.add(contaByTipoDto);
+            contaByTipoResponseDto.setNomeTipoConta(subitem[0].toString());
+            contaByTipoResponseDto.setValor(new BigDecimal(subitem[1].toString()));
+            lista.add(contaByTipoResponseDto);
         }
 
         return lista;

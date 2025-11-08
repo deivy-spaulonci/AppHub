@@ -1,19 +1,14 @@
 package com.br.commands.conta;
 
 import com.br.business.service.ContaService;
-import com.br.business.service.FormaPagamentoService;
 import com.br.business.service.FornecedorService;
 import com.br.business.service.TipoContaService;
 import com.br.commands.DefaultComponent;
 import com.br.config.ShellHelper;
 import com.br.entity.Conta;
-import com.br.entity.Fornecedor;
-import com.br.util.Util;
 import lombok.extern.log4j.Log4j2;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 @Log4j2
 public class CadastroContas {
@@ -98,7 +93,7 @@ public class CadastroContas {
 //    }
 
     public void inputCalcValuePgto(Conta conta){
-        BigDecimal valorPago = new BigDecimal(this.defaultComponent.inValor("Valor Pago"));
+        BigDecimal valorPago = new BigDecimal(this.defaultComponent.inputValor("Valor Pago"));
         int comp = valorPago.compareTo(conta.getValor());
         conta.setDesconto(BigDecimal.ZERO);
         conta.setMulta(BigDecimal.ZERO);

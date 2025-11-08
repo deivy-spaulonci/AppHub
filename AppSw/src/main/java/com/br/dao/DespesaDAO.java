@@ -58,12 +58,12 @@ public class DespesaDAO extends AbstractDAO<Despesa> {
         String sql = SELECT_ALL + " WHERE 1=1 " ;
 
         if(despesaFilter != null) {
-            if(despesaFilter.getTipoDespesa() != null)
-                sql += " AND D.ID_TIPO_DESPESA = "+despesaFilter.getTipoDespesa().getId();
-            if(despesaFilter.getFormaPagamento() != null)
-                sql += " AND D.ID_FORMA_PAGAMENTO = "+despesaFilter.getFormaPagamento().getId();
-            if(despesaFilter.getFornecedor() != null && despesaFilter.getFornecedor().getId()!=null)
-                sql += " AND D.ID_FORNECEDOR = "+despesaFilter.getFornecedor().getId();
+            if(despesaFilter.getIdTipoDespesa() != null)
+                sql += " AND D.ID_TIPO_DESPESA = "+despesaFilter.getIdTipoDespesa();
+            if(despesaFilter.getIdTipoDespesa() != null)
+                sql += " AND D.ID_FORMA_PAGAMENTO = "+despesaFilter.getIdFormaPagamento();
+            if(despesaFilter.getIdFornecedor() != null && despesaFilter.getIdFornecedor()!=null)
+                sql += " AND D.ID_FORNECEDOR = "+despesaFilter.getIdFornecedor();
             if(despesaFilter.getDataInicial() != null && despesaFilter.getDataFinal() != null) {
                 sql += " AND D.DATA_PAGAMENTO BETWEEN '%s' AND '%s' ".formatted(despesaFilter.getDataInicial().toString(),
                                 despesaFilter.getDataFinal().toString());
