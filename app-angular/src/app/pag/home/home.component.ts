@@ -174,7 +174,7 @@ export class HomeComponent implements OnInit{
       const documentStyle = getComputedStyle(document.documentElement);
       const textColor = documentStyle.getPropertyValue('--text-color');
 
-      const nomesTiposDespesa = this.dataDespesas.map((d: { tipoDespesa: { nome: any; }; }) => d.tipoDespesa.nome);
+      const nomesTiposDespesa = this.dataDespesas.map((d: { nomeTipoDespesa: { nomeTipoDespesa: any; }; }) => d.nomeTipoDespesa);
       const valorTiposDespesa = this.dataDespesas.map((d: { subTotal: any; })  => d.subTotal);
 
       this.dataDespesas = {

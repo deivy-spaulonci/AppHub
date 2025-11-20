@@ -1,6 +1,7 @@
 package com.br.business.service;
 
-import com.br.dto.request.TipoContaRequestDTO;
+import com.br.dto.request.create.TipoContaCreateRequestDTO;
+import com.br.dto.request.update.TipoContaUpdateRequestDTO;
 import com.br.dto.response.TipoContaResponseDTO;
 import com.br.entity.TipoConta;
 import com.br.mapper.TipoContaMapper;
@@ -46,8 +47,14 @@ public class TipoContaService {
     }
 
     @Transactional
-    public TipoContaResponseDTO save(TipoContaRequestDTO tipoContaRequestDTO) {
-        TipoConta tipoConta = tipoContaMapper.toEntity(tipoContaRequestDTO);
+    public TipoContaResponseDTO update(TipoContaUpdateRequestDTO tipoContaUpdateRequestDTO) {
+        TipoConta tipoConta = tipoContaMapper.toEntity(tipoContaUpdateRequestDTO);
+        return tipoContaMapper.toDto(tipoContaRepository.save(tipoConta));
+    }
+
+    @Transactional
+    public TipoContaResponseDTO save(TipoContaCreateRequestDTO tipoContaCreateRequestDTO) {
+        TipoConta tipoConta = tipoContaMapper.toEntity(tipoContaCreateRequestDTO);
         return tipoContaMapper.toDto(tipoContaRepository.save(tipoConta));
     }
 }

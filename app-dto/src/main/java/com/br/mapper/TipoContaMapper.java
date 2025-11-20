@@ -1,6 +1,7 @@
 package com.br.mapper;
 
-import com.br.dto.request.TipoContaRequestDTO;
+import com.br.dto.request.create.TipoContaCreateRequestDTO;
+import com.br.dto.request.update.TipoContaUpdateRequestDTO;
 import com.br.dto.response.TipoContaResponseDTO;
 import com.br.entity.TipoConta;
 import org.mapstruct.*;
@@ -15,8 +16,12 @@ import java.util.List;
 )
 public interface TipoContaMapper {
     TipoContaMapper INSTANCE = Mappers.getMapper(TipoContaMapper.class);
+
     @Mapping(source = "nome", target = "nome")
-    TipoConta toEntity(TipoContaRequestDTO tipoContaRequestDTO);
+    TipoConta toEntity(TipoContaCreateRequestDTO tipoContaCreateRequestDTO);
+
+    @Mapping(source = "nome", target = "nome")
+    TipoConta toEntity(TipoContaUpdateRequestDTO tipoContaUpdateRequestDTO);
 
     TipoContaResponseDTO toDto(TipoConta tipoConta);
 

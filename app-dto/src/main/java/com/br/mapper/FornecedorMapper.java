@@ -1,6 +1,7 @@
 package com.br.mapper;
 
-import com.br.dto.request.FornecedorRequestDTO;
+import com.br.dto.request.create.FornecedorCreateRequestDTO;
+import com.br.dto.request.update.FornecedorUpdateRequestDTO;
 import com.br.dto.response.FornecedorResponseDTO;
 import com.br.entity.Fornecedor;
 import org.mapstruct.*;
@@ -11,7 +12,10 @@ import java.util.List;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface FornecedorMapper {
     FornecedorMapper INSTANCE = Mappers.getMapper(FornecedorMapper.class);
-    Fornecedor toEntity(FornecedorRequestDTO fornecedorRequestDTO);
+
+    Fornecedor toEntity(FornecedorCreateRequestDTO fornecedorCreateRequestDTO);
+
+    Fornecedor toEntity(FornecedorUpdateRequestDTO fornecedorUpdateRequestDTO);
 
     FornecedorResponseDTO toDto(Fornecedor fornecedor);
 

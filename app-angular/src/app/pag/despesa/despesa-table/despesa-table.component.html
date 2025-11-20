@@ -48,18 +48,15 @@
          [rowsPerPageOptions]="[10, 20, 30, 40]"
          [(selection)]="despesaSelecinada"
          (onLazyLoad)="loadData($event)"
-         [paginatorPosition]="'bottom'"
          [style]="{width:'1000px'}"
+         selectionMode="single"
          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-         dataKey="id"
-         editMode="row"
          scrollHeight="flex"
          responsiveLayout="stack"
          showGridlines
          stripedRows>
   <ng-template #header>
     <tr>
-      <th pSortableColumn="id">Id<p-sortIcon field="id"/></th>
       <th pSortableColumn="tipoDespesa">Despesa<p-sortIcon field="tipoDespesa"/></th>
       <th pSortableColumn="fornecedor">Fornecedor<p-sortIcon field="fornecedor"/></th>
       <th pSortableColumn="dataPagamento">Data Pgto<p-sortIcon field="dataPagamento"/></th>
@@ -69,8 +66,7 @@
     </tr>
   </ng-template>
   <ng-template #body let-despesa>
-    <tr [pTooltip]="despesa.obs">
-      <td>{{ despesa.id }}</td>
+    <tr [pTooltip]="despesa.obs" [pSelectableRow]="despesa">
       <td>{{ despesa.tipoDespesa.nome }}</td>
       <td>{{ despesa.fornecedor.nome }}</td>
       <td class="text-center">{{ despesa.dataPagamento | date: 'dd/MM/yyyy' }}</td>

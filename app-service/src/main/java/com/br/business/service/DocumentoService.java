@@ -10,29 +10,6 @@ import java.util.List;
 @Service
 public class DocumentoService {
 
-//    // Classe para armazenar a estrutura de diretórios e arquivos
-//    static class Diretorio {
-//        String nome;
-//        List<Diretorio> subDiretorios;
-//        List<String> arquivos;
-//
-//        Diretorio(String nome) {
-//            this.nome = nome;
-//            this.subDiretorios = new ArrayList<>();
-//            this.arquivos = new ArrayList<>();
-//        }
-//
-//        // Adiciona um subdiretório
-//        void addSubDiretorio(Diretorio subdiretorio) {
-//            this.subDiretorios.add(subdiretorio);
-//        }
-//
-//        // Adiciona um arquivo
-//        void addArquivo(String arquivo) {
-//            this.arquivos.add(arquivo);
-//        }
-//    }
-
     public static List<DiretorioResponseDTO> listarArquivosEmFormatoDeArvore(String path) {
         List<DiretorioResponseDTO> estrutura = new ArrayList<>();
         File pasta = new File(path);
@@ -65,25 +42,24 @@ public class DocumentoService {
                 }
             }
         }
-
         return diretorioResponseDTO;
     }
 
-    public static void imprimirEstrutura(List<DiretorioResponseDTO> estrutura, String indentacao) {
-        for (DiretorioResponseDTO diretorioResponseDTO : estrutura) {
-            System.out.println(indentacao + "[DIR] " + diretorioResponseDTO.getNome());
-
-            // Imprime arquivos no diretório
-            for (String arquivo : diretorioResponseDTO.getArquivos()) {
-                System.out.println(indentacao + "  [ARQUIVO] " + arquivo);
-            }
-
-            // Imprime os subdiretórios
-            if (!diretorioResponseDTO.getSubDiretorioResponsDTOS().isEmpty()) {
-                imprimirEstrutura(diretorioResponseDTO.getSubDiretorioResponsDTOS(), indentacao + "  ");
-            }
-        }
-    }
+//    public static void imprimirEstrutura(List<DiretorioResponseDTO> estrutura, String indentacao) {
+//        for (DiretorioResponseDTO diretorioResponseDTO : estrutura) {
+//            System.out.println(indentacao + "[DIR] " + diretorioResponseDTO.getNome());
+//
+//            // Imprime arquivos no diretório
+//            for (String arquivo : diretorioResponseDTO.getArquivos()) {
+//                System.out.println(indentacao + "  [ARQUIVO] " + arquivo);
+//            }
+//
+//            // Imprime os subdiretórios
+//            if (!diretorioResponseDTO.getSubDiretorioResponsDTOS().isEmpty()) {
+//                imprimirEstrutura(diretorioResponseDTO.getSubDiretorioResponsDTOS(), indentacao + "  ");
+//            }
+//        }
+//    }
 //    public static void main(String[] args) {
 //        // Substitua o caminho pelo diretório que você deseja passar
 //        String caminhoDaPasta = "/media/deivy/hd01/Pagamentos/Pagamentos_PF"; // Caminho do diretório

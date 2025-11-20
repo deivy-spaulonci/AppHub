@@ -1,6 +1,6 @@
 package com.br.mapper;
 
-import com.br.dto.request.TipoDespesaRequestDTO;
+import com.br.dto.request.create.TipoDespesaCreateRequestDTO;
 import com.br.dto.response.TipoDespesaResponseDTO;
 import com.br.entity.TipoDespesa;
 import org.mapstruct.*;
@@ -11,7 +11,7 @@ import java.util.List;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface TipoDespesaMapper {
     TipoDespesaMapper INSTANCE = Mappers.getMapper(TipoDespesaMapper.class);
-    TipoDespesa toEntity(TipoDespesaRequestDTO tipoDespesaRequestDTO);
+    TipoDespesa toEntity(TipoDespesaCreateRequestDTO tipoDespesaRequestDTO);
 
     TipoDespesaResponseDTO toDto(TipoDespesa tipoDespesa);
 

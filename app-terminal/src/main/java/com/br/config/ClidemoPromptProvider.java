@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class ClidemoPromptProvider implements PromptProvider {
     @Override
     public AttributedString getPrompt() {
-        return new AttributedString("APP-SHELL:>", 
+        return new AttributedString(" APP-SHELL:>",
             AttributedStyle.DEFAULT.foreground(AttributedStyle.GREEN)
         );
     }

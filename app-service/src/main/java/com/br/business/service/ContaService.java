@@ -1,6 +1,7 @@
 package com.br.business.service;
 
-import com.br.dto.request.ContaRequestDTO;
+import com.br.dto.request.create.ContaCreateRequestDTO;
+import com.br.dto.request.update.ContaUpdateRequestDTO;
 import com.br.dto.response.ContaByTipoResponseDTO;
 import com.br.dto.response.ContaResponseDTO;
 import com.br.entity.Conta;
@@ -28,8 +29,10 @@ import java.util.Objects;
 public class ContaService {
 
     private ContaRepository contaRepository;
+
     @PersistenceContext
     private EntityManager em;
+
     public static final ContaMapper contaMapper = ContaMapper.INSTANCE;
 
     @Autowired
@@ -40,33 +43,46 @@ public class ContaService {
     public List<ContaResponseDTO> listContas() {
         return contaMapper.toDtoList(contaRepository.findAll());
     }
+
     public ContaResponseDTO findById(BigInteger id) {
         Conta conta = contaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Produto não encontrado com o ID: " + id));
         return contaMapper.toDto(conta);
     }
+
     public List<ContaResponseDTO> listContaSorted(ContaFilter contaFilter, Sort sort) {
         return contaMapper.toDtoList(contaRepository.listContaSorted(sort, contaFilter));
     }
+
     public Page<ContaResponseDTO> listContaPaged(ContaFilter contaFilter, Pageable pageable) {
         Page<Conta> contaPage = contaRepository.listContaPaged(pageable, contaFilter);
         return contaPage.map(contaMapper::toDto);
     }
+
     @Transactional
-    public ContaResponseDTO save(ContaRequestDTO contaRequestDTO) {
-        Conta conta = contaMapper.toEntity(contaRequestDTO);
-        conta.setLancamento(LocalDateTime.now());
-        Conta newConta =  contaRepository.save(conta);
+    public ContaResponseDTO update(ContaUpdateRequestDTO contaUpdateRequestDTO) {
+        Conta conta = contaMapper.toEntity(contaUpdateRequestDTO);
+        Conta newConta = contaRepository.save(conta);
         return contaMapper.toDto(newConta);
     }
+
+    @Transactional
+    public ContaResponseDTO save(ContaCreateRequestDTO contaCreateRequestDTO) {
+        Conta conta = contaMapper.toEntity(contaCreateRequestDTO);
+        conta.setLancamento(LocalDateTime.now());
+        Conta newConta = contaRepository.save(conta);
+        return contaMapper.toDto(newConta);
+    }
+
     @Transactional
     public void deleteById(BigInteger idConta) {
-        if(Objects.nonNull(findById(idConta)))
+        if (Objects.nonNull(findById(idConta)))
             contaRepository.deleteById(idConta);
     }
-    public List<ContaByTipoResponseDTO> getContaByTipo(){
+
+    public List<ContaByTipoResponseDTO> getContaByTipo() {
         List<ContaByTipoResponseDTO> lista = new ArrayList<>();
 
-        for(Object item : contaRepository.getContaByTipo(em)){
+        for (Object item : contaRepository.getContaByTipo(em)) {
             ContaByTipoResponseDTO contaByTipoResponseDto = new ContaByTipoResponseDTO();
             var subitem = (Object[]) item;
             contaByTipoResponseDto.setNomeTipoConta(subitem[0].toString());
@@ -77,11 +93,11 @@ public class ContaService {
         return lista;
     }
 
-    public List gastosContaAnual(int ano){
+    public List gastosContaAnual(int ano) {
         return contaRepository.findGastoPorAno(ano);
     }
 
-    public BigDecimal getSumConta(ContaFilter contaFilter){
+    public BigDecimal getSumConta(ContaFilter contaFilter) {
         return contaRepository.getSumConta(contaFilter, em);
     }
 

@@ -1,10 +1,9 @@
 package com.br.business.service;
 
-import com.br.dto.request.DespesaRequestDTO;
-import com.br.dto.request.LoteDespesaRequestDTO;
+import com.br.dto.request.create.DespesaCreateRequestDTO;
+import com.br.dto.request.update.DespesaUpdateRequestDTO;
 import com.br.dto.response.DespesaByTipoResponseDTO;
 import com.br.dto.response.DespesaResponseDTO;
-import com.br.dto.response.FornecedorResponseDTO;
 import com.br.entity.Despesa;
 import com.br.filter.DespesaFilter;
 import com.br.mapper.DespesaMapper;
@@ -73,8 +72,14 @@ public class DespesaService {
     }
 
     @Transactional
-    public DespesaResponseDTO save(DespesaRequestDTO despesaRequestDTO) {
-        Despesa despesa = despesaMapper.toEntity(despesaRequestDTO);
+    public DespesaResponseDTO update(DespesaUpdateRequestDTO despesaUpdateRequestDTO) {
+        Despesa despesa = despesaMapper.toEntity(despesaUpdateRequestDTO);
+        return despesaMapper.toDto(despesaRepository.save(despesa));
+    }
+
+    @Transactional
+    public DespesaResponseDTO save(DespesaCreateRequestDTO despesaCreateRequestDTO) {
+        Despesa despesa = despesaMapper.toEntity(despesaCreateRequestDTO);
         despesa.setLancamento(LocalDateTime.now());
         return despesaMapper.toDto(despesaRepository.save(despesa));
     }

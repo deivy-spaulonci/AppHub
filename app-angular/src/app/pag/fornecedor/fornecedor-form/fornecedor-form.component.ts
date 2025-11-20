@@ -127,7 +127,7 @@ export class FornecedorFormComponent implements OnInit {
       fornecedor.cidade = this.cidadeSelect;
 
       this.defaultService.save(fornecedor, 'fornecedor').subscribe({
-        next: res => this.messageService.add({severity: 'success', summary: 'Success', detail: 'Fornecedor salvo!'}),
+        next: res => this.messageService.add({severity: 'success', summary: 'Success', detail: 'Fornecedor.ts salvo!'}),
         error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o fornecedor'}),
         complete: () => {
           this.loading = false;

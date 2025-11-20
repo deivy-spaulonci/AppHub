@@ -1,6 +1,7 @@
 package com.br.mapper;
 
-import com.br.dto.request.ContaRequestDTO;
+import com.br.dto.request.create.ContaCreateRequestDTO;
+import com.br.dto.request.update.ContaUpdateRequestDTO;
 import com.br.dto.response.ContaResponseDTO;
 import com.br.entity.Conta;
 import org.mapstruct.*;
@@ -11,7 +12,10 @@ import java.util.List;
 @Mapper
 public interface ContaMapper {
     ContaMapper INSTANCE = Mappers.getMapper(ContaMapper.class);
-    Conta toEntity(ContaRequestDTO contaRequestDTO);
+
+    Conta toEntity(ContaCreateRequestDTO contaCreateRequestDTO);
+
+    Conta toEntity(ContaUpdateRequestDTO contaUpdateRequestDTO);
 
     ContaResponseDTO toDto(Conta conta);
 

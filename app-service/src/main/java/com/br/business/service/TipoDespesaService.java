@@ -1,6 +1,6 @@
 package com.br.business.service;
 
-import com.br.dto.request.TipoDespesaRequestDTO;
+import com.br.dto.request.create.TipoDespesaCreateRequestDTO;
 import com.br.dto.response.TipoDespesaResponseDTO;
 import com.br.entity.TipoDespesa;
 import com.br.entity.TipoDespesa_;
@@ -42,7 +42,7 @@ public class TipoDespesaService {
     }
 
     @Transactional
-    public TipoDespesaResponseDTO save(TipoDespesaRequestDTO tipoDespesaRequestDTO) {
+    public TipoDespesaResponseDTO save(TipoDespesaCreateRequestDTO tipoDespesaRequestDTO) {
         TipoDespesa tipoDespesa = tipoDespesaMapper.toEntity(tipoDespesaRequestDTO);
         return tipoDespesaMapper.toDto(tipoDespesaRepository.save(tipoDespesa));
     }

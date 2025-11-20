@@ -1,7 +1,7 @@
 <div id="frameHome">
 
   <p-card header="Despesas" [style]="{width: '100%',height:'100%'}">
-    <p-chart type="bar" [data]="dataDespesas" [options]="optionsDespesa" height="420"/>
+    <p-chart type="bar" [data]="dataDespesas" [options]="optionsDespesa" height="485"/>
     <ng-template #footer>
       <p-message severity="info" icon="pi pi-money-bill" styleClass="h-full">
         Total: {{totalDespesa$ | currency}}
@@ -9,8 +9,15 @@
     </ng-template>
   </p-card>
 
+  <p-card header="Gastos" [style]="{width: '100%'} ">
+    <p-select [options]="[2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026]"
+              [(ngModel)]="selectedYear" (onChange)="aoAnoSelecionado($event)"/>
+    <p-chart type="line" [data]="dataGastos" [options]="optionsGastos" class="h-[25rem]" />
+  </p-card>
+
+
   <p-card header="Contas" [style]="{width: '100%',height:'100%'}">
-    <p-chart type="pie" [data]="dataContas" [options]="optionsContas" height="420"/>
+    <p-chart type="pie" [data]="dataContas" [options]="optionsContas" height="380"/>
     <ng-template #footer>
       <p-message severity="info" icon="pi pi-money-bill" styleClass="h-full">
         Total: {{totalConta$ | currency}}
@@ -31,10 +38,4 @@
     </p-table>
   </p-card>
 
-  <p-card header="Gastos" [style]="{width: '100%'} ">
-    <p-select [options]="[2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026]"
-              [(ngModel)]="selectedYear" (onChange)="aoAnoSelecionado($event)"/>
-
-    <p-chart type="line" [data]="dataGastos" [options]="optionsGastos" class="h-[25rem]" />
-  </p-card>
 </div>

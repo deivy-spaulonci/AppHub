@@ -16,9 +16,11 @@
         <option value="$PROJECT_DIR$/app-fx/pom.xml" />
         <option value="$PROJECT_DIR$/app-kt/pom.xml" />
         <option value="$PROJECT_DIR$/app-sp-fx/pom.xml" />
+        <option value="$PROJECT_DIR$/app-terminalX/pom.xml" />
         <option value="$PROJECT_DIR$/app-teste/pom.xml" />
         <option value="$PROJECT_DIR$/dto/pom.xml" />
         <option value="$PROJECT_DIR$/teste/pom.xml" />
+        <option value="$PROJECT_DIR$/untitled/pom.xml" />
       </set>
     </option>
   </component>

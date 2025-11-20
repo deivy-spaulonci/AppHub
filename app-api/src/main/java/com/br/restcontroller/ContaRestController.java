@@ -1,7 +1,8 @@
 package com.br.restcontroller;
 
 import com.br.business.service.ContaService;
-import com.br.dto.request.ContaRequestDTO;
+import com.br.dto.request.create.ContaCreateRequestDTO;
+import com.br.dto.request.update.ContaUpdateRequestDTO;
 import com.br.dto.response.ContaByTipoResponseDTO;
 import com.br.dto.response.ContaResponseDTO;
 import com.br.filter.ContaFilter;
@@ -56,14 +57,14 @@ ContaRestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<ContaResponseDTO> create(@RequestBody @Valid ContaRequestDTO contaRequestDTO){
-        return new ResponseEntity<>(contaService.save(contaRequestDTO), HttpStatus.CREATED);
+    public ResponseEntity<ContaResponseDTO> create(@RequestBody @Valid ContaCreateRequestDTO contaCreateRequestDTO){
+        return new ResponseEntity<>(contaService.save(contaCreateRequestDTO), HttpStatus.CREATED);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ContaResponseDTO> update(@RequestBody @Valid ContaRequestDTO contaRequestDTO){
-        return new ResponseEntity<>(contaService.save(contaRequestDTO), HttpStatus.OK);
+    public ResponseEntity<ContaResponseDTO> update(@RequestBody @Valid ContaUpdateRequestDTO contaUpdateRequestDTO){
+        return new ResponseEntity<>(contaService.update(contaUpdateRequestDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

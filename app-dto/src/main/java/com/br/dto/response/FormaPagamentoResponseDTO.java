@@ -4,9 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+import java.math.BigInteger;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FormaPagamentoResponseDTO {
+public class FormaPagamentoResponseDTO implements Serializable {
+    BigInteger id;
     String nome;
 }

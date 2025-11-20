@@ -96,11 +96,7 @@
            [rowsPerPageOptions]="[10, 20, 30, 40]"
            [(selection)]="contaSelecinada"
            (onLazyLoad)="loadData($event)"
-           [(contextMenuSelection)]="contaSelecinada"
-           [contextMenu]="cm"
            currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros"
-           dataKey="id"
-           editMode="row"
            scrollHeight="flex"
            responsiveLayout="stack"
            selectionMode="single"
@@ -108,7 +104,6 @@
            stripedRows>
         <ng-template #header>
           <tr>
-            <th pSortableColumn="id">Id<p-sortIcon field="id"/></th>
             <th pSortableColumn="tipoConta">Conta<p-sortIcon field="tipoConta"/></th>
             <th pSortableColumn="emissao">Emissão<p-sortIcon field="emissao"/></th>
             <th pSortableColumn="vencimento">Vencimento<p-sortIcon field="vencimento"/></th>
@@ -120,8 +115,7 @@
           </tr>
         </ng-template>
         <ng-template #body let-conta>
-          <tr [pTooltip]="conta.obs" [pSelectableRow]="conta" [pContextMenuRow]="conta" [ngStyle]="rowStyle(conta)">
-            <td>{{ conta.id }}</td>
+          <tr [pTooltip]="conta.obs" [pSelectableRow]="conta" [ngStyle]="rowStyle(conta)">
             <td>{{ conta.tipoConta.nome }}
               <i *ngIf="!conta.tipoConta.ativo" [style]="{float:'right'}" style="color: red" pTooltip="Conta Cancelada">Encerrada !</i>
             </td>
@@ -147,8 +141,6 @@
         </ng-template>
   </p-table>
 </div>
-
-<p-contextmenu #cm [model]="items"></p-contextmenu>
 
 <p-drawer [(visible)]="docsVisible" header="Documentos" position="right" [style]="{width: '40%'}">
 

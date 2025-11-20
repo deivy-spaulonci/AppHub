@@ -63,7 +63,7 @@ export class FornecedorTableComponent implements OnInit {
   updateFornecedor(fornecedor: Fornecedor) {
     this.loading=true;
     this.defaultService.update(fornecedor, 'fornecedor').subscribe({
-      next: res => this.messageService.add({severity: 'success', summary: 'Success', detail: 'Fornecedor atualizado'}),
+      next: res => this.messageService.add({severity: 'success', summary: 'Success', detail: 'Fornecedor.ts atualizado'}),
       error: err => this.messageService.add({severity: 'error', summary: 'Error', detail: 'salvar fornecedor'}),
       complete: () => {
         delete this.clonedFornecedors[fornecedor.id as number];
@@ -85,39 +85,39 @@ export class FornecedorTableComponent implements OnInit {
   }
 
   loadData(event: TableLazyLoadEvent) {
-    let urlfiltros: string = '';
-    // let prefix: string =''
-    this.loading = true;
+        let urlfiltros: string = '';
+        // let prefix: string =''
+        this.loading = true;
 
-    console.log('passou pelo load data')
-    if (this.filtroTexto)
-      urlfiltros = '&busca=' + this.filtroTexto;
+        console.log('passou pelo load data')
+        if (this.filtroTexto)
+          urlfiltros = '&busca=' + this.filtroTexto;
 
-    event.rows = (event.rows ? event.rows : this.pageSize);
-    event.sortField = (event.sortField ? event.sortField : 'nome');
+        event.rows = (event.rows ? event.rows : this.pageSize);
+        event.sortField = (event.sortField ? event.sortField : 'nome');
 
-    const url: string = 'fornecedor/page?page=' + (event.first! / this.pageSize)
-      + '&size=' + event.rows
-      + '&sort=' + event.sortField + ',' + (event.sortOrder == 1 ? 'asc' : 'desc')
-      + urlfiltros;
+        const url: string = 'fornecedor/page?page=' + (event.first! / this.pageSize)
+          + '&size=' + event.rows
+          + '&sort=' + event.sortField + ',' + (event.sortOrder == 1 ? 'asc' : 'desc')
+          + urlfiltros;
 
-    console.log(url);
+        console.log(url);
 
-    this.defaultService.get(url).subscribe({
-      next: resultado => {
-        console.log('passou pelo load data next')
-        if(resultado){
-          this.fornecedores = resultado.content;
-          this.totalElements = resultado.totalElements;
-          this.messageService.add({severity: 'info',summary: 'Info',detail: `${this.totalElements} fornecedores carregados`,life: 3000});
-        }else{
-          this.fornecedores = [];
-          this.totalElements = 0;
-        }
+        this.defaultService.get(url).subscribe({
+          next: resultado => {
+            console.log('passou pelo load data next')
+            if(resultado){
+              this.fornecedores = resultado.content;
+              this.totalElements = resultado.totalElements;
+              this.messageService.add({severity: 'info',summary: 'Info',detail: `${this.totalElements} fornecedores carregados`,life: 3000});
+            }else{
+              this.fornecedores = [];
+              this.totalElements = 0;
+            }
 
-      },
-      error: error => this.messageService.add({severity: 'error',summary: 'Error',detail: 'Erro ao carregar fornecedores',life: 3000}),
-      complete: () =>  this.loading = false
-    });
+          },
+          error: error => this.messageService.add({severity: 'error',summary: 'Error',detail: 'Erro ao carregar fornecedores',life: 3000}),
+          complete: () =>  this.loading = false
+        });
   }
 }

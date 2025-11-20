@@ -1,7 +1,7 @@
 package com.br.restcontroller;
 
 import com.br.business.service.TipoDespesaService;
-import com.br.dto.request.TipoDespesaRequestDTO;
+import com.br.dto.request.create.TipoDespesaCreateRequestDTO;
 import com.br.dto.response.TipoDespesaResponseDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +32,13 @@ public class TipoDespesaController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<TipoDespesaResponseDTO> saveTipoDespesa(@RequestBody @Valid TipoDespesaRequestDTO tipoDespesaRequestDTO) {
+    public ResponseEntity<TipoDespesaResponseDTO> saveTipoDespesa(@RequestBody @Valid TipoDespesaCreateRequestDTO tipoDespesaRequestDTO) {
         return new ResponseEntity<>(tipoDespesaService.save(tipoDespesaRequestDTO), HttpStatus.CREATED);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<?> update(@RequestBody @Valid TipoDespesaRequestDTO tipoDespesaRequestDTO){
+    public ResponseEntity<?> update(@RequestBody @Valid TipoDespesaCreateRequestDTO tipoDespesaRequestDTO){
         return new ResponseEntity<>(tipoDespesaService.save(tipoDespesaRequestDTO),  HttpStatus.OK);
      }
 }

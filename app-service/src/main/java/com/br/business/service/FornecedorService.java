@@ -1,7 +1,7 @@
 package com.br.business.service;
 
-
-import com.br.dto.request.FornecedorRequestDTO;
+import com.br.dto.request.create.FornecedorCreateRequestDTO;
+import com.br.dto.request.update.FornecedorUpdateRequestDTO;
 import com.br.dto.response.FornecedorResponseDTO;
 import com.br.entity.Cidade;
 import com.br.entity.Fornecedor;
@@ -28,6 +28,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 
 @Service
@@ -36,7 +37,7 @@ public class FornecedorService {
     @PersistenceContext
     private EntityManager em;
 
-    private String RECEITA_AWS = "https://publica.cnpj.ws/cnpj/";
+    private final String RECEITA_AWS = "https://publica.cnpj.ws/cnpj/";
     private FornecedorRepository fornecedorRepository;
     private CidadeRepository cidadeRepository;
     private static final FornecedorMapper fornecedorMapper = FornecedorMapper.INSTANCE;
@@ -49,8 +50,8 @@ public class FornecedorService {
     }
 
     public FornecedorResponseDTO findByCnpj(String cnpj) {
-        Fornecedor fonecedor = fornecedorRepository.findByCnpj(cnpj).orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado com o CNPJ: " + cnpj));
-        return fornecedorMapper.toDto(fonecedor);
+        Optional<Fornecedor> fonecedor = fornecedorRepository.findByCnpj(cnpj);//.orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado com o CNPJ: " + cnpj));
+        return fonecedor.map(fornecedorMapper::toDto).orElse(null);
     }
 
     public FornecedorResponseDTO findById(BigInteger id) {
@@ -76,8 +77,16 @@ public class FornecedorService {
     }
 
     @Transactional
-    public FornecedorResponseDTO save(FornecedorRequestDTO fornecedorRequestDTO) {
-        Fornecedor fornecedor = fornecedorMapper.toEntity(fornecedorRequestDTO);
+    public FornecedorResponseDTO update(FornecedorUpdateRequestDTO fornecedorUpdateRequestDTO) {
+        Fornecedor fornecedor = fornecedorMapper.toEntity(fornecedorUpdateRequestDTO);
+        if(fornecedorUpdateRequestDTO.getCidade().getId()==null)
+            fornecedor.setCidade(cidadeRepository.findCidadeByIbgeCod(fornecedorUpdateRequestDTO.getCidade().getIbgeCod()));
+        return fornecedorMapper.toDto(fornecedorRepository.save(fornecedor));
+    }
+
+    @Transactional
+    public FornecedorResponseDTO save(FornecedorCreateRequestDTO fornecedorCreateRequestDTO) {
+        Fornecedor fornecedor = fornecedorMapper.toEntity(fornecedorCreateRequestDTO);
         return fornecedorMapper.toDto(fornecedorRepository.save(fornecedor));
     }
 
@@ -91,20 +100,28 @@ public class FornecedorService {
         String json = getFornecedorApiWeb(cnpj);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            FornecedorCloudResponseDTO fornecedorAWS = objectMapper.readValue(json, FornecedorCloudResponseDTO.class);
-            Cidade cidade = cidadeRepository.findCidadeByIbgeCod(fornecedorAWS.getIbgeCod());
+            if(json.isEmpty()){
+                return null;
+            }else{
+                FornecedorCloudResponseDTO fornecedorAWS = objectMapper.readValue(json, FornecedorCloudResponseDTO.class);
+                Cidade cidade = Cidade.builder().build();
+                cidade.setIbgeCod(fornecedorAWS.getEstabelecimentoCloudResponseDTO().getCidadeCloudResponseDTO().getIbgeCod());
+                cidade.setNome(fornecedorAWS.getEstabelecimentoCloudResponseDTO().getCidadeCloudResponseDTO().getNome());
+                cidade.setUf(fornecedorAWS.getEstabelecimentoCloudResponseDTO().getEstadoCloudResponseDTO().getSigla());
 
-            Fornecedor fornecedor = Fornecedor.builder()
-                    .cnpj(fornecedorAWS.getCnpj().replaceAll("[^0-9]",""))
-                    .razaoSocial(fornecedorAWS.getNome() == null ? fornecedorAWS.getFantasia() : fornecedorAWS.getNome())
-                    .nome(fornecedorAWS.getFantasia()==null ? fornecedorAWS.getNome() : fornecedorAWS.getFantasia())
-                    .cpf("")
-                    //.ibgeCod(fornecedorAWS.getIbgeCod())
-                    .cidade(cidade)
-                    .build();
-
-            return fornecedorMapper.toDto(fornecedor);
-
+                Fornecedor fornecedor = Fornecedor.builder()
+                        .cnpj(fornecedorAWS.getEstabelecimentoCloudResponseDTO().getCnpj().replaceAll("[^0-9]",""))
+                        .razaoSocial(fornecedorAWS.getRazaoSocial() == null ?
+                                fornecedorAWS.getEstabelecimentoCloudResponseDTO().getNomeFantasia() :
+                                fornecedorAWS.getRazaoSocial())
+                        .nome(fornecedorAWS.getEstabelecimentoCloudResponseDTO().getNomeFantasia()==null ?
+                                fornecedorAWS.getRazaoSocial() :
+                                fornecedorAWS.getEstabelecimentoCloudResponseDTO().getNomeFantasia())
+                        .cpf("")
+                        .cidade(cidade)
+                        .build();
+                return fornecedorMapper.toDto(fornecedor);
+            }
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

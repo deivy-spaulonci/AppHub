@@ -1,143 +1,62 @@
 package com.br.commands;
 
-import com.br.business.service.*;
+import com.br.commands.despesa.CadastroDespesa;
 import com.br.commands.despesa.ConsultaDespesa;
-import com.br.commands.fornecedor.FornecedorComp;
-import com.br.config.ShellHelper;
-import com.br.filter.DespesaFilter;
-import com.br.util.Util;
-import lombok.Getter;
-import lombok.Setter;
+import com.br.commands.fornecedor.CadastroFornecedor;
+import com.br.commands.fornecedor.ConsultaFornecedor;
+import com.br.components.DespesaComponent;
+import com.br.components.FornecedorComponent;
 import lombok.extern.log4j.Log4j2;
-import org.jline.consoleui.prompt.ConsolePrompt;
-import org.jline.consoleui.prompt.PromptResultItemIF;
-import org.jline.consoleui.prompt.builder.PromptBuilder;
 import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.shell.component.flow.ComponentFlow;
-import org.springframework.shell.standard.AbstractShellComponent;
+import org.springframework.shell.component.view.TerminalUI;
+import org.springframework.shell.component.view.control.BoxView;
+import org.springframework.shell.geom.Rectangle;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 
-
-import java.io.IOException;
-import java.util.Map;
-
 @Log4j2
 @ShellComponent
-public class FinanceiroCommands extends AbstractShellComponent {
+public class FinanceiroCommands{
 
-    @Setter
-    @Getter
-    private Terminal terminal;
-    private DefaultComponent defaultComponent;
-    private ComponentFlow.Builder componentFlowBuilder;
-    private ShellHelper shellHelper;
-    private FornecedorService fornecedorService;
-    private CidadeService cidadeService;
-    private DespesaService despesaService;
-    private TipoContaService tipoContaService;
-    private TipoDespesaService tipoDespesaService;
-    private FormaPagamentoService formaPagamentoService;
-    private ContaService contaService;
-    private FornecedorComp fornecedorComp;
+    private DespesaComponent despesaComponent;
+    private FornecedorComponent fornecedorComponent;
+
+
 
     @Autowired
-    public FinanceiroCommands(ComponentFlow.Builder componentFlowBuilder,
-                              ShellHelper shellHelper,
-                              Terminal terminal,
-                              FornecedorService fornecedorService,
-                              CidadeService cidadeService,
-                              DespesaService despesaService,
-                              TipoContaService tipoContaService,
-                              TipoDespesaService  tipoDespesaService,
-                              FormaPagamentoService formaPagamentoService,
-                              ContaService contaService) {
-        this.componentFlowBuilder = componentFlowBuilder;
-        this.shellHelper = shellHelper;
-        this.terminal = terminal;
-        this.fornecedorService = fornecedorService;
-        this.cidadeService = cidadeService;
-        this.despesaService = despesaService;
-        this.tipoContaService = tipoContaService;
-        this.tipoDespesaService = tipoDespesaService;
-        this.formaPagamentoService = formaPagamentoService;
-        this.contaService = contaService;
-//        this.fornecedorComp = new FornecedorComp(terminal, getTemplateExecutor(), getResourceLoader());
+    public FinanceiroCommands(DespesaComponent despesaComponent,
+                              FornecedorComponent fornecedorComponent) {
+
+        this.despesaComponent = despesaComponent;
+        this.fornecedorComponent = fornecedorComponent;
+
 
     }
 
-    @ShellMethod("teste")
-    public void listPrompt() throws IOException {
-
-        ConsolePrompt prompt = new ConsolePrompt(terminal);
-        PromptBuilder builder = prompt.getPromptBuilder();
-
-        // Create a list prompt for single selection
-        builder.createListPrompt()
-                .name("color")
-                .message("Choose your favorite color")
-                .newItem().text("Red").add()
-                .newItem("green").text("Green").add()
-                .newItem("blue").text("Blue").add()
-                .newItem("yellow").text("Yellow").add()
-                .pageSize(3) // Show 3 items at a time
-                .addPrompt();
-
-        try {
-            Map<String, PromptResultItemIF> result = prompt.prompt(builder.build());
-            System.out.println("Selected color: " + result.get("color").getResult());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    @ShellMethod("Consulta Fornecedor")
+    public void fornecedores() {
+        ConsultaFornecedor consultaFornecedor = new ConsultaFornecedor(fornecedorComponent);
+        consultaFornecedor.consulta();
     }
 
-
-    @ShellMethod("Status Despesas")
-    public void statusDespesa(){
-        DespesaFilter despesaFilter = DespesaFilter.builder().build();
-        shellHelper.prInfo("-".repeat(50));
-        shellHelper.prInfo(String.format("> Registros: %-10s", despesaService.getCountDespesa()));
-        shellHelper.prInfo(String.format("> Total:     %-10s", Util.toCurrencyPtBr(despesaService.getSumDespesa(despesaFilter))));
-        shellHelper.prInfo("-".repeat(50));
+    @ShellMethod("Cadastro Fornecedor")
+    public void addFornecedor() {
+        CadastroFornecedor cadastroFornecedor = new CadastroFornecedor(fornecedorComponent);
+        cadastroFornecedor.cadastrar();
     }
 
-
-//    @ShellMethod("Consulta Fornecedor")
-//    public void findFornecedor() {
-////        this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
-////        ConsultaFornecedor consultaFornecedor = new ConsultaFornecedor(this.defaultComponent, this.shellHelper);
-////        consultaFornecedor.consulta(fornecedorService);
-//    }
-//
-//
-//    @ShellMethod("Cadastro Fornecedor")
-//    public void addFornecedor() {
-//        this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
-//        CadastroFornecedor cadastroFornecedor = new CadastroFornecedor(this.defaultComponent, this.shellHelper);
-//        cadastroFornecedor.cadastro(fornecedorService, cidadeService);
-//    }
-//
-//
-//
     @ShellMethod("Consulta Despesas")
     public void despesas(){
-        this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
-        ConsultaDespesa consultaDespesa = new ConsultaDespesa(this.defaultComponent,this.shellHelper, this.fornecedorComp);
-        consultaDespesa.consulta(despesaService, fornecedorService, tipoDespesaService, formaPagamentoService);
+            ConsultaDespesa consultaDespesa = new ConsultaDespesa(despesaComponent);
+            consultaDespesa.consulta();
     }
-//
-////    @ShellMethod("Cadastro Despesas")
-////    public void addDespesa() {
-////        this.defaultComponent = new DefaultComponent(terminal, getTemplateExecutor(), getResourceLoader());
-////        CadastroDespesa cadastroDespesa = new CadastroDespesa(this.defaultComponent, this.shellHelper);
-////        cadastroDespesa.cadastrar(tipoDespesaService,
-////                formaPagamentoService,
-////                despesaService,
-////                fornecedorService,
-////                cidadeService);
-////    }
+
+    @ShellMethod("Cadastro Despesas")
+    public void addDespesa() {
+        CadastroDespesa cadastroDespesa =  new CadastroDespesa(despesaComponent);
+        cadastroDespesa.cadastrar();
+    }
 //
 ////    @ShellMethod("Consulta Contas")
 ////    public void contas(){

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 /**
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DespesaResponseDTO implements Serializable {
+    BigInteger id;
     BigDecimal valor;
     FormaPagamentoResponseDTO formaPagamento;
     LocalDate dataPagamento;

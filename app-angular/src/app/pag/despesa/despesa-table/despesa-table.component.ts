@@ -159,7 +159,7 @@ export class DespesaTableComponent implements OnInit{
     event.rows = (event.rows ? event.rows : this.pageSize);
     event.sortField = (event.sortField ? event.sortField : 'dataPagamento');
 
-    const url: string = 'despesa/page?page=' + (event.first! / this.pageSize)
+    const url: string = 'despesa/page?page=' + (event.first! / event.rows)
       + '&size=' + event.rows
       + '&sort=' + event.sortField + ',' + (event.sortOrder == 1 ? 'asc' : 'desc')
       + urlfiltros;

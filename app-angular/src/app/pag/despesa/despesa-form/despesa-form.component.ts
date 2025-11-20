@@ -123,7 +123,7 @@ export class DespesaFormComponent implements OnInit{
     else if(['0,00','0','', null, undefined].indexOf(this.valor.trim()) == 0)
       this.messageService.add({severity: 'error', summary: 'Error', detail: 'Valor inválida!'});
     else if(!this.fornecedorSelecionado)
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Fornecedor inválida!'});
+      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Fornecedor.ts inválida!'});
     else{
       this.loading=true;
       var despesa:Despesa = new Despesa();
@@ -136,19 +136,37 @@ export class DespesaFormComponent implements OnInit{
       despesa.valor =  Util.formatMoedaToFloat(Util.formatFloatToReal(this.valor));
       despesa.obs = this.obs;
 
-      this.defaultService.save(despesa, 'despesa').subscribe({
-        next: res => this.messageService.add({severity: 'success', summary: 'Success', detail: 'Despesa salva!'}),
-        error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o despesa'}),
-        complete: () => {
-          if(this.idEdicao)
-            this.router.navigate(['/despesa-table'])
-          this.loading = false;
-          this.valor = '0,00';
-          this.obs = '';
-          this.getTotal();
-        }
-      });
+      if(despesa.id)
+        this.updateDespesa(despesa);
+      else
+        this.createDespesa(despesa);
     }
+  }
+
+  updateDespesa(despesa:Despesa){
+    this.defaultService.update(despesa, 'despesa').subscribe({
+      next: res => this.messageService.add({severity: 'success', summary: 'Success', detail: 'Despesa atualizada!'}),
+      error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o despesa'}),
+      complete: () => {
+        this.loading = false;
+        this.router.navigate(['/despesa-table'])
+        this.valor = '0,00';
+        this.obs = '';
+      }
+    });
+  }
+
+  createDespesa(despesa:Despesa){
+    this.defaultService.save(despesa, 'despesa').subscribe({
+      next: res => this.messageService.add({severity: 'success', summary: 'Success', detail: 'Despesa salva!'}),
+      error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o despesa'}),
+      complete: () => {
+        this.loading = false;
+        this.valor = '0,00';
+        this.obs = '';
+        this.getTotal();
+      }
+    });
   }
 
   maskaraMoeda($event: KeyboardEvent) {

@@ -118,47 +118,47 @@ public class ContaCommands  extends AbstractShellComponent {
 //    }
 
 
-    public boolean inputEmissao(Conta conta){
-        boolean valid = false;
-        do{
-            String emissao = this.defaultComponent.inputTextDefault("Emissao -> ", "");
-            valid = !emissao.isEmpty() && Validate.isValidDate(emissao);
-            if(valid)
-                conta.setEmissao(Util.getData(emissao));
-        } while (valid ? false :  this.defaultComponent.confirmationInput("Emissao inválida! Continuar", true));
-        return valid;
-    }
-
-    public boolean inputVencimento(Conta conta){
-        boolean valid = false;
-        do{
-            String vencimento = this.defaultComponent.inputTextDefault("Vencimento -> ", "");
-            valid = !vencimento.trim().isEmpty() && Validate.isValidDate(vencimento) && vencimento.matches("[0-9]+");
-            if(valid){
-                conta.setVencimento(Util.getData(vencimento));
-                valid = (conta.getVencimento().compareTo(conta.getEmissao()) >= 0) ;
-            }
-        } while (valid ? false :  this.defaultComponent.confirmationInput("Vencimento inválido! Continuar", true));
-        return valid;
-    }
-
-    public boolean inputParcelas(Conta conta){
-        boolean valid = false;
-        do{
-            String parcela = this.defaultComponent.inputTextDefault("Parcela  ->", "00");
-            String totalPa = this.defaultComponent.inputTextDefault("Total Parcelas  ->", "00");
-            valid = parcela.matches("[0-9]+") && totalPa.matches("[0-9]+");
-            if(valid){
-                conta.setParcela(Integer.parseInt(parcela));
-                conta.setTotalParcela(Integer.parseInt(totalPa));
-                valid = conta.getTotalParcela() >= conta.getParcela();
-            }else{
-                conta.setParcela(0);
-                conta.setTotalParcela(0);
-            }
-        } while (valid ? false :  this.defaultComponent.confirmationInput("Parcelas inválida! Continuar", true));
-        return valid;
-    }
+//    public boolean inputEmissao(Conta conta){
+//        boolean valid = false;
+//        do{
+//            String emissao = this.defaultComponent.inputTextDefault("Emissao -> ", "");
+//            valid = !emissao.isEmpty() && Validate.isValidDate(emissao);
+//            if(valid)
+//                conta.setEmissao(Util.getData(emissao));
+//        } while (valid ? false :  this.defaultComponent.confirmationInput("Emissao inválida! Continuar", true));
+//        return valid;
+//    }
+//
+//    public boolean inputVencimento(Conta conta){
+//        boolean valid = false;
+//        do{
+//            String vencimento = this.defaultComponent.inputTextDefault("Vencimento -> ", "");
+//            valid = !vencimento.trim().isEmpty() && Validate.isValidDate(vencimento) && vencimento.matches("[0-9]+");
+//            if(valid){
+//                conta.setVencimento(Util.getData(vencimento));
+//                valid = (conta.getVencimento().compareTo(conta.getEmissao()) >= 0) ;
+//            }
+//        } while (valid ? false :  this.defaultComponent.confirmationInput("Vencimento inválido! Continuar", true));
+//        return valid;
+//    }
+//
+//    public boolean inputParcelas(Conta conta){
+//        boolean valid = false;
+//        do{
+//            String parcela = this.defaultComponent.inputTextDefault("Parcela  ->", "00");
+//            String totalPa = this.defaultComponent.inputTextDefault("Total Parcelas  ->", "00");
+//            valid = parcela.matches("[0-9]+") && totalPa.matches("[0-9]+");
+//            if(valid){
+//                conta.setParcela(Integer.parseInt(parcela));
+//                conta.setTotalParcela(Integer.parseInt(totalPa));
+//                valid = conta.getTotalParcela() >= conta.getParcela();
+//            }else{
+//                conta.setParcela(0);
+//                conta.setTotalParcela(0);
+//            }
+//        } while (valid ? false :  this.defaultComponent.confirmationInput("Parcelas inválida! Continuar", true));
+//        return valid;
+//    }
 //
 //    public boolean inputValor(Conta conta){
 //        boolean valid = false;
@@ -199,16 +199,16 @@ public class ContaCommands  extends AbstractShellComponent {
 //    }
 
 
-    public boolean inputDataPagamento(Conta conta){
-        boolean valid = false;
-        do{
-            String dataPgto = this.defaultComponent.inputTextDefault("Data pagamento -> ", conta.getVencimento().toString());
-            valid = !dataPgto.isEmpty() && Validate.isValidDate(dataPgto);
-            if(valid)
-                conta.setDataPagamento(Util.getData(dataPgto));
-        } while (valid ? false :  this.defaultComponent.confirmationInput("Data pagamento inválida! Continuar", true));
-        return valid;
-    }
+//    public boolean inputDataPagamento(Conta conta){
+//        boolean valid = false;
+//        do{
+//            String dataPgto = this.defaultComponent.inputTextDefault("Data pagamento -> ", conta.getVencimento().toString());
+//            valid = !dataPgto.isEmpty() && Validate.isValidDate(dataPgto);
+//            if(valid)
+//                conta.setDataPagamento(Util.getData(dataPgto));
+//        } while (valid ? false :  this.defaultComponent.confirmationInput("Data pagamento inválida! Continuar", true));
+//        return valid;
+//    }
 //
 //    public Optional<Conta> comboConta(ContaFilter contaFilter){
 //        List<SelectorItem<String>> tipos = new ArrayList<>();

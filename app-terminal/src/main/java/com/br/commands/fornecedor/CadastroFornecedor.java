@@ -1,145 +1,179 @@
 package com.br.commands.fornecedor;
 
-import com.br.business.service.CidadeService;
-import com.br.business.service.FornecedorService;
-import com.br.commands.DefaultComponent;
+import com.br.components.FornecedorComponent;
 import com.br.config.ShellHelper;
-import com.br.entity.Fornecedor;
-import lombok.extern.log4j.Log4j2;
+import com.br.dto.ref.CidadeRefDTO;
+import com.br.dto.request.create.FornecedorCreateRequestDTO;
+import com.br.dto.response.CidadeResponseDTO;
+import com.br.dto.response.FornecedorResponseDTO;
+import com.br.entity.Estado;
+import com.br.util.VTerminal;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.shell.component.support.SelectorItem;
+import org.springframework.shell.standard.ShellComponent;
 
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-@Log4j2
+@ShellComponent
 public class CadastroFornecedor {
 
-    private DefaultComponent defaultComponent;
-    private ShellHelper shellHelper;
-    private FornecedorService fornecedorService;
+    private FornecedorComponent fornecedorCmp;
+    private VTerminal vTr;
+    private int largura = 100;
 
-    public CadastroFornecedor(DefaultComponent defaultComponent,
-                              ShellHelper shellHelper) {
-        this.defaultComponent = defaultComponent;
-        this.shellHelper = shellHelper;
+    @Autowired
+    public CadastroFornecedor(FornecedorComponent fornecedorCmp) {
+        this.fornecedorCmp = fornecedorCmp;
+        this.vTr = new VTerminal(fornecedorCmp.getDefaultComponent().getShellHelper());
     }
 
-    public void printFornecedorApi(Fornecedor f){
-        shellHelper.prInfo("Fornecedor da api!");
-        shellHelper.prInfo("Nome_________: " + f.getNome());
-        shellHelper.prInfo("Razão Social_: " + f.getRazaoSocial());
-        shellHelper.prInfo("CNPJ / CPF __: " + (Objects.nonNull(f.getCnpj()) ? f.getCnpj() : f.getCpf()));
-        shellHelper.prInfo("Ibge_________: " + f.getCidade().getIbgeCod());
+    public void cadastrar() {
+        var contForn = true;
+
+        List<SelectorItem<String>> tpPerson = new ArrayList<>();
+        tpPerson.add(SelectorItem.of("Pessoa Jurídica", "1"));
+        tpPerson.add(SelectorItem.of("Pessoa Física", "2"));
+
+        do{
+            vTr.clear();
+            String pessoa = fornecedorCmp.getDefaultComponent().selectDefault(tpPerson, "Selecionar Tipo Pessoa");
+
+            if(pessoa.equals("1")){
+                cadastrarPessoaJuridica();
+                contForn = fornecedorCmp.getDefaultComponent().confirmationInput("Salvar outro Fornecedor", true);
+            }else{
+                String cpf =  fornecedorCmp.getDefaultComponent().inputTextDefault("CPF :", "");
+                List<FornecedorResponseDTO> forncs = fornecedorCmp.getFornecedorService().listFornecedoresSorted(cpf, Sort.by("nome"));
+                if(forncs.isEmpty()){
+                    cadastrarPessoaFisica(cpf);
+                    vTr.clear();
+                    contForn = fornecedorCmp.getDefaultComponent().confirmationInput("Salvar outro Fornecedor", true);
+                }else{
+                    vTr.msgErro("Fornecedor com esse CPF já existe");
+                    contForn = false;
+                }
+            }
+        }while (contForn == true);
+        vTr.clear();
     }
 
-    public void printFornecedor(Fornecedor f){
-        shellHelper.prInfo("Fornecedor já cadastrado!");
-        shellHelper.prInfo("Nome_________: " + f.getNome());
-        shellHelper.prInfo("Razão Social_: " + f.getRazaoSocial());
-        shellHelper.prInfo("CNPJ / CPF __: " + (Objects.nonNull(f.getCnpj()) ? f.getCnpj() : f.getCpf()));
-        shellHelper.prInfo("Cidade_______: " + f.getCidade().getNome());
+    public void cadastrarPessoaFisica(String cpf) {
+        vTr.lnDefault(largura);
+        vTr.lnLabelValue("CPF", cpf);
+        String nome = fornecedorCmp.getDefaultComponent().inputTextDefault("Nome:", "");
+        vTr.lnLabelValue("Nome", nome);
+        String rasaoSocial = fornecedorCmp.getDefaultComponent().inputTextDefault("Razão Social :", nome);
+        vTr.lnLabelValue("Razão Social ", rasaoSocial);
+
+        List<SelectorItem<String>> estados = new ArrayList<>();
+        Arrays.stream(Estado.values()).toList().forEach(estado ->
+                estados.add(SelectorItem.of(estado.getValue(), estado.getValue()))
+        );
+        String estado = fornecedorCmp.getDefaultComponent().selectDefault(estados, "Selecionar Estado");
+
+        boolean contCidade = true;
+        String cidadeCodIbge = null;
+        List<CidadeResponseDTO> cidadeResponseDTOS;
+        CidadeResponseDTO cidadeResponseDTO = null;
+        do{
+            String cidadeSearch =  fornecedorCmp.getDefaultComponent().inputTextDefault("Cidade :", "");
+            List<SelectorItem<String>> cidades = new ArrayList<>();
+            cidadeResponseDTOS =  fornecedorCmp.getCidadeService().listCidadesByUfContainingNome(estado, cidadeSearch);
+            cidadeResponseDTOS.forEach(cidade -> {
+                cidades.add(SelectorItem.of(cidade.getNome(), cidade.getIbgeCod()));
+            });
+            if(cidades.isEmpty()){
+                contCidade = fornecedorCmp.getDefaultComponent().confirmationInput("Nenhuma cidade encontrada, continuar", true);
+            }else{
+                cidadeCodIbge = fornecedorCmp.getDefaultComponent().selectDefault(cidades, "Selecionar Cidade");
+
+                String finalCidadeCodIbge = cidadeCodIbge;
+                cidadeResponseDTO = cidadeResponseDTOS.stream()
+                        .filter(cidadeResponseDTO1 -> cidadeResponseDTO1.getIbgeCod().equals(finalCidadeCodIbge))
+                        .findFirst().orElse(null);
+
+                contCidade = false;
+            }
+
+        }while (contCidade==true);
+
+        if(cidadeResponseDTO!=null)
+            vTr.lnLabelValue("Cidade", cidadeResponseDTO.getNome() +" - " + cidadeResponseDTO.getUf());
+
+        vTr.lnDefault(largura);
+
+        if(fornecedorCmp.getDefaultComponent().confirmationInput("Salvar Fornecedor", true)){
+            FornecedorCreateRequestDTO fornecedorCreateRequestDTO = FornecedorCreateRequestDTO.builder()
+                    .cpf(cpf)
+                    .nome(nome)
+                    .cidade(new CidadeRefDTO())
+                    .razaoSocial(rasaoSocial)
+                    .build();
+            fornecedorCreateRequestDTO.getCidade().setIbgeCod(cidadeCodIbge);
+            fornecedorCmp.getFornecedorService().save(fornecedorCreateRequestDTO);
+        }
     }
 
-    public Fornecedor cadastro(FornecedorService fornecedorService,
-                               CidadeService cidadeService) {
-//        //FORNECEDOR ----------------------------------------------------
-//        List<SelectorItem<String>> tpPerson = new ArrayList<>();
-//        tpPerson.add(SelectorItem.of("Pessoa Jurídica", "1"));
-//        tpPerson.add(SelectorItem.of("Pessoa Física", "2"));
-//        String pessoa = defaultComponent.selectDefault(tpPerson, "Selecionar Tipo Pessoa");
-//
-//        Fornecedor fornecedor = null;
-//
-//        if(pessoa.equals("1")){//pessoa juridica
-//            var contForn = true;
-//            String cnpj = "";
-//            do{
-//                cnpj = defaultComponent.inputCnpjFornecedor();
-//                if(!fornecedorService.isCnpjValido(cnpj)){
-//                    shellHelper.printError('⛔' + " CNPJ inválido !!!");
-//                    contForn = defaultComponent.confirmationInput("Fornecedor não encontrado!  Deseja continuar", true);
-//                }else{
-//                    shellHelper.printInfo(" Buscando fornecedor no banco...");
-//                    fornecedor = fornecedorService.findByCnpj(cnpj);
-//                    if(fornecedor == null){
-//                        System.out.print("\033[F\033[K");//apago a linha anterior
-//                        shellHelper.printWarning(" Fornecedor não encontrado no banco, buscando na internet...");
-//                        fornecedor = fornecedorService.getFornecedorFromWeb(cnpj);
-//                        if(fornecedor == null){
-//                            System.out.print("\033[F\033[K");
-//                            contForn = defaultComponent.confirmationInput("Fornecedor não encontrado!  Deseja continuar", true);
-//                        }else {
-//                            System.out.print("\033[F\033[K");
-//                            shellHelper.printSuccess(" Fornecedor econtrado!");
-//                            shellHelper.printInfo(String.format("Nome : %s", fornecedor.getNome()));
-//                            shellHelper.printInfo(String.format("Razao Social : %s", fornecedor.getRazaoSocial()));
-//                            shellHelper.printInfo(String.format("CNPJ : %s", fornecedor.getCnpj()));
-//                            shellHelper.printInfo(String.format("Cidade : %s = %s", fornecedor.getCidade().getNome(), fornecedor.getCidade().getUf()));
-//                            if(defaultComponent.confirmationInput("Cadastar", true)){
-//                                shellHelper.printInfo("salvando novo fornecedor...");
-//                                fornecedor  = fornecedorService.save(fornecedor);
-//                                contForn = false;
-//                            }else{
-//                                contForn = defaultComponent.confirmationInput("Deseja continuar", true);
-//                            }
-//                        }
-//                    }else{
-//                        System.out.print("\033[F\033[K");
-//                        shellHelper.printInfo(" Fornecedor econtrado!");
-//                        //shellHelper.printInfo('✅'+ " ["+fornecedor.getId()+"] " + fornecedor.getNome());
-//                        contForn = false;
-//                    }
-//                }
-//            } while (contForn == true);
-//
-//        }else{//PESSOA FISICA
-//
-//            String pfbusca =  defaultComponent.inputTextDefault("Fornecedor Pessoa Fisica :", "");
-//            List<SelectorItem<String>> pfs = new ArrayList<>();
-//            List<Fornecedor> forncs = fornecedorService.listFornecedoresSorted(pfbusca, Sort.by("nome"));
-//            if(!forncs.isEmpty()){
-//                forncs.forEach(pf ->{
-//                    String leg = String.format("%-50s | CPF : %-20s | %s - %s", pf.getNome(), pf.getCpf(), pf.getCidade().getNome(), pf.getCidade().getUf());
-//                    pfs.add(SelectorItem.of(leg , pf.getId().toString()));
-//                });
-//                String idPFF = defaultComponent.selectDefault(pfs, "Selecionar Fornecedor");
-//                fornecedor = forncs.stream().filter(fornec -> fornec.getId().equals(new BigInteger(idPFF))).findFirst().get();
-//
-//            }else{//novo fornecedor pessoa fisica
-//                if(defaultComponent.confirmationInput("Nenhum forencedor pessoa fisica econtrado cadastrar manualmente", true)){
-//                    List<SelectorItem<String>> estados = new ArrayList<>();
-//                    Arrays.stream(Estado.values()).toList().forEach(estado ->
-//                            estados.add(SelectorItem.of(estado.getValue(), estado.getValue()))
-//                    );
-//                    String estado = defaultComponent.selectDefault(estados, "Selecionar Estado");
-//
-//                    boolean contCidade = true;
-//                    String cidadeCodIbge = null;
-//                    do{
-//                        String cidadeSearch =  defaultComponent.inputTextDefault("Cidade :", "");
-//                        List<SelectorItem<String>> cidades = new ArrayList<>();
-//                        cidadeService.listCidadesByUfContainingNome(estado, cidadeSearch).forEach(cidade -> {
-//                            cidades.add(SelectorItem.of(cidade.getNome(), cidade.getIbgeCod()));
-//                        });
-//                        if(cidades.isEmpty()){
-//                            contCidade = defaultComponent.confirmationInput("Nenhuma cidade encontrada, continuar", true);
-//                        }else{
-//                            cidadeCodIbge = defaultComponent.selectDefault(cidades, "Selecionar Cidade");
-//                            contCidade = false;
-//                        }
-//                    }while (contCidade==true);
-//
-//                    fornecedor = new Fornecedor().builder()
-//                            .cpf(defaultComponent.inputTextDefault("CPF :", ""))
-//                            .nome(defaultComponent.inputTextDefault("Nome :", ""))
-//                            .razaoSocial(defaultComponent.inputTextDefault("Razão Social :", ""))
-////							.ibgeCod(cidadeCodIbge)
-//                            .build();
-//
-//                    shellHelper.printInfo("salvando novo fornecedor pessoa física...");
-//                    fornecedor  = fornecedorService.save(fornecedor);
-//                }
-//            }
-//        }
-//        return fornecedor;
-        return null;
+    public FornecedorResponseDTO findByCnpj(String cnpj) {
+        try {
+            return  fornecedorCmp.getFornecedorService().findByCnpj(cnpj);
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    public void cadastrarPessoaJuridica(){
+        boolean cont = false;
+        FornecedorResponseDTO  fornecedorResponseDTO;
+
+        do{
+            vTr.clear();
+            String cnpj = fornecedorCmp.getDefaultComponent().inputTextDefault("CNPJ", "");
+            if(!fornecedorCmp.getFornecedorService().isCnpjValido(cnpj)){
+                vTr.msgErro("CNPJ inválido");
+                cont = fornecedorCmp.getDefaultComponent().confirmationInput("Deseja continuar", true);
+            } else {
+                vTr.msg(" Buscando fornecedor no banco...");
+
+                if (this.findByCnpj(cnpj) == null) {
+                    vTr.removeLn();
+                    vTr.msgWarn("Fornecedor não encontrado no banco, buscando na internet");
+                    fornecedorResponseDTO = fornecedorCmp.getFornecedorService().getFornecedorFromWeb(cnpj);
+                    if (fornecedorResponseDTO == null) {
+                        vTr.removeLn();
+                        cont = fornecedorCmp.getDefaultComponent().confirmationInput("Fornecedor não encontrado!  Deseja continuar", true);
+                    }else {
+                        vTr.clear();
+                        vTr.lnDefault(largura);
+                        vTr.msgSucess("|  Fornecedor econtrado!");
+                        vTr.lnLabelValue("Nome", fornecedorResponseDTO.getNome());
+                        vTr.lnLabelValue("Razao Social", fornecedorResponseDTO.getRazaoSocial());
+                        vTr.lnLabelValue("CNPJ", fornecedorResponseDTO.getCnpj());
+                        vTr.lnLabelValue("Cidade", fornecedorResponseDTO.getCidade().getNome()+ " - "+ fornecedorResponseDTO.getCidade().getUf());
+                        vTr.lnDefault(largura);
+
+                        if (fornecedorCmp.getDefaultComponent().confirmationInput("Cadastrar", true)) {
+                            CidadeRefDTO cidadeRefDTO = CidadeRefDTO.builder().ibgeCod(fornecedorResponseDTO.getCidade().getIbgeCod()).build();
+                            FornecedorCreateRequestDTO fornecedorCreateRequestDTO = FornecedorCreateRequestDTO.builder()
+                                    .nome(fornecedorResponseDTO.getNome())
+                                    .razaoSocial(fornecedorResponseDTO.getRazaoSocial())
+                                    .cnpj(fornecedorResponseDTO.getCnpj())
+                                    .cpf(fornecedorResponseDTO.getCpf())
+                                    .cidade(cidadeRefDTO)
+                                    .build();
+                            fornecedorResponseDTO = fornecedorCmp.getFornecedorService().save(fornecedorCreateRequestDTO);
+
+                            vTr.msgSucess("Fornecedor salvo");
+                        }
+                    }
+
+                }else{
+                    cont = fornecedorCmp.getDefaultComponent().confirmationInput("Fornecedor ja existe ! Deseja continuar", true);
+                }
+            }
+        }while(cont);
     }
 }

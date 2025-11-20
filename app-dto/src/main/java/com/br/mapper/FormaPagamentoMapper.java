@@ -1,6 +1,7 @@
 package com.br.mapper;
 
-import com.br.dto.request.FormaPagamentoRequestDTO;
+import com.br.dto.request.create.FormaPagamentoCreateRequestDTO;
+import com.br.dto.request.update.FormaPagamentoUpdateRequestDTO;
 import com.br.dto.response.FormaPagamentoResponseDTO;
 import com.br.entity.FormaPagamento;
 import org.mapstruct.*;
@@ -11,7 +12,10 @@ import java.util.List;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface FormaPagamentoMapper {
     FormaPagamentoMapper INSTANCE = Mappers.getMapper(FormaPagamentoMapper.class);
-    FormaPagamento toEntity(FormaPagamentoRequestDTO formaPagamentoRequestDto);
+
+    FormaPagamento toEntity(FormaPagamentoCreateRequestDTO formaPagamentoCreateRequestDTO);
+
+    FormaPagamento toEntity(FormaPagamentoUpdateRequestDTO formaPagamentoUpdateRequestDTO);
 
     FormaPagamentoResponseDTO toDto(FormaPagamento formaPagamento);
 

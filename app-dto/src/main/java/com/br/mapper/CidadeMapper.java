@@ -10,6 +10,7 @@ import java.util.List;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CidadeMapper {
     CidadeMapper INSTANCE = Mappers.getMapper(CidadeMapper.class);
+
     Cidade toEntity(CidadeResponseDTO cidadeResponseDto);
 
     CidadeResponseDTO toDto(Cidade cidade);

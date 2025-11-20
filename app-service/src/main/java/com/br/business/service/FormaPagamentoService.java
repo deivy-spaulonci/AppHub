@@ -1,6 +1,7 @@
 package com.br.business.service;
 
-import com.br.dto.request.FormaPagamentoRequestDTO;
+import com.br.dto.request.create.FormaPagamentoCreateRequestDTO;
+import com.br.dto.request.update.FormaPagamentoUpdateRequestDTO;
 import com.br.dto.response.FormaPagamentoResponseDTO;
 import com.br.entity.FormaPagamento;
 import com.br.entity.FormaPagamento_;
@@ -43,8 +44,15 @@ public class FormaPagamentoService {
     }
 
     @Transactional
-    public FormaPagamentoResponseDTO save(FormaPagamentoRequestDTO formaPagamentoRequestDTO) {
+    public FormaPagamentoResponseDTO save(FormaPagamentoCreateRequestDTO formaPagamentoRequestDTO) {
         FormaPagamento formaPagamento = formaPagamentoMapper.toEntity(formaPagamentoRequestDTO);
         return formaPagamentoMapper.toDto(formaPagamentoRepository.save(formaPagamento));
     }
+
+    @Transactional
+    public FormaPagamentoResponseDTO save(FormaPagamentoUpdateRequestDTO formaPagamentoUpdateRequestDTO) {
+        FormaPagamento formaPagamento = formaPagamentoMapper.toEntity(formaPagamentoUpdateRequestDTO);
+        return formaPagamentoMapper.toDto(formaPagamentoRepository.save(formaPagamento));
+    }
+
 }

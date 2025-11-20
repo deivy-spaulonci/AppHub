@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 /**
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ContaResponseDTO implements Serializable {
+    BigInteger id;
     String codigoBarra;
     TipoContaResponseDTO tipoConta;
     LocalDate emissao;

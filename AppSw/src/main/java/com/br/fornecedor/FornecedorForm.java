@@ -144,28 +144,29 @@ public class FornecedorForm extends JPanel {
     }
 
     public Fornecedor getFornecedorFromWeb(String cnpj){
-        String json = getFornecedorApiWeb(cnpj);
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            FornecedorCloudResponseDTO fornecedorAWS = objectMapper.readValue(json, FornecedorCloudResponseDTO.class);
-            Cidade cidade = cidadeDAO.buscarPorCodIbge(fornecedorAWS.getIbgeCod());
-
-            Fornecedor fornecedor = Fornecedor.builder()
-                    .cnpj(fornecedorAWS.getCnpj().replaceAll("[^0-9]",""))
-                    .razaoSocial(fornecedorAWS.getNome() == null ? fornecedorAWS.getFantasia() : fornecedorAWS.getNome())
-                    .nome(fornecedorAWS.getFantasia()==null ? fornecedorAWS.getNome() : fornecedorAWS.getFantasia())
-                    .cpf("")
-                    //.ibgeCod(fornecedorAWS.getIbgeCod())
-                    .cidade(cidade)
-                    .build();
-
-            return fornecedor;
-
-        } catch (JsonProcessingException e) {
-            Util.alertErro(this, "Erro na busca por fornecedor em nuvem!");
-            log.error(e);
-            throw new RuntimeException(e);
-        }
+//        String json = getFornecedorApiWeb(cnpj);
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        try {
+//            FornecedorCloudResponseDTO fornecedorAWS = objectMapper.readValue(json, FornecedorCloudResponseDTO.class);
+//            Cidade cidade = cidadeDAO.buscarPorCodIbge(fornecedorAWS.getIbgeCod());
+//
+//            Fornecedor fornecedor = Fornecedor.builder()
+//                    .cnpj(fornecedorAWS.getCnpj().replaceAll("[^0-9]",""))
+//                    .razaoSocial(fornecedorAWS.getNome() == null ? fornecedorAWS.getFantasia() : fornecedorAWS.getNome())
+//                    .nome(fornecedorAWS.getFantasia()==null ? fornecedorAWS.getNome() : fornecedorAWS.getFantasia())
+//                    .cpf("")
+//                    //.ibgeCod(fornecedorAWS.getIbgeCod())
+//                    .cidade(cidade)
+//                    .build();
+//
+//            return fornecedor;
+//
+//        } catch (JsonProcessingException e) {
+//            Util.alertErro(this, "Erro na busca por fornecedor em nuvem!");
+//            log.error(e);
+//            throw new RuntimeException(e);
+//        }
+        return null;
     }
 
     public String getFornecedorApiWeb(String cnpj){

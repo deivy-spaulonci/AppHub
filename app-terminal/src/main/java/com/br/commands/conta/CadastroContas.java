@@ -92,48 +92,48 @@ public class CadastroContas {
 //        }
 //    }
 
-    public void inputCalcValuePgto(Conta conta){
-        BigDecimal valorPago = new BigDecimal(this.defaultComponent.inputValor("Valor Pago"));
-        int comp = valorPago.compareTo(conta.getValor());
-        conta.setDesconto(BigDecimal.ZERO);
-        conta.setMulta(BigDecimal.ZERO);
-        if(comp < 0){
-            conta.setDesconto(conta.getValor().subtract(valorPago));
-        }else if(comp > 0)
-            conta.setMulta(valorPago.subtract(conta.getValor()));
-    }
+//    public void inputCalcValuePgto(Conta conta){
+//        BigDecimal valorPago = new BigDecimal(this.defaultComponent.inputValor("Valor Pago"));
+//        int comp = valorPago.compareTo(conta.getValor());
+//        conta.setDesconto(BigDecimal.ZERO);
+//        conta.setMulta(BigDecimal.ZERO);
+//        if(comp < 0){
+//            conta.setDesconto(conta.getValor().subtract(valorPago));
+//        }else if(comp > 0)
+//            conta.setMulta(valorPago.subtract(conta.getValor()));
+//    }
 
-    public boolean inputCodigoBarra(Conta conta){
-        boolean valid = false;
-        do{
-            conta.setCodigoBarra(this.defaultComponent.inputTextDefault(" Código Barras ->", "0".repeat(48)));
-            valid = conta.getCodigoBarra().matches("[0-9]+") && conta.getCodigoBarra().length()==47;
-        }while (!valid && this.defaultComponent.confirmationInput("Código Barra inválido! Continuar", true));
-        return valid;
-    }
-
-    public boolean inputParcela(Conta conta){
-        boolean valid = false;
-        do{
-            String parcela = "0";
-            String total = "0";
-            do{
-                parcela = this.defaultComponent.inputTextDefault(" Parcela ->", "0");
-                valid = parcela.matches("[0-9]+") && parcela.length()<=3;
-            }while(!valid && this.defaultComponent.confirmationInput("Parcela inválida! Continuar", true));
-            conta.setParcela(Integer.valueOf(parcela));
-
-            do{
-                total = this.defaultComponent.inputTextDefault(" Total ->", "0");
-                valid = total.matches("[0-9]+") && total.length()<=3;
-            }while(!valid && this.defaultComponent.confirmationInput("Total inválido! Continuar", true));
-            conta.setTotalParcela(Integer.valueOf(total));
-
-            valid = (conta.getParcela().compareTo(conta.getTotalParcela())<=0);
-
-        }while (!valid && this.defaultComponent.confirmationInput("Parcela maior que seu total! Continuar", true));
-        return valid;
-    }
+//    public boolean inputCodigoBarra(Conta conta){
+//        boolean valid = false;
+//        do{
+//            conta.setCodigoBarra(this.defaultComponent.inputTextDefault(" Código Barras ->", "0".repeat(48)));
+//            valid = conta.getCodigoBarra().matches("[0-9]+") && conta.getCodigoBarra().length()==47;
+//        }while (!valid && this.defaultComponent.confirmationInput("Código Barra inválido! Continuar", true));
+//        return valid;
+//    }
+//
+//    public boolean inputParcela(Conta conta){
+//        boolean valid = false;
+//        do{
+//            String parcela = "0";
+//            String total = "0";
+//            do{
+//                parcela = this.defaultComponent.inputTextDefault(" Parcela ->", "0");
+//                valid = parcela.matches("[0-9]+") && parcela.length()<=3;
+//            }while(!valid && this.defaultComponent.confirmationInput("Parcela inválida! Continuar", true));
+//            conta.setParcela(Integer.valueOf(parcela));
+//
+//            do{
+//                total = this.defaultComponent.inputTextDefault(" Total ->", "0");
+//                valid = total.matches("[0-9]+") && total.length()<=3;
+//            }while(!valid && this.defaultComponent.confirmationInput("Total inválido! Continuar", true));
+//            conta.setTotalParcela(Integer.valueOf(total));
+//
+//            valid = (conta.getParcela().compareTo(conta.getTotalParcela())<=0);
+//
+//        }while (!valid && this.defaultComponent.confirmationInput("Parcela maior que seu total! Continuar", true));
+//        return valid;
+//    }
 
 
 }

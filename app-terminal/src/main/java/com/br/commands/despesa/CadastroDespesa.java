@@ -1,83 +1,82 @@
 package com.br.commands.despesa;
 
-import com.br.business.service.*;
-import com.br.commands.DefaultComponent;
-import com.br.commands.fornecedor.CadastroFornecedor;
-import com.br.config.ShellHelper;
-import com.br.entity.Despesa;
-import com.br.entity.Fornecedor;
+import com.br.components.DespesaComponent;
+import com.br.dto.ref.FormaPagamentoRefDTO;
+import com.br.dto.ref.FornecedorRefDTO;
+import com.br.dto.ref.TipoDespesaRefDTO;
+import com.br.dto.request.create.DespesaCreateRequestDTO;
+import com.br.dto.response.FormaPagamentoResponseDTO;
+import com.br.dto.response.FornecedorResponseDTO;
+import com.br.dto.response.TipoDespesaResponseDTO;
 import com.br.util.Util;
-import lombok.extern.log4j.Log4j2;
+import com.br.util.VTerminal;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.shell.standard.ShellComponent;
 
 import java.math.BigDecimal;
 
-@Log4j2
+
+@ShellComponent
 public class CadastroDespesa {
 
-    private DefaultComponent defaultComponent;
-    private ShellHelper shellHelper;
-    private FornecedorService fornecedorService;
-    private CidadeService cidadeService;
+    private DespesaComponent despesaCmp;
+    private VTerminal vTr;
+    private int largura = 0;
 
-    public CadastroDespesa(DefaultComponent defaultComponent,
-                           ShellHelper shellHelper) {
-        this.defaultComponent = defaultComponent;
-        this.shellHelper = shellHelper;
+    @Autowired
+    public CadastroDespesa(DespesaComponent despesaCmp) {
+        this.despesaCmp = despesaCmp;
+        this.vTr = new VTerminal(despesaCmp.getDefaultComponent().getShellHelper());
     }
 
-//    public void cadastrar(TipoDespesaService tipoDespesaService,
-//                          FormaPagamentoService formaPagamentoService,
-//                          DespesaService despesaService,
-//                          FornecedorService fornecedorService,
-//                          CidadeService cidadeService) {
-//        this.fornecedorService = fornecedorService;
-//        this.cidadeService = cidadeService;
-//        var cont = true;
-//        Despesa despesaCadastro = new Despesa();
-//        do {
-//            System.out.print("\033\143");
-//            shellHelper.printInfo("+"+"-".repeat(100));
-//            //TIPO DESPESA ----------------------------------------------------
-//            despesaCadastro.setTipoDespesa(this.defaultComponent.selectTipoDespesa(tipoDespesaService.findTipoDespesas()));
-//            shellHelper.printInfo("| %-16s : %-25s".formatted("Tipo Despesa",
-//                    despesaCadastro.getTipoDespesa().getId()+"-"+ despesaCadastro.getTipoDespesa().getNome()));
-//
-//            //FORNECEDOR ----------------------------------------------------
-//            CadastroFornecedor cadastroFornecedor = new CadastroFornecedor(this.defaultComponent, this.shellHelper);
-//            Fornecedor fornecedor = cadastroFornecedor.cadastro(fornecedorService, cidadeService);
-//            if(fornecedor==null)
-//                return;
-//            despesaCadastro.setFornecedor(fornecedor);
-//            shellHelper.printInfo("| %-16s : %-25s".formatted("Fornecedor", despesaCadastro.getFornecedor().getNome()));
-//
-//            //DATA ----------------------------------------------------
-//            String datatxt = defaultComponent.inData("Data Pagamento");
-//            despesaCadastro.setDataPagamento(Util.getData(datatxt));
-//            shellHelper.printInfo("| %-16s : %-25s".formatted("Data pagamento", Util.toDatePtBr(despesaCadastro.getDataPagamento())));
-//
-//            //VALOR ----------------------------------------------------
-//            String valortxt = defaultComponent.inValor("Valor");
-//            despesaCadastro.setValor(new BigDecimal(valortxt));
-//            shellHelper.printInfo("| %-16s : %-25s".formatted("Valor", Util.toCurrencyPtBr(despesaCadastro.getValor())));
-//
-//            //FORMA PAGAMENTO ----------------------------------------------------
-//            despesaCadastro.setFormaPagamento(this.defaultComponent.selectFormaPagamento(formaPagamentoService.findFormasPagamento()));
-//            shellHelper.printInfo("| %-16s : %-25s".formatted("Forma Pagamento",
-//                    despesaCadastro.getFormaPagamento().getId()+" - "+despesaCadastro.getFormaPagamento().getNome()));
-//
-//            //OBSERVAÇÃO ----------------------------------------------------
-//            despesaCadastro.setObs(this.defaultComponent.inputoObs());
-//            shellHelper.printInfo("| %-16s : %-25s".formatted("Observação",despesaCadastro.getObs()));
-//
-//            shellHelper.printInfo("+"+"-".repeat(100));
-//
-//            cont = this.defaultComponent.confirmationInput("Salvar Despesa", true);
-//            if(cont==true)
-//                despesaService.save(despesaCadastro);
-//            else
-//                despesaCadastro = new Despesa();
-//            cont = this.defaultComponent.confirmationInput("Incluir outra Despesa", true);
-//        }while(cont);
-//    }
+    public void cadastrar() {
+        var exit = false;
+        DespesaCreateRequestDTO despesaCreateRequestDTO = new DespesaCreateRequestDTO();
+        do {
+            vTr.clear();
+            vTr.lnDefault(largura);
+            //TIPO DESPESA ----------------------------------------------------
+            despesaCreateRequestDTO.setTipoDespesa(new TipoDespesaRefDTO());
+            TipoDespesaResponseDTO tipoDespesaResponseDTO = despesaCmp.getTipoDespesaComponent().selectTipoDespesa();
+            despesaCreateRequestDTO.getTipoDespesa().setId(tipoDespesaResponseDTO.getId());
+            vTr.lnLabelValue("Tipo Despesa", tipoDespesaResponseDTO.getNome());
+
+            //FORNECEDOR ----------------------------------------------------
+            FornecedorResponseDTO fornec = despesaCmp.getFornecedorComponent().selectTableFornecedor();
+            vTr.removeLn();
+            despesaCreateRequestDTO.setFornecedor(new FornecedorRefDTO());
+            despesaCreateRequestDTO.getFornecedor().setId(fornec.getId());
+            vTr.lnLabelValue("Fornecedor", fornec.getNome());
+
+            //DATA ----------------------------------------------------
+            String datatxt = despesaCmp.getDefaultComponent().inputData("Data Pagamento");;
+            despesaCreateRequestDTO.setDataPagamento(Util.getData(datatxt));
+            vTr.lnLabelValue("Data Pagamento", Util.toDatePtBr(despesaCreateRequestDTO.getDataPagamento()));
+
+            //VALOR ----------------------------------------------------
+            String valortxt = despesaCmp.getDefaultComponent().inputValor("Valor");
+            despesaCreateRequestDTO.setValor(new BigDecimal(valortxt));
+            vTr.lnLabelValue("Valor", Util.toCurrencyPtBr(despesaCreateRequestDTO.getValor()));
+
+            //FORMA PAGAMENTO ----------------------------------------------------
+            despesaCreateRequestDTO.setFormaPagamento(new FormaPagamentoRefDTO());
+            FormaPagamentoResponseDTO formaPagamentoResponseDTO = despesaCmp.getFormaPagamentoComponent().sellectFormaPagamento();
+            despesaCreateRequestDTO.getFormaPagamento().setId(formaPagamentoResponseDTO.getId());
+            vTr.lnLabelValue("Forma Pagamento", formaPagamentoResponseDTO.getNome());
+
+            //OBSERVAÇÃO ----------------------------------------------------
+            despesaCreateRequestDTO.setObs(despesaCmp.getDefaultComponent().inputoObs());
+            vTr.lnLabelValue("Observação", despesaCreateRequestDTO.getObs());
+
+            vTr.lnDefault(largura);
+
+            if(despesaCmp.getDefaultComponent().confirmationInput("Salvar Despesa", true))
+                despesaCmp.getDespesaService().save(despesaCreateRequestDTO);
+           else
+                despesaCreateRequestDTO = new DespesaCreateRequestDTO();
+
+            exit  = despesaCmp.getDefaultComponent().confirmationInput("Incluir outra Despesa", true);
+        }while(exit);
+    }
 
 }

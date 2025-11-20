@@ -84,9 +84,7 @@ export class ContaTableComponent implements OnInit{
   @ViewChild('dt') table?:Table;
   status:any[]=[];
   statusFilter:any={};
-  items!: MenuItem[];
   setContaPagaVisible:boolean=false;
-
   contaPagaValor:string='0,00';
   contaPagaFormaPgto:FormaPagamento=new FormaPagamento();
   contaPagaDataPgto:string='';
@@ -106,10 +104,6 @@ export class ContaTableComponent implements OnInit{
   }
 
   ngOnInit(): void {
-    this.items = [
-      { label: 'Detalhes', icon: 'pi pi-fw pi-search',
-        command: () => this.router.navigate(['/conta-form'+this.contaSelecinada.id]) },
-    ];
 
     this.status = [
       { name: 'Em Aberto', code: 'ABERTO' },
@@ -227,7 +221,7 @@ export class ContaTableComponent implements OnInit{
   loadData(event: TableLazyLoadEvent) {
     let urlfiltros: string = '';
     // let prefix: string =''
-
+    this.loading = true;
 
     if(this.idFilter)
       urlfiltros += '&id='+this.idFilter;
@@ -245,7 +239,7 @@ export class ContaTableComponent implements OnInit{
       urlfiltros += '&contaStatus='+this.statusFilter.code;
 
     event.rows = (event.rows ? event.rows : this.pageSize);
-    event.sortField = (event.sortField ? event.sortField : 'dataPagamento');
+    event.sortField = (event.sortField ? event.sortField : 'vencimento');
 
     const url: string = 'conta/page?page=' + (event.first! / event.rows)
       + '&size=' + event.rows

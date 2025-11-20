@@ -6,8 +6,11 @@ import lombok.Setter;
 import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ShellHelper {
     @Value("${shell.out.info}")
     public String infoColor;
@@ -20,7 +23,8 @@ public class ShellHelper {
     @Setter
     @Getter
     private Terminal terminal;
-    
+
+    @Autowired
     public ShellHelper(Terminal terminal) {
         this.terminal = terminal;
     }

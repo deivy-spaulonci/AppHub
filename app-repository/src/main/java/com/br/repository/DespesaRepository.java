@@ -76,7 +76,7 @@ public interface DespesaRepository extends JpaRepository<Despesa, BigInteger>, J
                     predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(Despesa_.dataPagamento), despesaFilter.getDataInicial()));
                 if (Objects.nonNull(despesaFilter.getDataFinal()))
                     predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(Despesa_.dataPagamento), despesaFilter.getDataFinal()));
-                if (Objects.nonNull(despesaFilter.getIdFornecedor()))
+                if (Objects.nonNull(despesaFilter.getIdFormaPagamento()))
                     predicates.add(criteriaBuilder.equal(root.get(Despesa_.formaPagamento).get(FormaPagamento_.id), despesaFilter.getIdFormaPagamento()));
 
                 return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

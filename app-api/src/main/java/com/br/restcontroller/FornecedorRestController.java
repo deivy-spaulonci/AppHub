@@ -1,7 +1,8 @@
 package com.br.restcontroller;
 
 import com.br.business.service.FornecedorService;
-import com.br.dto.request.FornecedorRequestDTO;
+import com.br.dto.request.create.FornecedorCreateRequestDTO;
+import com.br.dto.request.update.FornecedorUpdateRequestDTO;
 import com.br.dto.response.FornecedorResponseDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -54,14 +56,14 @@ public class FornecedorRestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<FornecedorResponseDTO> create(@RequestBody @Valid FornecedorRequestDTO fornecedorRequestDTO) {
-        return new ResponseEntity<>(fornecedorService.save(fornecedorRequestDTO), HttpStatus.CREATED);
+    public ResponseEntity<FornecedorResponseDTO> create(@RequestBody @Valid FornecedorCreateRequestDTO fornecedorCreateRequestDTO) {
+        return new ResponseEntity<>(fornecedorService.save(fornecedorCreateRequestDTO), HttpStatus.CREATED);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<FornecedorResponseDTO> update(@RequestBody @Valid FornecedorRequestDTO fornecedorRequestDTO) {
-        return new ResponseEntity<>(fornecedorService.save(fornecedorRequestDTO), HttpStatus.OK);
+    public ResponseEntity<FornecedorResponseDTO> update(@RequestBody @Valid FornecedorUpdateRequestDTO fornecedorUpdateRequestDTO) {
+        return new ResponseEntity<>(fornecedorService.update(fornecedorUpdateRequestDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -73,10 +75,17 @@ public class FornecedorRestController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> consultaCNPJ(@PathVariable("cnpj") String cnpj) {
-        List<FornecedorResponseDTO> fornecedorList = fornecedorService.listFornecedoresSorted(cnpj, Sort.unsorted());
-        if (!fornecedorList.isEmpty())
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("CNPJ já cadastrado!");
-
-        return ok(fornecedorService.getFornecedorFromWeb(cnpj));
+        FornecedorResponseDTO fornecedorResponseDTO = fornecedorService.getFornecedorFromWeb(cnpj);
+        if(fornecedorResponseDTO == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("CNPJ não encontrado!");
+        return ok(fornecedorResponseDTO);
     }
+
+    @GetMapping("/existe/{cnpj}")
+    public ResponseEntity<Map<String, Object>> verificaCnpj(@PathVariable String cnpj) {
+        if(fornecedorService.findByCnpj(cnpj)!=null)
+            return ResponseEntity.ok(Map.of("exists", true,"message", "CNPJ já cadastrado"));
+        return ResponseEntity.ok(Map.of("exists", false,"message", "CNPJ não cadastrado"));
+    }
+
 }

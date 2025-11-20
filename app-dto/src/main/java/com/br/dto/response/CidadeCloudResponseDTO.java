@@ -1,0 +1,18 @@
+package com.br.dto.response;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.Serializable;
+
+@Getter
+@Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class CidadeCloudResponseDTO implements Serializable {
+    @JsonProperty("ibge_id")
+    public String ibgeCod;
+    @JsonProperty("nome")
+    public String nome;
+}

@@ -191,25 +191,49 @@ export class ContaFormComponent  implements OnInit{
         conta.dataPagamento = '';
       }
 
-      this.defaultService.save(conta, 'conta').subscribe({
-        next: res => {
-          this.messageService.add({severity: 'success', summary: 'Success', detail: 'Conta salva!'});
-          this.codBarras = '';
+      if(conta.id)
+        this.updateConta(conta);
+      else
+        this.createConta(conta);
 
-          conta = new Conta();
-        },
-        error: error => {
-          this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o conta'});
-        },
-        complete: () => {
-          // if(this.idEdicao)
-          //   this.router.navigate(['/conta'])
-          this.loading = false;
-          this.valor = '0,00';
-          this.obs = '';
-        }
-      });
     }
+  }
+
+  createConta(conta:Conta){
+    this.defaultService.save(conta, 'conta').subscribe({
+      next: res => {
+        this.messageService.add({severity: 'success', summary: 'Success', detail: 'Conta salva!'});
+        this.codBarras = '';
+        conta = new Conta();
+      },
+      error: error => {
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o conta'});
+      },
+      complete: () => {
+        this.loading = false;
+        this.valor = '0,00';
+        this.obs = '';
+      }
+    });
+  }
+
+  updateConta(conta:Conta){
+    this.defaultService.update(conta, 'conta').subscribe({
+      next: res => {
+        this.messageService.add({severity: 'success', summary: 'Success', detail: 'Conta atulizada!'});
+        this.codBarras = '';
+        conta = new Conta();
+      },
+      error: error => {
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o conta'});
+      },
+      complete: () => {
+        this.loading = false;
+        this.router.navigate(['/conta'])
+        this.valor = '0,00';
+        this.obs = '';
+      }
+    });
   }
 
 }

@@ -1,8 +1,9 @@
 package com.br.restcontroller;
 
 import com.br.business.service.DespesaService;
+import com.br.dto.request.create.DespesaCreateRequestDTO;
+import com.br.dto.request.update.DespesaUpdateRequestDTO;
 import com.br.dto.response.DespesaByTipoResponseDTO;
-import com.br.dto.request.DespesaRequestDTO;
 import com.br.dto.response.DespesaResponseDTO;
 import com.br.filter.DespesaFilter;
 import jakarta.validation.Valid;
@@ -60,14 +61,14 @@ public class DespesaRestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<DespesaResponseDTO> create(@RequestBody @Valid DespesaRequestDTO despesaRequestDTO){
-        return new ResponseEntity<>(despesaService.save(despesaRequestDTO), HttpStatus.CREATED);
+    public ResponseEntity<DespesaResponseDTO> create(@RequestBody @Valid DespesaCreateRequestDTO despesaCreateRequestDTO){
+        return new ResponseEntity<>(despesaService.save(despesaCreateRequestDTO), HttpStatus.CREATED);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<DespesaResponseDTO> update(@RequestBody @Valid DespesaRequestDTO despesaRequestDTO){
-        return new ResponseEntity<>(despesaService.save(despesaRequestDTO), HttpStatus.OK);
+    public ResponseEntity<DespesaResponseDTO> update(@RequestBody @Valid DespesaUpdateRequestDTO despesaUpdateRequestDTO){
+        return new ResponseEntity<>(despesaService.update(despesaUpdateRequestDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

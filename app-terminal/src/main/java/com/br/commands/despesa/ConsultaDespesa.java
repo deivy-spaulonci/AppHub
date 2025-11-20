@@ -1,236 +1,242 @@
 package com.br.commands.despesa;
 
-import com.br.business.service.DespesaService;
-import com.br.business.service.FormaPagamentoService;
-import com.br.business.service.FornecedorService;
-import com.br.business.service.TipoDespesaService;
-import com.br.commands.DefaultComponent;
-import com.br.commands.fornecedor.FornecedorComp;
-import com.br.config.ShellHelper;
+import com.br.components.DespesaComponent;
+import com.br.dto.PaginacaoDTO;
+import com.br.dto.ref.FormaPagamentoRefDTO;
+import com.br.dto.ref.FornecedorRefDTO;
+import com.br.dto.ref.TipoDespesaRefDTO;
+import com.br.dto.request.update.DespesaUpdateRequestDTO;
 import com.br.dto.response.DespesaResponseDTO;
+import com.br.dto.response.FormaPagamentoResponseDTO;
+import com.br.dto.response.FornecedorResponseDTO;
+import com.br.dto.response.TipoDespesaResponseDTO;
 import com.br.filter.DespesaFilter;
 import com.br.util.Util;
+import com.br.util.VTerminal;
+import com.br.util.Validate;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.shell.component.support.SelectorItem;
+import org.springframework.shell.standard.ShellComponent;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+@ShellComponent
 public class ConsultaDespesa {
 
-    private DefaultComponent defaultComponent;
-    private ShellHelper shellHelper;
-    private FornecedorComp fornecedorComp;
+    private DespesaComponent despesaCmp;
+    private int largura = 200;
+    private VTerminal vTr;
+    private PaginacaoDTO pgDTO =  new PaginacaoDTO();
+    private String mensagem = "";
+    private DespesaFilter despesaFilter;
 
-    public ConsultaDespesa(DefaultComponent defaultComponent,
-                           ShellHelper shellHelper,
-                           FornecedorComp fornecedorComp) {
-
-        this.defaultComponent = defaultComponent;
-        this.shellHelper = shellHelper;
-        this.fornecedorComp = fornecedorComp;
+    @Autowired
+    public ConsultaDespesa(DespesaComponent despesaCmp) {
+        this.despesaCmp = despesaCmp;
+        this.vTr = new VTerminal(despesaCmp.getDefaultComponent().getShellHelper());
     }
 
-    public void consulta(DespesaService despesaService,
-                         FornecedorService fornecedorService,
-                         TipoDespesaService tipoDespesaService,
-                         FormaPagamentoService formaPagamentoService){
-
-//    this.fornecedorComp = new FornecedorComp(terminal, getTemplateExecutor(), getResourceLoader());
-//
-        String mensagem = "";
+    public void consulta(){
         boolean contEdtDespesa = true;
-        DespesaFilter despesaFilter = DespesaFilter.builder().build();
-        int size = 30;
-        int numberPage = 1;
-        int order = 1;
-        String campoOrder = "dataPagamento";
+        despesaFilter = DespesaFilter.builder().build();
         Page<DespesaResponseDTO> pg;
+        String cols = "|  %-5s |  %-21s | %-50s | %-10s | %12s | %-34s |  %-50s";
+
         do{
-            Sort.Direction direction = (order==0 ? Sort.Direction.ASC : Sort.Direction.DESC);
-            Pageable pageable = PageRequest.of(numberPage-1, size, Sort.by(direction, campoOrder));
-            pg = despesaService.listDespesasPaged(despesaFilter, pageable);
-            String cols = " %-25s | %-50s | %-10s | %15s | %-34s |  %-50s";
-            final int LARG = 200;
-            String header = String.format(cols,"Tipo Despesa", "Fonrecedor", "Data", "Valor", "Forma Pagamento", "Obs");
-            System.out.print("\033\143");
-            shellHelper.prInfo("-".repeat(LARG));
-            shellHelper.prInfo(header);
-            shellHelper.prInfo("-".repeat(LARG));
+            Sort.Direction direction = (pgDTO.getOrder()==0 ? Sort.Direction.ASC : Sort.Direction.DESC);
+            Pageable pageable = PageRequest.of(pgDTO.getNumberPage()-1, pgDTO.getSize(), Sort.by(direction, pgDTO.getSort()));
+            pg = despesaCmp.getDespesaService().listDespesasPaged(despesaFilter, pageable);
+            String header = String.format(cols,"Id","Tipo Despesa", "Fonrecedor", "Data", "Valor", "Forma Pagamento", "Obs");
+            vTr.clear();
+            vTr.lnDefault(largura);
+            vTr.msg(header);
+            vTr.lnDefault(largura);
             if(pg.hasContent()){
                 pg.getContent().forEach(despesa -> {
                     String label = String.format(cols,
-//                            despesa.getId(),
+                            despesa.getId(),
                             despesa.getTipoDespesa().getNome(),
                             StringUtils.abbreviate(despesa.getFornecedor().getNome(), 50),
                             Util.toDatePtBr(despesa.getDataPagamento()),
                             Util.toCurrencyPtBr(despesa.getValor()),
                             despesa.getFormaPagamento().getNome(),
                             StringUtils.abbreviate(despesa.getObs(),40));
-                    shellHelper.prInfo(label);
+                    vTr.msg(label);
                 });
             }else
-                shellHelper.prInfo(" !!! nenhum despesa encontrado... !!!");
-                shellHelper.prInfo("-".repeat(LARG));
-                BigDecimal total = despesaService.getSumDespesa(despesaFilter);
-                shellHelper.prInfo("%n pagina: %-20s  paginas: %-20s tamanho: %-20s  registros: %-20s  total: %-20s %n".formatted(numberPage, pg.getTotalPages(), size, pg.getTotalElements(), Util.toCurrencyPtBr(total)));
-//            shellHelper.printInfo("Filtros:");
-//            if(despesaFilter.getId()!=null) shellHelper.printInfo("	-> id = " + despesaFilter.getId());
-//            if(despesaFilter.getTipoDespesa()!=null) shellHelper.printInfo("	-> Tipo despesa = " + despesaFilter.getTipoDespesa().getNome());
-//            if(despesaFilter.getFormaPagamento()!=null) shellHelper.printInfo("	-> Forma Pagamento = " + despesaFilter.getFormaPagamento().getNome());
-//            if(despesaFilter.getDataInicial()!=null) shellHelper.printInfo("	-> Data Inicial = " + Util.toDatePtBr(despesaFilter.getDataInicial()));
-//            if(despesaFilter.getDataFinal()!=null) shellHelper.printInfo("	-> Data Final = " + Util.toDatePtBr(despesaFilter.getDataFinal()));
-//            if(despesaFilter.getFornecedor()!=null) shellHelper.printInfo("	-> Fornecedor = "
-//                    + fornecedorService.findById(despesaFilter.getFornecedor().getId()).get().getNome());
-//            shellHelper.printInfo("");
-//            shellHelper.printInfo("paginação > [exit ]  [pag xx    ]  [order xx ]  [size]");
-//            shellHelper.printInfo("filtros   > [id xx]  [tipo      ]  [forma    ]  [periodo 00/00/0000 00/00/0000] [fornecedor] [clear]");
-//            shellHelper.printInfo("comandos  > [clear]  [excluir xx]  [editar xx]");
-//            shellHelper.printInfo("");
-//
+                vTr.msgWarn("nenhum despesa encontrado");
+            vTr.lnDefault(largura);
+            BigDecimal total = despesaCmp.getDespesaService().getSumDespesa(despesaFilter);
+            String legend = "%n pagina: %-20s  paginas: %-20s tamanho: %-20s  registros: %-20s  total: %-20s %n";
+            vTr.msg(legend.formatted(pgDTO.getNumberPage(), pg.getTotalPages(), pgDTO.getSize(), pg.getTotalElements(), Util.toCurrencyPtBr(total)));
+
+            vTr.lnDefault(largura);
+            vTr.msg("| %-10s:  [ %-6s | %-10s | %-9s | %-7s ] ".formatted("Filtros","tipo", "forma","periodo","fornecedor"));
+            vTr.msg("| %-10s:  [ %-6s | %-10s | %-4s ] ".formatted("Paginação", "pag xx","sort xx","size"));
+            vTr.msg("| %-10s:  [ %-6s | %-10s | %-9s | %-8s | %-4s ] ".formatted("Comandos", "clear", "excluir xx", "editar xx", "detalhe xx", "exit"));
+            vTr.lnDefault(largura);
+
+            if(pgDTO.getIdSelect() != null){
+                DespesaResponseDTO optionalDespesa;
+                try {
+                    optionalDespesa = despesaCmp.getDespesaService().findById(BigInteger.valueOf(pgDTO.getIdSelect()));
+                    showDespesa(optionalDespesa);
+                }catch (EntityNotFoundException e){
+                    mensagem = "Id da despesa não encontrado !";
+                }
+            }
 
             if(!mensagem.trim().isEmpty())
-                shellHelper.prWarning("%n%n  !!! %-20s... !!! %n%n".formatted(mensagem));
+                vTr.msgWarn(mensagem);
             mensagem = "";
 
-            String resposta = this.defaultComponent.inputTextDefault(" ->", "");
+            String resposta = despesaCmp.getDefaultComponent().inputTextDefault(" ->", "");
 
             if(resposta.equals("exit")){
                 contEdtDespesa = false;
             }else{
                 String[] resparr = resposta.split(" ");
                 switch (resparr[0]){
-                    case "size" :
-                        size = this.defaultComponent.selectPageDefault();
-                        break;
-                    case "pag" : {
-                        Integer pagina = this.defaultComponent.inputInteger("Página : ", numberPage+"");
-                        if(pagina>=1 && pagina<=pg.getTotalPages())
-                            numberPage = pagina;
-                        else
-                            mensagem = String.format("valor digitado tem que ser entre 1 e %d",pg.getTotalPages());
-                        break;
-                    }
-                    case "sort":{
-                        List<SelectorItem<String>> ltOpc = new ArrayList<>(){{
-                            add(SelectorItem.of("Id", "id"));
-                            add(SelectorItem.of("Tipo Despesa", "tipoDespesa"));
-                            add(SelectorItem.of("Forma Pagamento", "formaPagamento"));
-                            add(SelectorItem.of("Data Pagamento", "dataPagamento"));
-                            add(SelectorItem.of("Fonrecedor", "fornecedor.nome"));
-                        }};
-                        campoOrder = this.defaultComponent.selectDefault(ltOpc, "Selecionar Campo");
-                        List<SelectorItem<String>> opcOrder = new ArrayList<>();
-                        opcOrder.add(SelectorItem.of("Ascesdente", "0"));
-                        opcOrder.add(SelectorItem.of("Descendente", "1"));
-                        order = Integer.valueOf(this.defaultComponent.selectDefault(opcOrder, "Selecionar Ordem Campo"));
-                        break;
-                    }
-                    case "id": {
-                        String id = this.defaultComponent.inputTextDefault(" id ->", "");
-                        if (!id.trim().isEmpty() && id.matches("[0-9]+"))
-                            despesaFilter.setId(new BigInteger(id));
-                        else
-                            mensagem = String.format("valor digitado nao corresponde a um numero !",pg.getTotalPages());
-                        break;
-                    }
-//					case "tipo":
-//                        despesaFilter.setIdTipoDespesa(this.defaultComponent.selectTipoDespesa(tipoDespesaService.findTipoDespesas()).getId());
-//                        break;
-//					case "forma":
-//                        despesaFilter.setFormaPagamento(this.defaultComponent.selectFormaPagamento(formaPagamentoService.findFormasPagamento()));
-//                        break;
-//                    case "periodo":{
-//                        if(resparr[1]!=null && Validate.isValidDate(resparr[1])) {
-//                            despesaFilter.setDataInicial(Util.getData(resparr[1]));
-//                            if(resparr.length==3 && Validate.isValidDate(resparr[2]))
-//                                despesaFilter.setDataFinal(Util.getData(resparr[2]));
-//                            else
-//                                shellHelper.printError("data final inválida!");
-//                        }else
-//                            shellHelper.printError("data incial inválida!");
-//                        break;
-//                    }
-//                    case "fornecedor":{
-//                        despesaFilter.setFornecedor(new Fornecedor());
-//                        String fornec = fornecedorComp.selectTableFornecedor(fornecedorService.findFornecedores());
-//                        despesaFilter.getFornecedor().setId(new BigInteger(fornec));
-//                        break;
-//                    }
-//                    case "editar" :{
-//                        if (resparr[1] != null && resparr[1].matches("[0-9]+")) {
-//                            Optional<Despesa> optionalDespesa = despesaService.findById(new BigInteger(resparr[1].toString()));
-//                            if(optionalDespesa.isEmpty())
-//                                shellHelper.printError("Id da despesa não econtrado !");
-//                            else
-//                                editar(optionalDespesa.get(),
-//                                        tipoDespesaService,
-//                                        formaPagamentoService,
-//                                        despesaService,
-//                                        fornecedorService);
-//                        }else
-//                            shellHelper.printError("valor digitado nao corresponde a um numero");
-//                        this.defaultComponent.confirmationInput("enter para continuar", true);
-//                        break;
-//                    }
-                    case "clear": {
-                        despesaFilter = DespesaFilter.builder().build();
-                        break;
-                    }
-                    default: numberPage = pg.getContent().size() < size ? 1 : numberPage+1;
+                    case "size" : pgDTO.setSize(despesaCmp.getDefaultComponent().selectPageDefault()); break;
+                    case "pag" : page(pg.getTotalPages()); break;
+                    case "sort": sort(); break;
+					case "tipo": despesaFilter.setIdTipoDespesa(despesaCmp.getTipoDespesaComponent().selectTipoDespesa().getId()); break;
+					case "forma": despesaFilter.setIdFormaPagamento(despesaCmp.getFormaPagamentoComponent().sellectFormaPagamento().getId()); break;
+                    case "periodo": periodo(); break;
+                    case "fornecedor": despesaFilter.setIdFornecedor(despesaCmp.getFornecedorComponent().selectTableFornecedor().getId()); break;
+                    case "editar" : editar(); break;
+                    case "detalhe" : pgDTO.setIdSelect(despesaCmp.getDefaultComponent().inputInteger(" Id  ->", "")); break;
+                    case "clear": despesaFilter = DespesaFilter.builder().build(); pgDTO.setIdSelect(null); break;
+                    default: pgDTO.setNumberPage(pg.getContent().size() < pgDTO.getSize() ? 1 : pgDTO.getNumberPage()+1);
                 }
             }
         }while (!!contEdtDespesa);
     }
-//
-//    public void editar(Despesa despesa,
-//                       TipoDespesaService tipoDespesaService,
-//                       FormaPagamentoService formaPagamentoService,
-//                       DespesaService despesaService,
-//                       FornecedorService fornecedorService) {
-//		System.out.print("\033\143");
-//
-//		this.showDespesa(despesa);
-//
-//		if(defaultComponent.confirmationInput("Alterar Tipo Despesa", false))
-//			despesa.setTipoDespesa(this.defaultComponent.selectTipoDespesa(tipoDespesaService.findTipoDespesas()));
-//		if(defaultComponent.confirmationInput("Alterar Fornecedor", false))
-//            despesa.setFornecedor(this.defaultComponent.selectFornecedor(fornecedorService.findFornecedores()));
-//		if(defaultComponent.confirmationInput("Alterar Data Pagamento", false))
-//			despesa.setDataPagamento(Util.getData(this.defaultComponent.inData("Data Pagamento")));
-//		if(defaultComponent.confirmationInput("Alterar Valor", false))
-//            despesa.setValor(new BigDecimal(defaultComponent.inValor("Valor")));
-//		if(defaultComponent.confirmationInput("Alterar Forma Pagamento", false))
-//            despesa.setFormaPagamento(this.defaultComponent.selectFormaPagamento(formaPagamentoService.findFormasPagamento()));
-//		if(defaultComponent.confirmationInput("Alterar Observação", false))
-//			despesa.setObs(this.defaultComponent.inputoObs());
-//
-//        System.out.print("\033\143");
-//		this.showDespesa(despesa);
-//		if(this.defaultComponent.confirmationInput("Salvar Despesa", true)){
-//			despesaService.save(despesa);
-//		}
-//    }
-//
-//    public void showDespesa(Despesa despesa){
-//        shellHelper.printInfo("+"+"-".repeat(100));
-//        shellHelper.printInfo(String.format("| %-15s %s","Tipo Despesa: ", despesa.getTipoDespesa()));
-//        shellHelper.printInfo(
-//                String.format("| %-15s %s - %s - %s-%s", "Fornecedor: ",
-//                        despesa.getFornecedor().getNome(),
-//                        despesa.getFornecedor().getCnpj(),
-//                        despesa.getFornecedor().getCidade().getNome(),
-//                        despesa.getFornecedor().getCidade().getUf()));
-//        shellHelper.printInfo(String.format("| %-15s %s", "Data: ", Util.toDatePtBr(despesa.getDataPagamento())));
-//        shellHelper.printInfo(String.format("| %-15s %s", "Valor: ", Util.toCurrencyPtBr(despesa.getValor())));
-//        shellHelper.printInfo(String.format("| %-15s %s", "Forma Pgto: ", despesa.getFormaPagamento()));
-//        shellHelper.printInfo(String.format("| %-15s %s", "Obs: ", despesa.getObs()));
-//        shellHelper.printInfo("+"+"-".repeat(100));
-//	}
+
+    public void page(int totalPages){
+        Integer pagina = despesaCmp.getDefaultComponent().inputInteger("Página : ", pgDTO.getNumberPage()+"");
+        if(pagina>=1 && pagina<=totalPages)
+            pgDTO.setNumberPage(pagina);
+        else
+            mensagem = "valor digitado tem que ser entre 1 e "+totalPages;
+    }
+
+    public void periodo(){
+        String inicio = despesaCmp.getDefaultComponent().inputTextDefault(" Data Inicial (ddmmyyyy) ->", "");
+        Optional.ofNullable(inicio).filter(Validate::isValidDate).map(Util::getData).ifPresentOrElse(despesaFilter::setDataInicial,() -> mensagem = "Data Inicial inválida!");
+        String termino = despesaCmp.getDefaultComponent().inputTextDefault(" Data Final (ddmmyyyy) ->", "");
+        Optional.ofNullable(termino).filter(Validate::isValidDate).map(Util::getData).ifPresentOrElse(despesaFilter::setDataFinal,() -> mensagem = "Data final inválida!");
+    }
+
+    public void sort(){
+        List<SelectorItem<String>> ltOpc = new ArrayList<>(){{
+            add(SelectorItem.of("Id", "id"));
+            add(SelectorItem.of("Tipo Despesa", "tipoDespesa"));
+            add(SelectorItem.of("Forma Pagamento", "formaPagamento"));
+            add(SelectorItem.of("Data Pagamento", "dataPagamento"));
+            add(SelectorItem.of("Fonrecedor", "fornecedor.nome"));
+        }};
+        this.pgDTO.setSort(despesaCmp.getDefaultComponent().selectDefault(ltOpc, "Selecionar Campo"));
+        List<SelectorItem<String>> opcOrder = new ArrayList<>();
+        opcOrder.add(SelectorItem.of("Ascesdente", "0"));
+        opcOrder.add(SelectorItem.of("Descendente", "1"));
+        this.pgDTO.setOrder(Integer.valueOf(despesaCmp.getDefaultComponent().selectDefault(opcOrder, "Selecionar Ordem Campo")));
+    }
+
+    public void showDespesa(DespesaResponseDTO despesaResponseDTO){
+        vTr.msg("");
+        vTr.lnDefault(largura);
+        vTr.msg("| Detalhamento");
+        vTr.msg("|");
+        vTr.lnLabelValue("Tipo Despesa", despesaResponseDTO.getTipoDespesa().getNome());
+        vTr.lnLabelValue("Fornecedor",
+                        despesaResponseDTO.getFornecedor().getNome()+ " -  " +
+                        despesaResponseDTO.getFornecedor().getCnpj()+ " -  " +
+                        despesaResponseDTO.getFornecedor().getCidade().getNome()+ " -  " +
+                        despesaResponseDTO.getFornecedor().getCidade().getUf());
+        vTr.lnLabelValue( "Data", Util.toDatePtBr(despesaResponseDTO.getDataPagamento()));
+        vTr.lnLabelValue("Valor", Util.toCurrencyPtBr(despesaResponseDTO.getValor()));
+        vTr.lnLabelValue("Forma Pgto", despesaResponseDTO.getFormaPagamento().getNome());
+        vTr.lnLabelValue( "Obs", despesaResponseDTO.getObs());
+        vTr.lnDefault(largura);
+	}
+
+    public void editar() {
+        pgDTO.setIdSelect(despesaCmp.getDefaultComponent().inputInteger(" Id  ->", ""));
+        DespesaUpdateRequestDTO despesaUpdateRequestDTO = new DespesaUpdateRequestDTO();
+        DespesaResponseDTO despesaResponseDTO = despesaCmp.getDespesaService().findById(BigInteger.valueOf(pgDTO.getIdSelect()));
+
+        vTr.clear();
+        vTr.lnDefault(largura);
+        //TIPO DESPESA ----------------------------------------------------
+        vTr.lnLabelValue("Tipo Despesa", despesaResponseDTO.getTipoDespesa().getNome());
+        if(despesaCmp.getDefaultComponent().confirmationInput("Alterar Tipo de Despesa", false)){
+            TipoDespesaResponseDTO tipoDespesaResponseDTO = despesaCmp.getTipoDespesaComponent().selectTipoDespesa();
+            despesaUpdateRequestDTO.setTipoDespesa(new TipoDespesaRefDTO());
+            despesaUpdateRequestDTO.getTipoDespesa().setId(tipoDespesaResponseDTO.getId());
+            vTr.removeLn();
+            vTr.lnLabelValue("Tipo Despesa", tipoDespesaResponseDTO.getNome());
+        }
+
+        //FORNECEDOR ----------------------------------------------------
+        vTr.lnLabelValue("Fornecedor", despesaResponseDTO.getFornecedor().getNome());
+        if(despesaCmp.getDefaultComponent().confirmationInput("Alterar Fornecedor", false)){
+            vTr.removeLn();
+            FornecedorResponseDTO fornecedorResponseDTO = despesaCmp.getFornecedorComponent().selectTableFornecedor();
+            despesaUpdateRequestDTO.setFornecedor(new FornecedorRefDTO());
+            despesaUpdateRequestDTO.getFornecedor().setId(fornecedorResponseDTO.getId());
+            vTr.removeLn();
+            vTr.lnLabelValue("Fornecedor", fornecedorResponseDTO.getNome());
+        }
+
+        //DATA ----------------------------------------------------
+        vTr.lnLabelValue("Data Pagamento", Util.toDatePtBr(despesaResponseDTO.getDataPagamento()));
+        if(despesaCmp.getDefaultComponent().confirmationInput("Alterar Data Pagamento", false)){
+            String datatxt = despesaCmp.getDefaultComponent().inputData("Data Pagamento");
+            despesaUpdateRequestDTO.setDataPagamento(Util.getData(datatxt));
+            vTr.removeLn();
+            vTr.lnLabelValue("Data Pagamento", Util.toDatePtBr(despesaUpdateRequestDTO.getDataPagamento()));
+        }
+
+        //VALOR ----------------------------------------------------
+        vTr.lnLabelValue("Valor", Util.toCurrencyPtBr(despesaResponseDTO.getValor()));
+        if(despesaCmp.getDefaultComponent().confirmationInput("Alterar Valor", false)){
+            String valortxt = despesaCmp.getDefaultComponent().inputValor("Valor");
+            despesaUpdateRequestDTO.setValor(new BigDecimal(valortxt));
+            vTr.removeLn();
+            vTr.lnLabelValue("Valor", Util.toCurrencyPtBr(despesaUpdateRequestDTO.getValor()));
+        }
+
+        //FORMA PAGAMENTO ----------------------------------------------------
+        vTr.lnLabelValue("Forma Pagamento", despesaResponseDTO.getFormaPagamento().getNome());
+        if(despesaCmp.getDefaultComponent().confirmationInput("Alterar Forma Pagamento", false)){
+            FormaPagamentoResponseDTO formaPagamentoResponseDTO = despesaCmp.getFormaPagamentoComponent().sellectFormaPagamento();
+            despesaUpdateRequestDTO.setFormaPagamento(new FormaPagamentoRefDTO());
+            despesaUpdateRequestDTO.getFormaPagamento().setId(formaPagamentoResponseDTO.getId());
+            vTr.removeLn();
+            vTr.lnLabelValue("Forma Pagamento", formaPagamentoResponseDTO.getNome());
+        }
+
+        //OBSERVAÇÃO ----------------------------------------------------
+        vTr.lnLabelValue("Observação", despesaResponseDTO.getFormaPagamento().getNome());
+        if(despesaCmp.getDefaultComponent().confirmationInput("Alterar Observação", false)){
+            despesaUpdateRequestDTO.setObs(despesaCmp.getDefaultComponent().inputoObs());
+            vTr.removeLn();
+            vTr.lnLabelValue("Observação", despesaUpdateRequestDTO.getObs());
+        }
+
+        if(despesaCmp.getDefaultComponent().confirmationInput("Salvar alterações", false)){
+            despesaCmp.getDespesaService().update(despesaUpdateRequestDTO);
+        }
+    }
 }

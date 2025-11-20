@@ -65,7 +65,7 @@
       <td>
         <div style="display: grid; grid-template-columns: 50% 50%; text-align: center;">
           <i class="pi pi-pencil" [pTooltip]="'Editar'" pInitEditableRow style="color: blue" *ngIf="!editing" (click)="onRowEditInit(fornec)"></i>
-          <i class="pi pi-pen-to-square" [pTooltip]="'Ajustar Nome e Razão Social do Fornecedor'" style="color: green" *ngIf="!editing" (click)="updateNameFonnecedor(fornec)"></i>
+          <i class="pi pi-pen-to-square" [pTooltip]="'Ajustar Nome e Razão Social do Fornecedor.ts'" style="color: green" *ngIf="!editing" (click)="updateNameFonnecedor(fornec)"></i>
           <i class="pi pi-check" pSaveEditableRow style="color: green" *ngIf="editing" (click)="onRowEditSave(fornec)"></i>
           <i class="pi pi-times" pCancelEditableRow style="color: red" *ngIf="editing" (click)="onRowEditCancel(fornec, ri)"></i>
         </div>

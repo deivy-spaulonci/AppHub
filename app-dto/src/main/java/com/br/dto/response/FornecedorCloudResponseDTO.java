@@ -5,44 +5,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class FornecedorCloudResponseDTO {
+public class FornecedorCloudResponseDTO implements Serializable {
 
     @JsonProperty("razao_social")
-    public String nome;
+    public String razaoSocial;
     @JsonProperty("estabelecimento")
     public EstabelecimentoCloudResponseDTO estabelecimentoCloudResponseDTO;
-
-    public String getFantasia(){
-        return getEstabelecimentoCloudResponseDTO().getFantasia();
-    }
-    public String getCnpj(){
-        return getEstabelecimentoCloudResponseDTO().getCnpj();
-    }
-    public String getIbgeCod(){
-        return getEstabelecimentoCloudResponseDTO().getCidade().getIbgeCod();
-    }
-}
-
-@Getter
-@Setter
-@JsonIgnoreProperties(ignoreUnknown = true)
-class EstabelecimentoCloudResponseDTO {
-    @JsonProperty("nome_fantasia")
-    public String fantasia;
-    @JsonProperty("cnpj")
-    public String cnpj;
-    @JsonProperty("cidade")
-    public CidadeCloudResponseDTO cidade;
-}
-
-@Getter
-@Setter
-@JsonIgnoreProperties(ignoreUnknown = true)
-class CidadeCloudResponseDTO {
-    @JsonProperty("ibge_id")
-    public String ibgeCod;
-
 }
