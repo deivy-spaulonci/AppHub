@@ -1,28 +1,26 @@
 import {Component, OnInit} from '@angular/core';
-import {Card} from 'primeng/card';
-import {DefaultService} from '../../../service/default.service';
 import {MessageService} from 'primeng/api';
-import {TipoDespesa} from '../../../model/tipo-despesa';
-import {FormaPagamento} from '../../../model/forma-pagamento';
-import {Fornecedor} from '../../../model/fornecedor';
-import {Select} from 'primeng/select';
+import {TipoDespesa} from '@model/tipo-despesa';
+import {FormaPagamento} from '@model/forma-pagamento';
+import {Fornecedor} from '@model/fornecedor';
 import {FormsModule} from '@angular/forms';
-import {InputMask} from 'primeng/inputmask';
-import {Util} from '../../../util/util';
-import {InputText} from 'primeng/inputtext';
+import {Util} from '@util/util';
 import {Button} from 'primeng/button';
 import {Toast} from 'primeng/toast';
-import {Despesa} from '../../../model/despesa';
+import {Despesa} from '@model/despesa';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CurrencyPipe, NgIf} from '@angular/common';
-import {Panel} from "primeng/panel";
 import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
 import {firstValueFrom} from 'rxjs';
 import {Message} from 'primeng/message';
-import {ComboDefaultComponent} from '../../../shared/components/combo-default/combo-default.component';
-import {InputDateComponent} from '../../../shared/components/input-date/input-date.component';
-import {InputMoneyComponent} from '../../../shared/components/input-money/input-money.component';
-import {LoadingModalComponent} from '../../../shared/loading-modal/loading-modal.component';
+import {ComboDefaultComponent} from '@shared/components/combo-default/combo-default.component';
+import {InputDateComponent} from '@shared/components/input-date/input-date.component';
+import {InputMoneyComponent} from '@shared/components/input-money/input-money.component';
+import {LoadingModalComponent} from '@shared/loading-modal/loading-modal.component';
+import {DespesaService} from '@service/DespesaService';
+import {TipoDespesaService} from '@service/TipoDespesaService';
+import {FormaPagamentoService} from '@service/FormaPagamentoService';
+import {FornecedorService} from '@service/FornecedorService';
 
 @Component({
   selector: 'app-despesa-form',
@@ -60,7 +58,10 @@ export class DespesaFormComponent implements OnInit{
 
   constructor(private router: Router,
               private route: ActivatedRoute,
-              private defaultService: DefaultService,
+              private despesaService: DespesaService,
+              private tipoDespesaService: TipoDespesaService,
+              private formaPagamentoService: FormaPagamentoService,
+              private fornecedorService: FornecedorService,
               private messageService: MessageService) {
   }
 
@@ -74,9 +75,10 @@ export class DespesaFormComponent implements OnInit{
     this.getTotal();
     this.fornecedorSelecionado.nome = '';
 
-    if(this.idEdicao){
-      this.defaultService.get('despesa/'+this.idEdicao).subscribe({
-        next: res => {
+    if(this.idEdicao) {
+      this.despesaService.getDespesaById(this.idEdicao).subscribe({
+        next: (res: Despesa) => {
+          this.tipoDespesaSelecionado = res.tipoDespesa;
           this.tipoDespesaSelecionado = res.tipoDespesa;
           this.fornecedorSelecionado = res.fornecedor;
           this.formaPgtoSelecionado = res.formaPagamento;
@@ -84,16 +86,16 @@ export class DespesaFormComponent implements OnInit{
           this.valor = Util.formatFloatToReal(res.valor.toFixed(2).toString());
           this.obs = res.obs
         },
-        error: error => {},
-        complete: () => {}
+        error: () => Util.showMsgErro(this.messageService, 'Erro ao consulta despesa'),
+        complete: () => {
+        }
       });
     }
-
   }
 
   async loadInit(){
-    this.tiposDespesa = await firstValueFrom(this.defaultService.get('tipo-despesa'));
-    this.formasPgto = await firstValueFrom(this.defaultService.get('forma-pagamento'));
+    this.tiposDespesa = await firstValueFrom(this.tipoDespesaService.getTiposDespesa());
+    this.formasPgto = await firstValueFrom(this.formaPagamentoService.getFormasPagamento());
     if(!this.idEdicao){
       this.tipoDespesaSelecionado = this.tiposDespesa[0];
       this.formaPgtoSelecionado = this.formasPgto[0];
@@ -101,29 +103,30 @@ export class DespesaFormComponent implements OnInit{
   }
 
   async getTotal(){
-    this.valorTotal = await firstValueFrom(this.defaultService.get('despesa/valorTotal'))
+    this.despesaService.getValorTotal('').subscribe({
+      next: (res: any) => this.valorTotal = Number(res)
+    });
   }
 
   search(event: AutoCompleteCompleteEvent) {
     this.loading=true;
-    this.defaultService.get('fornecedor/find/'+event.query).subscribe({
-      next: res => {
+    this.fornecedorService.getFornecedorBusca(event.query).subscribe({
+      next: (res:Fornecedor[]) => {
         this.fornecedores = [];
         this.fornecedores = res;
       },
-      error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: 'consulta de fornecedores'}),
-      complete: () => this.loading=false
+      error: () => Util.showMsgErro(this.messageService,'Erro ao consultar de fornecedores'),
+      complete: () => this.loading = false
     });
   }
 
   save(){
-
     if(!Util.dataIsValida(this.data))
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Data inválida!'});
+      Util.showMsgErro(this.messageService, 'Data inválida!');
     else if(['0,00','0','', null, undefined].indexOf(this.valor.trim()) == 0)
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Valor inválida!'});
+      Util.showMsgErro(this.messageService, 'Valor inválido!');
     else if(!this.fornecedorSelecionado)
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Fornecedor.ts inválida!'});
+      Util.showMsgErro(this.messageService, 'Fornecedor inválida!');
     else{
       this.loading=true;
       var despesa:Despesa = new Despesa();
@@ -135,7 +138,6 @@ export class DespesaFormComponent implements OnInit{
       despesa.dataPagamento = Util.dataBRtoDataIso(this.data);
       despesa.valor =  Util.formatMoedaToFloat(Util.formatFloatToReal(this.valor));
       despesa.obs = this.obs;
-
       if(despesa.id)
         this.updateDespesa(despesa);
       else
@@ -144,22 +146,23 @@ export class DespesaFormComponent implements OnInit{
   }
 
   updateDespesa(despesa:Despesa){
-    this.defaultService.update(despesa, 'despesa').subscribe({
-      next: res => this.messageService.add({severity: 'success', summary: 'Success', detail: 'Despesa atualizada!'}),
-      error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o despesa'}),
+    this.despesaService.update(despesa).subscribe({
+      next: (res:Despesa) => Util.showMsgSuccess(this.messageService,'Despesa atualizada!'),
+      error: () => Util.showMsgErro(this.messageService,'Erro ao salvar o despesa!'),
       complete: () => {
         this.loading = false;
         this.router.navigate(['/despesa-table'])
         this.valor = '0,00';
         this.obs = '';
+        this.getTotal();
       }
     });
   }
 
   createDespesa(despesa:Despesa){
-    this.defaultService.save(despesa, 'despesa').subscribe({
-      next: res => this.messageService.add({severity: 'success', summary: 'Success', detail: 'Despesa salva!'}),
-      error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o despesa'}),
+    this.despesaService.create(despesa).subscribe({
+      next: () => Util.showMsgSuccess(this.messageService,'Despesa salva!'),
+      error: () => Util.showMsgErro(this.messageService,'Erro ao salvar o despesa'),
       complete: () => {
         this.loading = false;
         this.valor = '0,00';
@@ -168,10 +171,4 @@ export class DespesaFormComponent implements OnInit{
       }
     });
   }
-
-  maskaraMoeda($event: KeyboardEvent) {
-    const element = ( $event.target as HTMLInputElement);
-    element.value = Util.formatFloatToReal(element.value);
-  }
-
 }

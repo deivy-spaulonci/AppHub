@@ -4,6 +4,15 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
+    "baseUrl": "src",
+    "paths": {
+      "@model/*": ["app/model/*"],
+      "@pag/*":  ["app/pag/*"],
+      "@pipe/*":   ["app/pipe/*"],
+      "@service/*": ["app/service/*"],
+      "@shared/*": ["app/shared/*"],
+      "@util/*": ["app/util/*"],
+    },
     "types": []
   },
   "files": [

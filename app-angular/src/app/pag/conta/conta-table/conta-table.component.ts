@@ -1,34 +1,36 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {Card} from 'primeng/card';
 import {Toast} from 'primeng/toast';
-import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
+import {ConfirmationService, MessageService} from 'primeng/api';
 import {Router} from '@angular/router';
-import {DefaultService} from '../../../service/default.service';
-import {Conta} from '../../../model/conta';
+import {Conta} from '@model/conta';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {Message} from 'primeng/message';
-import {TipoConta} from '../../../model/tipo-conta';
-import {FormaPagamento} from '../../../model/forma-pagamento';
+import {TipoConta} from '@model/tipo-conta';
+import {FormaPagamento} from '@model/forma-pagamento';
 import {Table, TableLazyLoadEvent, TableModule} from 'primeng/table';
-import {Util} from '../../../util/util';
+import {Util} from '@util/util';
 import {Button, ButtonDirective} from 'primeng/button';
-import {CurrencyPipe, DatePipe, JsonPipe, NgIf, NgStyle} from '@angular/common';
+import {CurrencyPipe, DatePipe, NgIf, NgStyle} from '@angular/common';
 import {Tooltip} from 'primeng/tooltip';
 import {InputMask} from 'primeng/inputmask';
 import {Select} from 'primeng/select';
 import {FormsModule} from '@angular/forms';
 import {ScrollPanelModule} from 'primeng/scrollpanel';
-import {ContextMenu} from 'primeng/contextmenu';
 import {Dialog} from 'primeng/dialog';
-import {ComboDefaultComponent} from '../../../shared/components/combo-default/combo-default.component';
-import {InputDateComponent} from '../../../shared/components/input-date/input-date.component';
-import {InputMoneyComponent} from '../../../shared/components/input-money/input-money.component';
-import {LoadingModalComponent} from '../../../shared/loading-modal/loading-modal.component';
+import {ComboDefaultComponent} from '@shared/components/combo-default/combo-default.component';
+import {InputDateComponent} from '@shared/components/input-date/input-date.component';
+import {InputMoneyComponent} from '@shared/components/input-money/input-money.component';
+import {LoadingModalComponent} from '@shared/loading-modal/loading-modal.component';
 import {Drawer} from 'primeng/drawer';
 import {InputText} from 'primeng/inputtext';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
-import {FileSizePipe} from '../../../pipe/file-size.pipe';
+import {FileSizePipe} from '@pipe/file-size.pipe';
 import {Ripple} from 'primeng/ripple';
+import {ContaService} from '@service/ContaService';
+import {TipoContaService} from '@service/TipoContaService';
+import {FormaPagamentoService} from '@service/FormaPagamentoService';
+import {DocumentoService} from '@service/DocumentoService';
 
 @Component({
   selector: 'app-conta-table',
@@ -47,7 +49,6 @@ import {Ripple} from 'primeng/ripple';
     FormsModule,
     NgIf,
     ScrollPanelModule,
-    ContextMenu,
     Dialog,
     ComboDefaultComponent,
     InputDateComponent,
@@ -97,14 +98,16 @@ export class ContaTableComponent implements OnInit{
   basePath:string='/media/d31vy/hd01/Pagamentos/Pagamentos_PF/2010/042010/';
 
   constructor(private confirmationService: ConfirmationService,
+              private contaService: ContaService,
+              private tipoContaService: TipoContaService,
+              private formaPagamentoService: FormaPagamentoService,
+              private documentoService: DocumentoService,
               private router: Router,
               private sanitizer: DomSanitizer,
-              private defaultService: DefaultService,
               private messageService: MessageService) {
   }
 
   ngOnInit(): void {
-
     this.status = [
       { name: 'Em Aberto', code: 'ABERTO' },
       { name: 'Pago', code: 'PAGO' },
@@ -112,20 +115,13 @@ export class ContaTableComponent implements OnInit{
       { name: 'Vencimento Hoje', code: 'HOJE' },
     ];
 
-    this.defaultService.get('conta/page').subscribe({
-      next: res =>{ this.contas = res.content; },
-      error: error => { this.messageService.add({ severity: 'error', summary: 'Error', detail: 'consulta de contas' }); },
-      complete: () => {}
+    this.tipoContaService.getTiposConta().subscribe({
+      next: (res: TipoConta[]) => this.tiposConta = res,
+      error: () => Util.showMsgErro(this.messageService, 'Erro ao consulta de tipo contas')
     });
-    this.defaultService.get('tipo-conta?sort=nome,asc').subscribe({
-      next: res =>{ this.tiposConta = res; },
-      error: error => { this.messageService.add({ severity: 'error', summary: 'Error', detail: 'consulta de tipo contas' }); },
-      complete: () => {}
-    });
-    this.defaultService.get('forma-pagamento').subscribe({
-      next: res =>{ this.formasPgto = res; },
-      error: error => {},
-      complete: () => {}
+    this.formaPagamentoService.getFormasPagamento().subscribe({
+      next: (res: FormaPagamento[]) => this.formasPgto = res,
+      error: () => Util.showMsgErro(this.messageService, 'Erro ao consultade forma de pagamento'),
     });
   }
 
@@ -143,15 +139,13 @@ export class ContaTableComponent implements OnInit{
   pagarConta(){
     if(this.contaSelecinada){
       if(!Util.dataIsValida(this.contaPagaDataPgto))
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Data pagamento inválida!'});
+        Util.showMsgErro(this.messageService, 'Data pagamento inválida!');
       else if(['0,00','0','', null, undefined].indexOf(this.contaPagaValor.trim()) == 0)
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Valor inválido!'});
+        Util.showMsgErro(this.messageService, 'Valor inválido!');
       else if(!this.contaPagaFormaPgto || !this.contaPagaFormaPgto.id)
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Forma de Pagamento inválida!'});
+        Util.showMsgErro(this.messageService, 'Forma de Pagamento inválida!');
       else{
         this.loading = true;
-        //this.contaSelecinada.valor = Util.formatMoedaToFloat(Util.formatFloatToReal(this.contaPagaValor));
-
         let vlPg: number = Util.formatMoedaToFloat(Util.formatFloatToReal(this.contaPagaValor));
         if(vlPg > this.contaSelecinada.valor)
           this.contaSelecinada.multa = Math.round((vlPg - this.contaSelecinada.valor) * 100)/100;
@@ -161,13 +155,9 @@ export class ContaTableComponent implements OnInit{
         this.contaSelecinada.dataPagamento = Util.dataBRtoDataIso(this.contaPagaDataPgto);
         this.contaSelecinada.formaPagamento = this.contaPagaFormaPgto;
 
-        this.defaultService.save(this.contaSelecinada, 'conta').subscribe({
-          next: res => {
-            this.messageService.add({severity: 'success', summary: 'Success', detail: 'Conta salva!'});
-          },
-          error: error => {
-            this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o conta'});
-          },
+        this.contaService.create(this.contaSelecinada).subscribe({
+          next: () => Util.showMsgSuccess(this.messageService, 'Conta salva!'),
+          error: () => Util.showMsgErro(this.messageService, 'Erro ao salvar o conta'),
           complete: () => {
             this.loading = false;
             this.setContaPagaVisible=false;
@@ -176,8 +166,7 @@ export class ContaTableComponent implements OnInit{
         });
       }
     }else
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'sem conta selecionada'});
-
+      Util.showMsgErro(this.messageService, 'Sem conta selecionada')
   }
 
   delConta(event: Event, id:number){
@@ -190,12 +179,12 @@ export class ContaTableComponent implements OnInit{
       acceptButtonProps: {label: 'Excluir',severity: 'warn',},
       accept: () => {
         this.loading = true;
-        this.defaultService.delete(id,'conta').subscribe({
-          next: res =>{
-            this.messageService.add({severity: 'success', summary: 'Success', detail: 'Conta excluída!'});
+        this.contaService.delConta(id).subscribe({
+          next: () =>{
+            Util.showMsgSuccess(this.messageService, 'Conta excluída!');
             this.table?._filter();
           },
-          error: error => { this.messageService.add({ severity: 'error', summary: 'Error', detail: 'exlcuir conta' }); },
+          error: () => Util.showMsgErro(this.messageService, 'erro ao exlcuir conta'),
           complete: () => this.loading=false
         })
       },
@@ -226,7 +215,7 @@ export class ContaTableComponent implements OnInit{
     if(this.idFilter)
       urlfiltros += '&id='+this.idFilter;
     if(this.tipoContaFilter && this.tipoContaFilter.id)
-      urlfiltros += '&tipoConta.id='+ this.tipoContaFilter.id;
+      urlfiltros += '&idTipoConta='+ this.tipoContaFilter.id;
     if(this.checkData(this.vencimentoInicialFilter))
       urlfiltros += '&vencimentoInicial='+Util.dataStringBrToDateString(this.vencimentoInicialFilter);
     if(this.checkData(this.vencimentoFinalFilter))
@@ -241,59 +230,47 @@ export class ContaTableComponent implements OnInit{
     event.rows = (event.rows ? event.rows : this.pageSize);
     event.sortField = (event.sortField ? event.sortField : 'vencimento');
 
-    const url: string = 'conta/page?page=' + (event.first! / event.rows)
+    const url: string = '?page=' + (event.first! / event.rows)
       + '&size=' + event.rows
       + '&sort=' + event.sortField + ',' + (event.sortOrder == 1 ? 'asc' : 'desc')
       + urlfiltros;
 
-    this.defaultService.get(url).subscribe({
-      next: resultado => {
+    this.contaService.getContasPage(url).subscribe({
+      next: (res:any) => {
         this.contas = [];
         this.totalElements = 0;
-        if(resultado) {
-          this.contas = resultado.content;
-          this.totalElements = resultado.totalElements;
-          this.defaultService.get('conta/valorTotal?'+urlfiltros).subscribe({
-            next: resultado => {
-              this.valorTotal = resultado;
-            }
+        if(res) {
+          this.contas = res.content;
+          this.totalElements = res.totalElements;
+          this.contaService.getValorTotal('?'+urlfiltros).subscribe({
+            next: (res:any) => this.valorTotal = res
           })
         }
-        this.messageService.add({severity: 'info',summary: 'Info',detail: `${this.totalElements} contas carregadas`,life: 3000});
+        Util.showMsgInfo(this.messageService, `${this.totalElements} contas carregadas`);
       },
-      error: error => this.messageService.add({severity: 'error',summary: 'Error',detail: 'Erro ao carregar as contas',life: 3000}),
-      complete: () => {
-        this.loading = false;
-      }
+      error: () => Util.showMsgErro(this.messageService,'Erro ao carregar as contas'),
+      complete: () => this.loading = false
     });
   }
 
   carregarDocs(){
-    this.defaultService.get('documentos/diretorio?path='+this.basePath).subscribe({
-      next: res => {
-        this.files = res;
-      },
-      error: error => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'consulta de documentos'});
-      },
-      complete: () => {
-        this.loading=false;
-      }
+    this.documentoService.getDocumentoByPath(this.basePath).subscribe({
+      next: (res: String[]) => this.files = res,
+      error: () => Util.showMsgErro(this.messageService, 'consulta de documentos'),
+      complete: () => this.loading=false,
     });
   }
 
   aoSelecionarDocs(event: any) {
     this.loading = true;
-    let url = 'documentos/base64?path='+this.basePath+this.selectedFile.nome;
-    this.defaultService.get(url).subscribe({
-      next: res => {
+    let url = '?path='+this.basePath+this.selectedFile.nome;
+    this.documentoService.getDocumentoBase64(url).subscribe({
+      next: (res:any) => {
         const dataUrl = `data:${res.mimeType};base64,${res.base64}`;
         this.conteudoBase64 = this.sanitizer.bypassSecurityTrustResourceUrl(dataUrl);
       },
-      error: err => this.messageService.add({severity: 'error', summary: 'Error', detail: err}),
-      complete: () => {
-        this.loading = false;
-      }
+      error: (err: any) => Util.showMsgErro(this.messageService, err),
+      complete: () => this.loading = false
     });
   }
 

@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {InputMask} from 'primeng/inputmask';
 import {FormsModule} from '@angular/forms';
-import { Util } from '../../../util/util';
+import { Util } from '@util/util';
 
 @Component({
   selector: 'app-input-parcelas',

@@ -1,23 +1,21 @@
 import {Component, OnInit} from '@angular/core';
-import {DefaultService} from '../../../service/default.service';
 import {TableLazyLoadEvent, TableModule} from 'primeng/table';
 import {CardModule} from 'primeng/card';
-import {Fornecedor} from '../../../model/fornecedor';
+import {Fornecedor} from '@model/fornecedor';
 import {ButtonModule} from 'primeng/button';
 import {InputGroupModule} from 'primeng/inputgroup';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {InputGroupAddonModule} from 'primeng/inputgroupaddon';
-import {Toast, ToastModule} from 'primeng/toast';
+import {ToastModule} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
 import {NgIf} from '@angular/common';
 import {Tooltip} from 'primeng/tooltip';
-import {Util} from '../../../util/util';
+import {Util} from '@util/util';
 import {Message} from "primeng/message";
-import {Panel} from "primeng/panel";
-import {Router} from '@angular/router';
 import {Toolbar} from 'primeng/toolbar';
-import {LoadingModalComponent} from '../../../shared/loading-modal/loading-modal.component';
+import {LoadingModalComponent} from '@shared/loading-modal/loading-modal.component';
+import {FornecedorService} from '@service/FornecedorService';
 
 @Component({
   selector: 'app-fornecedor-table',
@@ -37,17 +35,21 @@ export class FornecedorTableComponent implements OnInit {
   fornecedorSelecionado!: Fornecedor;
   clonedFornecedors: { [s: number]: Fornecedor } = {};
 
-  constructor(private router: Router,
-              private defaultService: DefaultService,
+  constructor(private fornecedorService: FornecedorService,
               private messageService: MessageService) {
   }
 
   ngOnInit(): void {
-    this.defaultService.get('fornecedor/page').subscribe({
+    this.loading = true;
+    this.fornecedorService.getFornecedoresPage('').subscribe({
       next: res => this.fornecedores = res.content,
-      error: err => this.messageService.add({severity: 'error', summary: 'Error', detail: 'consulta de fornecedores'}),
-      // complete: () => this.loading=false
+      error: err => Util.showMsgErro(this.messageService,'consulta de fornecedores'),
+      complete: () => this.loading = false
     });
+  }
+
+  addMsg(tipo:string, summary:string, msg:string){
+    this.messageService.add({severity: tipo, summary: summary, detail: msg});
   }
 
   onRowEditInit(fornecedor: Fornecedor) {
@@ -61,13 +63,13 @@ export class FornecedorTableComponent implements OnInit {
   }
 
   updateFornecedor(fornecedor: Fornecedor) {
-    this.loading=true;
-    this.defaultService.update(fornecedor, 'fornecedor').subscribe({
-      next: res => this.messageService.add({severity: 'success', summary: 'Success', detail: 'Fornecedor.ts atualizado'}),
-      error: err => this.messageService.add({severity: 'error', summary: 'Error', detail: 'salvar fornecedor'}),
+    this.loading = true;
+    this.fornecedorService.update(fornecedor).subscribe({
+      next: res => Util.showMsgSuccess(this.messageService,'Fornecedor atualizado'),
+      error: err => Util.showMsgErro(this.messageService,'Erro ao salvar fornecedor'),
       complete: () => {
         delete this.clonedFornecedors[fornecedor.id as number];
-        this.loading=false;
+        this.loading = false;
       }
     });
   }
@@ -76,7 +78,7 @@ export class FornecedorTableComponent implements OnInit {
     if (fornecedor.nome.trim().length > 0 && fornecedor.razaoSocial.trim().length > 0)
       this.updateFornecedor(fornecedor)
     else
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'Nome ou Razão Social inválido(s)'});
+      Util.showMsgErro(this.messageService, 'Nome ou Razão Social inválido(s)');
   }
 
   onRowEditCancel(fornecedor: Fornecedor, index: number) {
@@ -85,39 +87,34 @@ export class FornecedorTableComponent implements OnInit {
   }
 
   loadData(event: TableLazyLoadEvent) {
-        let urlfiltros: string = '';
-        // let prefix: string =''
-        this.loading = true;
+    let urlfiltros: string = '';
 
-        console.log('passou pelo load data')
-        if (this.filtroTexto)
-          urlfiltros = '&busca=' + this.filtroTexto;
+    this.loading = true;
 
-        event.rows = (event.rows ? event.rows : this.pageSize);
-        event.sortField = (event.sortField ? event.sortField : 'nome');
+    if (this.filtroTexto)
+      urlfiltros = '&busca=' + this.filtroTexto;
 
-        const url: string = 'fornecedor/page?page=' + (event.first! / this.pageSize)
-          + '&size=' + event.rows
-          + '&sort=' + event.sortField + ',' + (event.sortOrder == 1 ? 'asc' : 'desc')
-          + urlfiltros;
+    event.rows = (event.rows ? event.rows : this.pageSize);
+    event.sortField = (event.sortField ? event.sortField : 'nome');
 
-        console.log(url);
+    const url: string = '?page=' + (event.first! / this.pageSize)
+      + '&size=' + event.rows
+      + '&sort=' + event.sortField + ',' + (event.sortOrder == 1 ? 'asc' : 'desc')
+      + urlfiltros;
 
-        this.defaultService.get(url).subscribe({
-          next: resultado => {
-            console.log('passou pelo load data next')
-            if(resultado){
-              this.fornecedores = resultado.content;
-              this.totalElements = resultado.totalElements;
-              this.messageService.add({severity: 'info',summary: 'Info',detail: `${this.totalElements} fornecedores carregados`,life: 3000});
-            }else{
-              this.fornecedores = [];
-              this.totalElements = 0;
-            }
-
-          },
-          error: error => this.messageService.add({severity: 'error',summary: 'Error',detail: 'Erro ao carregar fornecedores',life: 3000}),
-          complete: () =>  this.loading = false
-        });
+    this.fornecedorService.getFornecedoresPage(url).subscribe({
+      next: res => {
+        if (res) {
+          this.fornecedores = res.content;
+          this.totalElements = res.totalElements;
+          Util.showMsgInfo(this.messageService, 'fornecedores carregados');
+        } else {
+          this.fornecedores = [];
+          this.totalElements = 0;
+        }
+      },
+      error: err => Util.showMsgErro(this.messageService,'Erro ao carregar fornecedores'),
+      complete: () => this.loading = false
+    });
   }
 }

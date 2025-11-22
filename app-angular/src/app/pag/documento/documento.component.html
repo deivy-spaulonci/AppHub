@@ -13,31 +13,22 @@
 </p-toolbar>
 
 <div id="gridListFiles">
-
   <div *ngFor="let f of files;" class="itemPdf">
-
     <span>{{f.nome}}</span>
-
     <iframe *ngIf="f.ext=='pdf'" [src]="getPdf(f.base64, f.ext)" ></iframe>
-
     <div *ngIf="f.ext!='pdf'" class="image-container">
       <img [src]="getPdf(f.base64, f.ext)" alt="sem imagem" loading="lazy"/>
     </div>
-
     <div class="footer">
       <p-button icon="pi pi-pencil" label="Renomear" severity="info" class="w-full" styleClass="w-full" (click)="initRename(f)" size="small"/>
       <p-button icon="pi pi-trash" label="Excluir" severity="danger" class="w-full" styleClass="w-full" (click)="delDoc($event, f)" size="small"/>
-      <p-togglebutton onLabel="Selecionado" offLabel="Selecionar" onIcon="pi pi-check-circle" size="small"
-                      offIcon="pi pi-circle" styleClass="w-full" (click)="addSelect(f)"/>
+      <p-togglebutton onLabel="Selecionado" offLabel="Selecionar" onIcon="pi pi-check-circle" size="small" offIcon="pi pi-circle" styleClass="w-full" (click)="addSelect(f)"/>
     </div>
-
   </div>
 </div>
 
 <app-loading-modal [visible]="loading"></app-loading-modal>
-
 <p-toast/>
-
 <p-dialog header="Renomear Arquivo" [modal]="true" [(visible)]="popupRenShow" [style]="{ width: '50rem' }">
   <div class="flex items-center gap-4 mb-4">
     <input pInputText id="username" class="flex-auto" [(ngModel)]="newNameFile" />

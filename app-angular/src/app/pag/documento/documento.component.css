@@ -17,14 +17,13 @@
 }
 
 .itemPdf iframe, .image-container{
-  height: 600px;
+  height: 800px;
   width: 100%;
   overflow: auto;
 }
 .image-container img{
   width: 100%;
 }
-
 
 .itemPdf .footer{
   display: grid;

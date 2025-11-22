@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {Util} from '../../../util/util';
+import {Util} from '@util/util';
 import {InputText} from 'primeng/inputtext';
 
 @Component({

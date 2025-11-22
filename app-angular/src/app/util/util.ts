@@ -1,3 +1,7 @@
+import {MessageService} from 'primeng/api';
+import { TipoMessage } from '@util/tipo-message';
+import { TitleMessage } from '@util/title-message';
+
 export class Util {
   static capitalizeSentence(sentence: string): string {
     return sentence
@@ -49,19 +53,25 @@ export class Util {
   }
 
   static maskaraTeste(valor: string): string{
-
-
     // Remove tudo que não for dígito
     valor = valor.replace(/\D/g, "");
-
     // Limita a 5 dígitos
     valor = valor.substring(0, 5);
-
     // Adiciona a barra após o segundo dígito
     if (valor.length > 2) {
       valor = valor.substring(0, 2) + "/" + valor.substring(2);
     }
-
     return valor;
   }
+
+  static showMsgErro(messageService: MessageService, msg:string){
+    messageService.add({severity: TipoMessage.ERROR, summary: TitleMessage.ERROR, detail: msg});
+  }
+  static showMsgSuccess(messageService: MessageService, msg:string){
+    messageService.add({severity: TipoMessage.SUCCCESS, summary: TitleMessage.SUCCCESS, detail: msg});
+  }
+  static showMsgInfo(messageService: MessageService, msg:string){
+    messageService.add({severity: TipoMessage.INFO, summary: TitleMessage.INFO, detail: msg});
+  }
+
 }

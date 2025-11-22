@@ -8,13 +8,13 @@ import {SelectButton} from 'primeng/selectbutton';
 import {FormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
 import {Select} from 'primeng/select';
-import {DefaultService} from '../../../service/default.service';
 import {MessageService} from 'primeng/api';
-import {Fornecedor} from '../../../model/fornecedor';
-import {Util} from '../../../util/util';
-import {Router} from '@angular/router';
-import {LoadingModalComponent} from '../../../shared/loading-modal/loading-modal.component';
+import {Fornecedor} from '@model/fornecedor';
+import {Util} from '@util/util';
+import {LoadingModalComponent} from '@shared/loading-modal/loading-modal.component';
 import {Toast} from 'primeng/toast';
+import {CidadeService} from '@service/CidadeService';
+import {FornecedorService} from '@service/FornecedorService';
 
 @Component({
   selector: 'app-fornecedor-form',
@@ -41,29 +41,28 @@ export class FornecedorFormComponent implements OnInit {
   loading: boolean = false;
   maskCnpj:string='99.999.999/9999-99';
 
-  constructor(private router: Router,
-              private defaultService: DefaultService,
+  constructor(private cidadeService: CidadeService,
+              private fornecedorService: FornecedorService,
               private messageService: MessageService) {
   }
 
   ngOnInit(): void {
-    this.defaultService.get('cidade/estados').subscribe({
-      next: res => {
+    this.cidadeService.getEstados().subscribe({
+      next: (res: []) => {
         this.estados = [];
         for (var item of res) {
           this.estados.push({name: item, code: item})
         }
       },
-      error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: 'consulta de estados'}),
-      // complete: () => this.loading = false
+      error: () => Util.showMsgErro(this.messageService,'consulta de estados'),
     });
   }
 
   searchCities(cidadeSelect: any) {
     this.loading=true;
     if (this.estadoSelect && this.estadoSelect.name) {
-      this.defaultService.get('cidade/' + this.estadoSelect.name).subscribe({
-        next: res => {
+      this.cidadeService.getCidadeByUf(this.estadoSelect.name).subscribe({
+        next: (res: any) => {
           this.cidades = [];
           for (var cidade of res) {
             this.cidades.push({nome: cidade.nome, id: cidade.id, ibgeCod: cidade.ibgeCod})
@@ -71,11 +70,11 @@ export class FornecedorFormComponent implements OnInit {
           if (cidadeSelect)
             this.cidadeSelect = cidadeSelect;
         },
-        error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: 'consulta de cidades'}),
+        error: () => Util.showMsgErro(this.messageService,'erro na consulta de cidades'),
         complete: () => this.loading=false
       });
     } else {
-      this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao consultar cidades'});
+      Util.showMsgErro(this.messageService,'erro ao consultar cidades');
     }
   }
 
@@ -90,15 +89,15 @@ export class FornecedorFormComponent implements OnInit {
   searchCNPJ() {
     if (['', null, undefined].indexOf(this.cnpj) != 0) {
       this.loading=true;
-      this.defaultService.get('fornecedor/consultaCnpj/' + this.cnpj.replace(/[^0-9]+/g, ''))
+      this.fornecedorService.buscaCNPJWeb(this.cnpj.replace(/[^0-9]+/g, ''))
         .subscribe({
-          next: async res => {
+          next: async (res:Fornecedor) => {
             this.estadoSelect = this.estados.filter(est => est.name == res.cidade.uf)[0];
             this.searchCities(res.cidade);
             this.nome = Util.capitalizeSentence(res.nome);
             this.razaoSocial = Util.capitalizeSentence(res.razaoSocial);
           },
-          error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: error.error}),
+          error: (error: { error: any; }) => Util.showMsgErro(this.messageService,error.error),
           complete: () => this.loading = false
         });
     }
@@ -126,9 +125,9 @@ export class FornecedorFormComponent implements OnInit {
       }
       fornecedor.cidade = this.cidadeSelect;
 
-      this.defaultService.save(fornecedor, 'fornecedor').subscribe({
-        next: res => this.messageService.add({severity: 'success', summary: 'Success', detail: 'Fornecedor.ts salvo!'}),
-        error: error => this.messageService.add({severity: 'error', summary: 'Error', detail: 'erro ao salvar o fornecedor'}),
+      this.fornecedorService.create(fornecedor).subscribe({
+        next: () => Util.showMsgSuccess(this.messageService,'Fornecedor salvo!'),
+        error: () => Util.showMsgErro(this.messageService,'Erro ao salvar o fornecedor'),
         complete: () => {
           this.loading = false;
           this.cnpj = '';

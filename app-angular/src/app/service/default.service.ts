@@ -20,27 +20,9 @@ export class DefaultService {
     return this.http.get<any>(`${this.ROOT}${api}`, this.httpOptions);
   }
 
-  renFile(obj: any, api:string): Observable<any> {
-    console.log(`${this.ROOT}${api}`);
-    return this.http.put<any>(`${this.ROOT}${api}`, obj, { responseType: 'text' as 'json' });
-  }
-
-  delFile(api:string): Observable<any> {
-    console.log(`${this.ROOT}${api}`);
-    return this.http.get<any>(`${this.ROOT}${api}`, { responseType: 'text' as 'json' });
-  }
-
-  delFiles(obj:any, api:string): Observable<any> {
-    console.log(`${this.ROOT}${api}`);
-    return this.http.post<any>(this.ROOT + api, obj, { responseType: 'text' as 'json' });
-  }
-
   save(obj: any, api: string): Observable<any> {
+    console.log(`${this.ROOT}${api}`);
     return this.http.post<any>(this.ROOT + api, obj, this.httpOptions);
-  }
-
-  update(obj: any, api: string): Observable<any> {
-    return this.http.put<any>(this.ROOT + api, obj, this.httpOptions);
   }
 
   delete(obj: any | number, api: string): Observable<any> {
@@ -49,5 +31,18 @@ export class DefaultService {
     return this.http.delete<any>(url, this.httpOptions);
   }
 
+  update(obj: any, api: string): Observable<any> {
+    console.log(`${this.ROOT}${api}`);
+    return this.http.put<any>(this.ROOT + api, obj, this.httpOptions);
+  }
 
+  updateTextToJson(obj: any, api: string): Observable<any> {
+    console.log(`${this.ROOT}${api}`);
+    return this.http.put<any>(api, obj, { responseType: 'text' as 'json' });
+  }
+
+  postTextToJson(obj: any, api:string): Observable<any> {
+    console.log(`${this.ROOT}${api}`);
+    return this.http.post<any>(this.ROOT + api, obj, { responseType: 'text' as 'json' });
+  }
 }

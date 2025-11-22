@@ -1,18 +1,18 @@
 import {ChangeDetectorRef, Component, effect, inject, OnInit, PLATFORM_ID} from '@angular/core';
 import {CardModule} from 'primeng/card';
 import {MessageModule} from 'primeng/message';
-import {DefaultService} from '../../service/default.service';
 import {FormsModule} from '@angular/forms';
-import {CurrencyPipe, DatePipe, isPlatformBrowser, NgClass, NgForOf, NgIf, NgStyle} from '@angular/common';
+import {CurrencyPipe, DatePipe, isPlatformBrowser, NgClass, NgStyle} from '@angular/common';
 import {ChartModule, UIChart} from 'primeng/chart';
 import {forkJoin} from 'rxjs';
-import {DataView} from 'primeng/dataview';
 import {TableModule} from 'primeng/table';
 import {Select, SelectChangeEvent} from 'primeng/select';
+import {DespesaService} from '@service/DespesaService';
+import {ContaService} from '@service/ContaService';
 
 @Component({
   selector: 'app-home',
-  imports: [CardModule, MessageModule, FormsModule, CurrencyPipe, UIChart, ChartModule, DataView, NgForOf, DatePipe, NgIf, TableModule, NgClass, NgStyle, Select],
+  imports: [CardModule, MessageModule, FormsModule, CurrencyPipe, UIChart, ChartModule, DatePipe, TableModule, NgClass, NgStyle, Select],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
   standalone: true,
@@ -20,15 +20,10 @@ import {Select, SelectChangeEvent} from 'primeng/select';
 })
 export class HomeComponent implements OnInit{
 
-  readonly VLR_TOTAL_CONTA_URL = 'conta/valorTotal';
   readonly CT_PAGO_URL = '?contaStatus=PAGO';
   readonly CT_HOJE_URL = '?contaStatus=HOJE';
   readonly CT_ABERTO_URL = '?contaStatus=ABERTO';
   readonly CT_ATRASADO_URL = '?contaStatus=ATRASADO';
-  readonly CT_STATUS_URL = 'conta?contaStatus='
-
-  readonly VLR_TOTAL_DESPESA_URL= 'despesa/valorTotal';
-  readonly DESPESA_POR_TIPO_URL= 'despesa/despesaPorTipo';
 
   totalDespesa$!: number;
   totalConta$!: number;
@@ -65,25 +60,21 @@ export class HomeComponent implements OnInit{
     // }
   });
 
-  constructor(private defaultService: DefaultService,
+  constructor(private despesaService: DespesaService,
+              private contaService: ContaService,
               private currencyPipe: CurrencyPipe,
               private cd: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
 
-    this.defaultService.get(this.VLR_TOTAL_DESPESA_URL).subscribe(res =>{
-      this.totalDespesa$ = res;
-    });
-
-    this.defaultService.get(this.VLR_TOTAL_CONTA_URL).subscribe(res =>{
-      this.totalConta$ = res;
-    });
+    this.despesaService.getValorTotal('').subscribe({ next: (res: number) => this.totalDespesa$ = res});
+    this.contaService.getValorTotal('').subscribe({ next: (res:number) => this.totalConta$ = res});
 
     forkJoin({
-      emaberto:this.defaultService.get('conta'+this.CT_ABERTO_URL),
-      atrasado:this.defaultService.get('conta'+this.CT_ATRASADO_URL),
-      hoje:this.defaultService.get('conta'+this.CT_HOJE_URL)
+      emaberto:this.contaService.getContas(this.CT_ABERTO_URL),
+      atrasado:this.contaService.getContas(this.CT_ATRASADO_URL),
+      hoje:this.contaService.getContas(this.CT_HOJE_URL)
     }).subscribe({
       next: ({emaberto,atrasado,hoje}) => {
         this.contasEmAberto = (emaberto as []).concat(atrasado as []);
@@ -100,13 +91,11 @@ export class HomeComponent implements OnInit{
     //   })
     //
     // });
-
-
     forkJoin({
-      pago:this.defaultService.get(this.VLR_TOTAL_CONTA_URL+this.CT_PAGO_URL),
-      hoje:this.defaultService.get(this.VLR_TOTAL_CONTA_URL+this.CT_HOJE_URL),
-      aberto:this.defaultService.get(this.VLR_TOTAL_CONTA_URL+this.CT_ABERTO_URL),
-      atrasado:this.defaultService.get(this.VLR_TOTAL_CONTA_URL+this.CT_ATRASADO_URL),
+      pago:this.contaService.getValorTotal(this.CT_PAGO_URL),
+      hoje:this.contaService.getValorTotal(this.CT_HOJE_URL),
+      aberto:this.contaService.getValorTotal(this.CT_ABERTO_URL),
+      atrasado:this.contaService.getValorTotal(this.CT_ATRASADO_URL),
     }).subscribe({
       next: ({pago,hoje,aberto,atrasado}) => {
         this.totalContaAvencer$ = pago;
@@ -115,32 +104,30 @@ export class HomeComponent implements OnInit{
         this.totalContaAtrasado$ = atrasado;
         this.initChartContas();
       },
-      error: erro => {
-        console.error('Falhou alguma chamada', erro);
-      }
+      error: (error:any) => console.error(error)
     });
 
-    this.defaultService.get(this.DESPESA_POR_TIPO_URL).subscribe({
-      next: (res) => {
+    this.despesaService.getDespesaByTipo().subscribe({
+      next: (res: any) => {
         this.dataDespesas = res;
         this.initChartDespesas();
       },
-      error: erro => console.error('Falhou alguma chamada', erro)
+      error: (error: any) => console.error(error)
     });
     this.loadGastos();
   }
 
   loadGastos(){
     forkJoin({
-      gastoD:this.defaultService.get("despesa/gastoAno/"+this.selectedYear),
-      gastoC:this.defaultService.get("conta/gastoAno/"+this.selectedYear),
+      gastoD:this.despesaService.getGastoAno(this.selectedYear),
+      gastoC:this.contaService.getGastoAno(this.selectedYear),
     }).subscribe({
       next: ({gastoD,gastoC}) => {
         this.dataGastosDespesa = gastoD;
         this.dataGastosConta = gastoC;
         this.initChartGastos();
       },
-      error: erro => console.error('Falhou alguma chamada', erro)
+      error: error => console.error(error)
     });
   }
 

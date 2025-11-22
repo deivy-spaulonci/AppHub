@@ -38,7 +38,6 @@
     <p-card [style]="{ width: '250px'}">
       <p-button label="Docs" icon="pi pi-file-o" iconPos="top" [style]="{width: '100%'}" [raised]="true" (onClick)="docsVisible = true"/>
     </p-card>
-
   </div>
 
   <p-card header="Conta" id="panelConta" *ngIf="contaSelecinada">
@@ -203,5 +202,3 @@
 <app-loading-modal [visible]="loading" message="Processando sua requisição..."></app-loading-modal>
 
 <p-toast/>
-
-

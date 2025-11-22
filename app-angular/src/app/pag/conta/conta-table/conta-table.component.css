@@ -6,6 +6,7 @@
   height: 260px;
   width: 1260px;
 }
+
 #panelFiltros{
   display: grid;
   grid-template-columns: 80px 1fr;

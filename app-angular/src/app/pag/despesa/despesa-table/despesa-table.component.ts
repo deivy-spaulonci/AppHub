@@ -1,35 +1,29 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {Card} from 'primeng/card';
-import {Despesa} from '../../../model/despesa';
-import {DefaultService} from '../../../service/default.service';
+import {Despesa} from '@model/despesa';
 import {ConfirmationService, MessageService} from 'primeng/api';
 import {Table, TableLazyLoadEvent, TableModule} from 'primeng/table';
-import {CurrencyPipe, DatePipe, JsonPipe, NgIf, NgStyle} from '@angular/common';
-import {InputText} from 'primeng/inputtext';
+import {CurrencyPipe, DatePipe} from '@angular/common';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {InputNumber} from 'primeng/inputnumber';
-import {InputMask} from 'primeng/inputmask';
-import {Button, ButtonDirective} from 'primeng/button';
-import {InputGroupAddon, InputGroupAddonModule} from 'primeng/inputgroupaddon';
+import {Button} from 'primeng/button';
+import {InputGroupAddonModule} from 'primeng/inputgroupaddon';
 import {InputGroupModule} from 'primeng/inputgroup';
-import {IconField} from 'primeng/iconfield';
 import {Toast} from 'primeng/toast';
-import {Drawer} from 'primeng/drawer';
-import {Toolbar} from 'primeng/toolbar';
-import {TipoDespesa} from '../../../model/tipo-despesa';
-import {FormaPagamento} from '../../../model/forma-pagamento';
-import {Select} from 'primeng/select';
-import {Fornecedor} from '../../../model/fornecedor';
-import {Util} from '../../../util/util';
+import {TipoDespesa} from '@model/tipo-despesa';
+import {FormaPagamento} from '@model/forma-pagamento';
+import {Fornecedor} from '@model/fornecedor';
+import {Util} from '@util/util';
 import {Tooltip} from 'primeng/tooltip';
-import {Router, RouterLink} from '@angular/router';
+import {Router} from '@angular/router';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {Message} from 'primeng/message';
-import {TipoConta} from '../../../model/tipo-conta';
-import {Panel} from "primeng/panel";
-import {ComboDefaultComponent} from '../../../shared/components/combo-default/combo-default.component';
-import {InputDateComponent} from '../../../shared/components/input-date/input-date.component';
-import {LoadingModalComponent} from '../../../shared/loading-modal/loading-modal.component';
+import {ComboDefaultComponent} from '@shared/components/combo-default/combo-default.component';
+import {InputDateComponent} from '@shared/components/input-date/input-date.component';
+import {LoadingModalComponent} from '@shared/loading-modal/loading-modal.component';
+import {TipoDespesaService} from '@service/TipoDespesaService';
+import {FormaPagamentoService} from '@service/FormaPagamentoService';
+import {FornecedorService} from '@service/FornecedorService';
+import {DespesaService} from '@service/DespesaService';
 
 @Component({
   selector: 'app-despesa-table',
@@ -76,30 +70,28 @@ export class DespesaTableComponent implements OnInit{
   @ViewChild('dt') table?:Table;
 
   constructor(private confirmationService: ConfirmationService,
+              private despesaService:DespesaService,
+              private tipoDespesaService:TipoDespesaService,
+              private formaPagamentoService:FormaPagamentoService,
+              private fornecedorService:FornecedorService,
               private router: Router,
-              private defaultService: DefaultService,
               private messageService: MessageService) {
   }
 
   ngOnInit(): void {
-    this.defaultService.get('despesa/page').subscribe({
-      next: res =>{ this.despesas = res.content; },
-      error: error => { this.messageService.add({ severity: 'error', summary: 'Error', detail: 'consulta de fornecedores' }); },
+    this.tipoDespesaService.getTiposDespesa().subscribe({
+      next: (res: TipoDespesa[]) => this.tiposDespesa = res,
+      error: () => Util.showMsgErro(this.messageService,'consulta de tipo despesas'),
       complete: () => {}
     });
-    this.defaultService.get('tipo-despesa').subscribe({
-      next: res =>{ this.tiposDespesa = res; },
-      error: error => { this.messageService.add({ severity: 'error', summary: 'Error', detail: 'consulta de tipo despesas' }); },
+    this.formaPagamentoService.getFormasPagamento().subscribe({
+      next: (res: FormaPagamento[]) => this.formasPgto = res,
+      error: () => Util.showMsgErro(this.messageService,'consulta de formas de pagamento'),
       complete: () => {}
     });
-    this.defaultService.get('forma-pagamento').subscribe({
-      next: res =>{ this.formasPgto = res; },
-      error: error => { this.messageService.add({ severity: 'error', summary: 'Error', detail: 'consulta de formas de pagamento' }); },
-      complete: () => {}
-    });
-    this.defaultService.get('fornecedor ').subscribe({
-      next: res =>{ this.fornecedores = res; },
-      error: error => { this.messageService.add({ severity: 'error', summary: 'Error', detail: 'consulta fornecedores' }); },
+    this.fornecedorService.getFornecedores().subscribe({
+      next: (res: Fornecedor[]) =>{ this.fornecedores = res; },
+      error: () => Util.showMsgErro(this.messageService,'consulta fornecedores'),
       complete: () => {}
     })
   }
@@ -115,12 +107,12 @@ export class DespesaTableComponent implements OnInit{
       acceptButtonProps: {label: 'Excluir',severity: 'warn',},
       accept: () => {
         this.loading=true;
-        this.defaultService.delete(id,'despesa').subscribe({
-          next: res =>{
-            this.messageService.add({severity: 'success', summary: 'Success', detail: 'Despesa excluída!'});
+        this.despesaService.delDespesa(id).subscribe({
+          next: () =>{
+            Util.showMsgSuccess(this.messageService,'Despesa excluída!');
             this.table?._filter();
           },
-          error: error => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'exlcuir despesa' }),
+          error: () => Util.showMsgErro(this.messageService,'exlcuir despesa'),
           complete: () => this.loading=true
         })
       },
@@ -140,17 +132,16 @@ export class DespesaTableComponent implements OnInit{
 
   loadData(event: TableLazyLoadEvent) {
     let urlfiltros: string = '';
-    // let prefix: string =''
     this.loading = true;
 
     if(this.idFilter)
       urlfiltros += '&id='+this.idFilter;
     if(this.tipoDespesaFilter && this.tipoDespesaFilter.id)
-      urlfiltros += '&tipoDespesa.id='+ this.tipoDespesaFilter.id;
+      urlfiltros += '&idTipoDespesa='+ this.tipoDespesaFilter.id;
     if(this.fornecedorFilter && this.fornecedorFilter.id)
-      urlfiltros += '&fornecedor.id='+ this.fornecedorFilter.id;
+      urlfiltros += '&idFornecedor='+ this.fornecedorFilter.id;
     if(this.formaPgtoFilter && this.formaPgtoFilter.id)
-      urlfiltros += '&formaPagamento.id='+this.formaPgtoFilter.id
+      urlfiltros += '&idFormaPagamento='+this.formaPgtoFilter.id
     if(this.dataInicialFilter)
       urlfiltros += '&dataInicial='+Util.dataStringBrToDateString(this.dataInicialFilter);
     if(this.dataFinalFilter)
@@ -159,25 +150,25 @@ export class DespesaTableComponent implements OnInit{
     event.rows = (event.rows ? event.rows : this.pageSize);
     event.sortField = (event.sortField ? event.sortField : 'dataPagamento');
 
-    const url: string = 'despesa/page?page=' + (event.first! / event.rows)
+    const url: string = '?page=' + (event.first! / event.rows)
       + '&size=' + event.rows
       + '&sort=' + event.sortField + ',' + (event.sortOrder == 1 ? 'asc' : 'desc')
       + urlfiltros;
 
-    this.defaultService.get(url).subscribe({
-      next: resultado => {
+    this.despesaService.getDespesasPage(url).subscribe({
+      next: (res:any) => {
         this.despesas = [];
         this.totalElements = 0;
-        if(resultado) {
-          this.despesas = resultado.content;
-          this.totalElements = resultado.totalElements;
-          this.defaultService.get('despesa/valorTotal?'+urlfiltros).subscribe({
-            next: resultado => this.valorTotal = resultado
+        if(res) {
+          this.despesas = res.content;
+          this.totalElements = res.totalElements;
+          this.despesaService.getValorTotal('?'+urlfiltros).subscribe({
+            next: (res: any) => this.valorTotal = Number(res)
           })
         }
-        this.messageService.add({severity: 'info',summary: 'Info',detail: `${this.totalElements} despesas carregadas`,life: 3000});
+        Util.showMsgInfo(this.messageService, `${this.totalElements} despesas carregadas`);
       },
-      error: error => this.messageService.add({severity: 'error',summary: 'Error',detail: 'Erro ao carregar as despesas',life: 3000}),
+      error: () => Util.showMsgErro(this.messageService,'Erro ao carregar as despesas'),
       complete: () => this.loading = false
     });
   }
