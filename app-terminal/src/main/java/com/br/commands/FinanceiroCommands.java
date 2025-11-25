@@ -7,11 +7,7 @@ import com.br.commands.fornecedor.ConsultaFornecedor;
 import com.br.components.DespesaComponent;
 import com.br.components.FornecedorComponent;
 import lombok.extern.log4j.Log4j2;
-import org.jline.terminal.Terminal;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.shell.component.view.TerminalUI;
-import org.springframework.shell.component.view.control.BoxView;
-import org.springframework.shell.geom.Rectangle;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 
@@ -22,16 +18,11 @@ public class FinanceiroCommands{
     private DespesaComponent despesaComponent;
     private FornecedorComponent fornecedorComponent;
 
-
-
     @Autowired
     public FinanceiroCommands(DespesaComponent despesaComponent,
                               FornecedorComponent fornecedorComponent) {
-
         this.despesaComponent = despesaComponent;
         this.fornecedorComponent = fornecedorComponent;
-
-
     }
 
     @ShellMethod("Consulta Fornecedor")

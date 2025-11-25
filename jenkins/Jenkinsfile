@@ -1,0 +1,12 @@
+#!/user/bin/env groovy
+pipeline{
+    agent none
+    stage{
+        stage('build'){
+            docker {image 'maven'}
+        }
+        steps{
+            sh "maven pakage -Dmaven.test.skip=true"
+        }
+    }
+}
