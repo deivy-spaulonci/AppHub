@@ -6,11 +6,8 @@ pipeline{
             agent{
                 docker {
                     image 'maven:3.9.6-eclipse-temurin-21'
-                    args '-v $WORKSPACE/.m2:/var/maven/.m2'
+                    args '-v /var/jenkins_home/.m2:/root/.m2'
                 }
-            }
-            environment {
-                MAVEN_OPTS = '-Dmaven.repo.local=/var/maven/.m2'
             }
             steps{
                 sh "mvn package -Dmaven.test.skip=true"
