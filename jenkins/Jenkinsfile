@@ -7,7 +7,7 @@ pipeline{
                 docker {image 'maven'}
             }
             steps{
-                sh "maven package -Dmaven.test.skip=true"
+                sh "mvn package -Dmaven.test.skip=true"
             }
        }
     }
