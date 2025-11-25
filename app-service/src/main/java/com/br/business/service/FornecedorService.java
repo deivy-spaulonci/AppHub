@@ -80,7 +80,7 @@ public class FornecedorService {
     public FornecedorResponseDTO update(FornecedorUpdateRequestDTO fornecedorUpdateRequestDTO) {
         Fornecedor fornecedor = fornecedorMapper.toEntity(fornecedorUpdateRequestDTO);
         if(fornecedorUpdateRequestDTO.getCidade().getId()==null)
-            fornecedor.setCidade(cidadeRepository.findCidadeByIbgeCod(fornecedorUpdateRequestDTO.getCidade().getIbgeCod()));
+            fornecedor.setCidade(cidadeRepository.findByIbgeCod(fornecedorUpdateRequestDTO.getCidade().getIbgeCod()).get());
         return fornecedorMapper.toDto(fornecedorRepository.save(fornecedor));
     }
 

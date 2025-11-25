@@ -25,11 +25,11 @@ public class CidadeService {
     }
 
     public List<CidadeResponseDTO> listCidadeByUf(String uf) {
-        return cidadeMapper.toDtoList(cidadeRepository.findCidadeByUf(uf));
+        return cidadeMapper.toDtoList(cidadeRepository.findByUf(uf));
     }
 
     public List<CidadeResponseDTO> listCidadesByUfContainingNome(String uf, String nome) {
-        return cidadeMapper.toDtoList(cidadeRepository.findCidadeByUfAndNomeContainingIgnoreCaseOrderByNome(uf, nome));
+        return cidadeMapper.toDtoList(cidadeRepository.findByUfAndNomeContainingIgnoreCaseOrderByNome(uf, nome));
     }
 
 }

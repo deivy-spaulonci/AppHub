@@ -6,12 +6,13 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface CidadeRepository extends JpaRepository<Cidade, BigInteger>{
-    List<Cidade> findCidadeByUf(String uf);
-    List<Cidade> findCidadeByUfAndNomeContainingIgnoreCaseOrderByNome(String uf, String nome);
-    Cidade findCidadeByIbgeCod(String ibge);
+public interface CidadeRepository extends JpaRepository<Cidade, BigInteger> {
+    List<Cidade> findByUf(String uf);
+
+    List<Cidade> findByUfAndNomeContainingIgnoreCaseOrderByNome(String uf, String nome);
+
+    Optional<Cidade> findByIbgeCod(String ibge);
 }
-
-
