@@ -7,9 +7,10 @@ import {providePrimeNG} from 'primeng/config';
 import Nora from '@primeng/themes/nora';
 import Material from '@primeng/themes/material';
 import {definePreset} from '@primeng/themes';
-import {provideHttpClient} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
+import {TokenInterceptor} from './security/TokenInterceptor';
 
 registerLocaleData(localePt);
 
@@ -23,7 +24,12 @@ export const appConfig: ApplicationConfig = {
       provide:  DEFAULT_CURRENCY_CODE,
       useValue: 'BRL'
     },
-    provideHttpClient(),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true,
+    },
+    provideHttpClient(withInterceptorsFromDi()),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideAnimationsAsync(),

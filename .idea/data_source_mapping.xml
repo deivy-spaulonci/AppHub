@@ -2,5 +2,6 @@
 <project version="4">
   <component name="DataSourcePerFileMappings">
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/538d2874-0b39-471b-9c29-a6a17b41b3f3/console.sql" value="538d2874-0b39-471b-9c29-a6a17b41b3f3" />
+    <file url="file://$PROJECT_DIR$/app-repository/src/main/java/com/br/repository/DespesaRepository.java" value="538d2874-0b39-471b-9c29-a6a17b41b3f3" />
   </component>
 </project>

@@ -1,24 +1,16 @@
 
-<p-tabs [value]="value" selectOnFocus="true">
+<p-tabs [value]="value">
   <p-tablist>
-    <p-tab [value]="0">Consulta</p-tab>
-    <p-tab [value]="1">Cadastro</p-tab>
-    <p-tab [value]="2">Tipo Conta</p-tab>
+    <p-tab value="conta-table" [routerLink]="'conta-table'">
+      <i class="pi pi-plus"></i><span>Consulta</span>
+    </p-tab>
+    <p-tab value="conta-form" [routerLink]="'conta-form'">
+      <i class="pi pi-list"></i><span>Cadastro</span>
+    </p-tab>
+    <p-tab value="tipo-conta" [routerLink]="'tipo-conta'">
+      <i class="pi pi-tag"></i><span>Tpo Conta</span>
+    </p-tab>
   </p-tablist>
-  <p-tabpanels class="p-0">
-
-    <p-tabpanel [value]="0" class="p-0">
-        <app-conta-table></app-conta-table>
-    </p-tabpanel>
-
-    <p-tabpanel [value]="1">
-      <app-conta-form></app-conta-form>
-    </p-tabpanel>
-
-    <p-tabpanel [value]="2">
-      <app-tipo-conta></app-tipo-conta>
-    </p-tabpanel>
-
-  </p-tabpanels>
 </p-tabs>
+<router-outlet></router-outlet>
 

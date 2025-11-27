@@ -94,7 +94,11 @@ public class ContaService {
     }
 
     public List gastosContaAnual(int ano) {
-        return contaRepository.findGastoPorAno(ano);
+        return contaRepository.findGastoPorAno(em, ano);
+    }
+
+    public List gastosContaTotalAnual() {
+        return contaRepository.findGastoTotalPorAno(em);
     }
 
     public BigDecimal getSumConta(ContaFilter contaFilter) {

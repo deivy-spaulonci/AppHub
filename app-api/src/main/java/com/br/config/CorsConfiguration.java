@@ -9,7 +9,11 @@ public class CorsConfiguration implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT");
+                .allowedOrigins("http://localhost:4200")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT")
+                // Permite que credenciais (cookies, headers de autorização) sejam incluídas
+                .allowCredentials(true)
+                // Cabeçalhos que o frontend pode enviar (muito importante para o token JWT)
+                .allowedHeaders("*");
     }
 }

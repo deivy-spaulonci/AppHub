@@ -9,16 +9,21 @@ import {TableModule} from 'primeng/table';
 import {Select, SelectChangeEvent} from 'primeng/select';
 import {DespesaService} from '@service/DespesaService';
 import {ContaService} from '@service/ContaService';
+import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
+import {LoadingModalComponent} from '@shared/loading-modal/loading-modal.component';
+import {Toast} from 'primeng/toast';
+import {MessageService} from 'primeng/api';
 
 @Component({
   selector: 'app-home',
-  imports: [CardModule, MessageModule, FormsModule, CurrencyPipe, UIChart, ChartModule, DatePipe, TableModule, NgClass, NgStyle, Select],
+  imports: [CardModule, MessageModule, FormsModule, CurrencyPipe, UIChart, ChartModule, DatePipe, TableModule, NgClass, NgStyle, Select, Tabs, TabList, Tab, TabPanels, TabPanel, LoadingModalComponent, Toast],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
   standalone: true,
-  providers: [CurrencyPipe]
+  providers: [CurrencyPipe,MessageService]
 })
 export class HomeComponent implements OnInit{
+  loading:boolean=false;
 
   readonly CT_PAGO_URL = '?contaStatus=PAGO';
   readonly CT_HOJE_URL = '?contaStatus=HOJE';
@@ -43,6 +48,11 @@ export class HomeComponent implements OnInit{
   dataGastosDespesa: any;
   dataGastosConta: any;
 
+  dataGastosAnual: any;
+  optionsDataGastosAnual: any;
+  dataGastosAnualDespesa: any;
+  dataGastosAnualConta: any;
+
   selectedYear: number = 2025;
 
   platformId = inject(PLATFORM_ID);
@@ -63,10 +73,12 @@ export class HomeComponent implements OnInit{
   constructor(private despesaService: DespesaService,
               private contaService: ContaService,
               private currencyPipe: CurrencyPipe,
+              private messageService: MessageService,
               private cd: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
+    this.loading =true;
 
     this.despesaService.getValorTotal('').subscribe({ next: (res: number) => this.totalDespesa$ = res});
     this.contaService.getValorTotal('').subscribe({ next: (res:number) => this.totalConta$ = res});
@@ -114,7 +126,21 @@ export class HomeComponent implements OnInit{
       },
       error: (error: any) => console.error(error)
     });
+
+    forkJoin({
+      gastoAnoConta:this.contaService.getGastoPorAno(),
+      gastoAnoDespesa:this.despesaService.getGastoPorAno(),
+    }).subscribe({
+      next: ({gastoAnoConta,gastoAnoDespesa}) => {
+        this.dataGastosAnualConta = gastoAnoConta;
+        this.dataGastosAnualDespesa = gastoAnoDespesa;
+        this.initChartGastoAnual();
+      },
+      error: (error:any) => console.error(error)
+    });
+
     this.loadGastos();
+    this.loading =false;
   }
 
   loadGastos(){
@@ -180,13 +206,7 @@ export class HomeComponent implements OnInit{
         indexAxis: 'y',
         maintainAspectRatio: false,
         aspectRatio: 0.8,
-        plugins: {
-          legend: {
-            labels: {
-              color: textColor
-            }
-          }
-        }
+        plugins: {legend: {labels: {color: textColor}}}
       };
       this.cd.markForCheck()
     }
@@ -274,31 +294,59 @@ export class HomeComponent implements OnInit{
       this.optionsGastos = {
         maintainAspectRatio: false,
         aspectRatio: 0.6,
-        plugins: {
-          legend: {
-            labels: {
-              color: textColor
-            }
-          }
-        },
+        plugins: {legend: {labels: {color: textColor}}},
         scales: {
           x: {
-            ticks: {
-              color: textColorSecondary
-            },
-            grid: {
-              color: surfaceBorder,
-              drawBorder: false
-            }
+            ticks: {color: textColorSecondary},
+            grid: {color: surfaceBorder,drawBorder: false}
           },
           y: {
-            ticks: {
-              color: textColorSecondary
-            },
-            grid: {
-              color: surfaceBorder,
-              drawBorder: false
-            }
+            ticks: {color: textColorSecondary},
+            grid: {color: surfaceBorder,drawBorder: false}
+          }
+        }
+      };
+      this.cd.markForCheck()
+    }
+  }
+
+  initChartGastoAnual() {
+    if (isPlatformBrowser(this.platformId)) {
+      const documentStyle = getComputedStyle(document.documentElement);
+      const textColor = documentStyle.getPropertyValue('--p-text-color');
+      const textColorSecondary = documentStyle.getPropertyValue('--p-text-muted-color');
+      const surfaceBorder = documentStyle.getPropertyValue('--p-content-border-color');
+
+      this.dataGastosAnual = {
+        labels: this.dataGastosAnualDespesa.map((item: any[]) => item[0]),
+        datasets: [
+          {
+            label: 'Despesas',
+            backgroundColor: documentStyle.getPropertyValue('--p-blue-500'),
+            borderColor: documentStyle.getPropertyValue('--p-blue-500'),
+            data: this.dataGastosAnualDespesa.map((item: any[]) => item[1])
+          },
+          {
+            label: 'Contas',
+            backgroundColor: documentStyle.getPropertyValue('--p-green-500'),
+            borderColor: documentStyle.getPropertyValue('--p-green-500'),
+            data: this.dataGastosAnualConta.map((item: any[]) => item[1])
+          }
+        ]
+      };
+
+      this.optionsDataGastosAnual = {
+        maintainAspectRatio: false,
+        aspectRatio: 0.8,
+        plugins: {legend: {labels: {color: textColor}}},
+        scales: {
+          x: {
+            ticks: {color: textColorSecondary,font: {weight: 500}},
+            grid: {color: surfaceBorder,drawBorder: false}
+          },
+          y: {
+            ticks: {color: textColorSecondary},
+            grid: {color: surfaceBorder,drawBorder: false}
           }
         }
       };

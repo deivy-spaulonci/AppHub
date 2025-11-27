@@ -1,15 +1,11 @@
-
-<p-tabs [value]="value" selectOnFocus="true">
+<p-tabs value="despesa-table">
   <p-tablist>
-    <p-tab [value]="0">Consulta</p-tab>
-    <p-tab [value]="1">Cadastro</p-tab>
+      <p-tab value="despesa-table" [routerLink]="'despesa-table'">
+        <i class="pi pi-plus"></i><span>Consulta</span>
+      </p-tab>
+    <p-tab value="despesa-form" [routerLink]="'despesa-form'">
+      <i class="pi pi-list"></i><span>Cadastro</span>
+    </p-tab>
   </p-tablist>
-  <p-tabpanels class="p-0">
-    <p-tabpanel [value]="0" class="p-0">
-      <app-despesa-table></app-despesa-table>
-    </p-tabpanel>
-    <p-tabpanel [value]="1">
-      <app-despesa-form></app-despesa-form>
-    </p-tabpanel>
-  </p-tabpanels>
 </p-tabs>
+<router-outlet></router-outlet>

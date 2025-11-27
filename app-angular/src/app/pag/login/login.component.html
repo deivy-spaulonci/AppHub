@@ -1,0 +1,31 @@
+<form #exampleForm="ngForm" (ngSubmit)="onSubmit(exampleForm)">
+  <div id="formCard">
+    <p-card >
+      <ng-template #header>
+        <i class="pi pi-key" style="font-size: 10.5rem; margin:10px;"></i>
+      </ng-template>
+      <ng-template #title> Login</ng-template>
+
+      <p style="text-align: left; display: grid; grid-row-gap: 10px ">
+        <p-iftalabel>
+          <input pInputText id="username" name="username" autocomplete="off"
+                 class="input" [(ngModel)]="credentials.username" #username="ngModel"
+                 required/>
+          <label for="username">Usuario</label>
+        </p-iftalabel>
+        <p-iftalabel>
+          <p-password [feedback]="false" id="password" name="password" fluid size="large"
+                      [inputStyle]="{height:'40px'}" [(ngModel)]="credentials.password"
+                      #password="ngModel"/>
+          <label for="password">Senha</label>
+        </p-iftalabel>
+      </p>
+
+      <ng-template #footer>
+        <div class="flex gap-4 mt-1">
+          <p-button label="Logar" class="w-full" styleClass="w-full" type="submit"/>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+</form>

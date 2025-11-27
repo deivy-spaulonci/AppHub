@@ -14,7 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -84,14 +83,36 @@ public interface DespesaRepository extends JpaRepository<Despesa, BigInteger>, J
         };
     }
 
-    @org.springframework.data.jpa.repository.Query(value = """
-        SELECT
-            MONTH(d.DATA_PAGAMENTO) AS mesint,            
-            SUM(d.VALOR) AS total
-        FROM DESPESA d
-        WHERE YEAR(d.DATA_PAGAMENTO) = :ano
-        GROUP BY mesint
-        ORDER BY mesint
-        """, nativeQuery = true)
-    List findGastoPorAno(@Param("ano") int ano);
+    default List findGastoPorAno(EntityManager entityManager, int ano) {
+        final CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        final CriteriaQuery<Object[]> query = cb.createQuery(Object[].class);
+        final Root<Despesa> root = query.from(Despesa.class);
+        var monthExpression = cb.function("month", Integer.class, root.get(Despesa_.dataPagamento));
+        query.multiselect(monthExpression,cb.sum(root.get(Despesa_.valor)));
+        query.where(cb.equal(cb.function("year", Integer.class, root.get(Despesa_.dataPagamento)), ano));
+        query.groupBy(monthExpression);
+        query.orderBy(cb.asc(monthExpression));
+        Query qry = entityManager.createQuery(query);
+        return qry.getResultList();
+    }
+
+
+    default List findGastoTotalPorAno(EntityManager entityManager) {
+        final CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        final CriteriaQuery<Object[]> query = cb.createQuery(Object[].class);
+        final Root<Despesa> root = query.from(Despesa.class);
+
+        var yearExpression = cb.function("year", Integer.class, root.get(Despesa_.dataPagamento));
+
+        query.multiselect(
+                yearExpression,
+                cb.sum(root.get(Despesa_.valor))
+        );
+
+        query.groupBy(yearExpression);
+        query.orderBy(cb.asc(yearExpression));
+
+        Query qry = entityManager.createQuery(query);
+        return qry.getResultList();
+    }
 }

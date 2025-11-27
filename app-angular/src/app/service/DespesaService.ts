@@ -10,38 +10,42 @@ import {Despesa} from '@model/despesa';
 export class DespesaService{
   ROOT:string="despesa";
 
-  constructor(private defaltService:DefaultService) {
+  constructor(private defaultService:DefaultService) {
   }
 
   getDespesasPage(url:string): Observable<any>{
-    return this.defaltService.get(this.ROOT+'/page'+url);
+    return this.defaultService.get(this.ROOT+'/page'+url);
   }
 
   getDespesaById(id:number): Observable<Despesa>{
-    return this.defaltService.get(this.ROOT+'/'+id);
+    return this.defaultService.get(this.ROOT+'/'+id);
   }
 
   getValorTotal(url:string): Observable<number>{
-    return this.defaltService.get(this.ROOT+'/valorTotal'+url);
+    return this.defaultService.get(this.ROOT+'/valorTotal'+url);
   }
 
   getDespesaByTipo():Observable<any>{
-    return this.defaltService.get(this.ROOT+'/despesaPorTipo');
+    return this.defaultService.get(this.ROOT+'/despesaPorTipo');
   }
 
   getGastoAno(ano:number):Observable<[]>{
-    return this.defaltService.get(this.ROOT+'/gastoAno/'+ano);
+    return this.defaultService.get(this.ROOT+'/gastoAno/'+ano);
+  }
+
+  getGastoPorAno():Observable<[]>{
+    return this.defaultService.get(this.ROOT+'/gasto-total-anual');
   }
 
   delDespesa(id:number):Observable<any>{
-    return this.defaltService.delete(id,this.ROOT)
+    return this.defaultService.delete(id,this.ROOT)
   }
 
   update(despesa:Despesa): Observable<Despesa>{
-    return this.defaltService.update(despesa, this.ROOT)
+    return this.defaultService.update(despesa, this.ROOT)
   }
 
   create(despesa:Despesa): Observable<Despesa>{
-    return this.defaltService.save(despesa, this.ROOT)
+    return this.defaultService.save(despesa, this.ROOT)
   }
 }

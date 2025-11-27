@@ -33,6 +33,10 @@ export class ContaService{
     return this.defaltService.get(this.ROOT+'/gastoAno/'+ano);
   }
 
+  getGastoPorAno():Observable<[]>{
+    return this.defaltService.get(this.ROOT+'/gasto-total-anual');
+  }
+
   update(conta:Conta): Observable<Conta>{
     return this.defaltService.update(conta, this.ROOT)
   }

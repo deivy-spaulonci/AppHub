@@ -84,4 +84,10 @@ ContaRestController {
     public List contaFindById(@PathVariable(name = "ano") Integer ano){
         return contaService.gastosContaAnual(ano);
     }
+
+    @GetMapping("/gasto-total-anual")
+    @ResponseStatus(HttpStatus.OK)
+    public List findGastoTotalAnual(){
+        return contaService.gastosContaTotalAnual();
+    }
 }

@@ -11,20 +11,35 @@ import {ContaFormComponent} from '@pag/conta/conta-form/conta-form.component';
 import {ParametrosComponent} from '@pag/parametros/parametros.component';
 import {DocumentoComponent} from '@pag/documento/documento.component';
 import {ContaComponent} from '@pag/conta/conta.component';
+import {LoginComponent} from '@pag/login/login.component';
+import {TipoConta} from '@model/tipo-conta';
+import {TipoContaComponent} from '@pag/conta/tipo-conta/tipo-conta.component';
+import {AuthGuard} from './security/AuthGuard';
+import {LogoutComponent} from '@pag/logout/logout.component';
 
 export const routes: Routes = [
-  {path:'home', component: HomeComponent},
-  {path:'despesa', component:DespesaComponent},
-  {path:'fornecedor', component:FornecedorComponent},
-  {path:'fornecedor-table', component:FornecedorTableComponent},
-  {path:'fornecedor-form', component:FornecedorFormComponent},
-  {path:'despesa-table', component:DespesaTableComponent},
-  {path:'despesa-form', component:DespesaFormComponent},
-  {path:'conta-table', component:ContaTableComponent},
-  {path:'conta-form', component:ContaFormComponent},
-  {path:'parametros', component:ParametrosComponent},
-  {path:'documentos', component:DocumentoComponent},
-  {path:'conta', component:ContaComponent},
-
+  {path:'login', component: LoginComponent},
+  {path:'home', component: HomeComponent, canActivate: [AuthGuard]},
+  {path:'despesa', component:DespesaComponent,
+    children: [
+      {path: '',redirectTo: 'despesa-table',pathMatch: 'full'},
+      {path:'despesa-table', component:DespesaTableComponent, canActivate: [AuthGuard]},
+      {path:'despesa-form', component:DespesaFormComponent, canActivate: [AuthGuard]},
+    ], canActivate: [AuthGuard]
+  },
+  {path:'fornecedor', component:FornecedorComponent, canActivate: [AuthGuard]},
+  {path:'fornecedor-table', component:FornecedorTableComponent, canActivate: [AuthGuard]},
+  {path:'fornecedor-form', component:FornecedorFormComponent, canActivate: [AuthGuard]},
+  {path:'parametros', component:ParametrosComponent, canActivate: [AuthGuard]},
+  {path:'documentos', component:DocumentoComponent, canActivate: [AuthGuard]},
+  {path:'conta', component:ContaComponent,
+    children: [
+      {path: '',redirectTo: 'conta-table',pathMatch: 'full'},
+      {path:'conta-table', component:ContaTableComponent, canActivate: [AuthGuard]},
+      {path:'conta-form', component:ContaFormComponent, canActivate: [AuthGuard]},
+      {path:'tipo-conta', component:TipoContaComponent, canActivate: [AuthGuard]},
+    ], canActivate: [AuthGuard]
+  },
+  {path:'logout', component: LogoutComponent},
   { path: '',   redirectTo: '/home', pathMatch: 'full' },
 ];

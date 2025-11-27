@@ -14,7 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -104,14 +103,35 @@ public interface ContaRepository extends JpaRepository<Conta, BigInteger>, JpaSp
         };
     }
 
-    @org.springframework.data.jpa.repository.Query(value = """
-        SELECT
-            MONTH(c.DATA_PAGAMENTO) AS mesint,            
-            SUM(c.VALOR) AS total
-        FROM CONTA c
-        WHERE YEAR(c.DATA_PAGAMENTO) = :ano
-        GROUP BY mesint
-        ORDER BY mesint
-        """, nativeQuery = true)
-    List findGastoPorAno(@Param("ano") int ano);
+    default List findGastoPorAno(EntityManager entityManager, int ano) {
+        final CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        final CriteriaQuery<Object[]> query = cb.createQuery(Object[].class);
+        final Root<Conta> root = query.from(Conta.class);
+        var monthExpression = cb.function("month", Integer.class, root.get(Conta_.dataPagamento));
+        query.multiselect(monthExpression,cb.sum(root.get(Conta_.valor)));
+        query.where(cb.equal(cb.function("year", Integer.class, root.get(Conta_.dataPagamento)), ano));
+        query.groupBy(monthExpression);
+        query.orderBy(cb.asc(monthExpression));
+        Query qry = entityManager.createQuery(query);
+        return qry.getResultList();
+    }
+
+    default List findGastoTotalPorAno(EntityManager entityManager) {
+        final CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        final CriteriaQuery<Object[]> query = cb.createQuery(Object[].class);
+        final Root<Conta> root = query.from(Conta.class);
+
+        var yearExpression = cb.function("year", Integer.class, root.get(Conta_.dataPagamento));
+
+        query.multiselect(yearExpression,cb.sum(root.get(Conta_.valor)));
+
+        query.where(cb.isNotNull(root.get(Conta_.dataPagamento)));
+        query.where(cb.isNotNull(root.get(Conta_.formaPagamento)));
+
+        query.groupBy(yearExpression);
+        query.orderBy(cb.asc(yearExpression));
+
+        Query qry = entityManager.createQuery(query);
+        return qry.getResultList();
+    }
 }

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from "primeng/tabs";
 import {DespesaTableComponent} from './despesa-table/despesa-table.component';
 import {DespesaFormComponent} from './despesa-form/despesa-form.component';
+import {RouterLink, RouterOutlet} from '@angular/router';
 
 @Component({
   selector: 'app-despesa',
@@ -12,7 +13,9 @@ import {DespesaFormComponent} from './despesa-form/despesa-form.component';
     TabPanels,
     Tabs,
     DespesaTableComponent,
-    DespesaFormComponent
+    DespesaFormComponent,
+    RouterOutlet,
+    RouterLink
   ],
   templateUrl: './despesa.component.html',
   styleUrl: './despesa.component.css'

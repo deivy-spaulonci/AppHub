@@ -112,6 +112,14 @@ public class DespesaService {
         return BigInteger.valueOf(despesaRepository.count());
     }
 
+    public List gastosDespesaAnual(int ano){
+        return despesaRepository.findGastoPorAno(em, ano);
+    }
+
+    public List gastosDespesaTotalAnual(){
+        return despesaRepository.findGastoTotalPorAno(em);
+    }
+
 //    public List<String> saveLote(LoteDespesaRequestDTO loteDespesaRequestDTO) {
 //        List<String> listStatus = new ArrayList<>();
 //        List<String> listErro = new ArrayList<>();
@@ -178,9 +186,7 @@ public class DespesaService {
 //        return listStatus;
 //    }
 
-    public List gastosDespesaAnual(int ano){
-        return despesaRepository.findGastoPorAno(ano);
-    }
+
 
 // AJUSTAR DEPOIS PORUQE O TIPO DE DESPESA E A FORMA DE PAGAMENTO NAO SAO MAIS ENUNS
 //    public String importFromResource() {

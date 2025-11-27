@@ -14,6 +14,7 @@ import {ToggleButton} from 'primeng/togglebutton';
 import {Divider} from 'primeng/divider';
 import {DocumentoService} from '@service/DocumentoService';
 import {Util} from '@util/util';
+import {LoadingModalComponent} from '@shared/loading-modal/loading-modal.component';
 
 @Component({
   selector: 'app-documento',
@@ -30,6 +31,7 @@ import {Util} from '@util/util';
     NgIf,
     ToggleButton,
     Divider,
+    LoadingModalComponent,
   ],
   templateUrl: './documento.component.html',
   standalone: true,

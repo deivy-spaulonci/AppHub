@@ -59,6 +59,12 @@ public class DespesaRestController {
         return despesaService.gastosDespesaAnual(ano);
     }
 
+    @GetMapping("/gasto-total-anual")
+    @ResponseStatus(HttpStatus.OK)
+    public List findGastoTotalAnual(){
+        return despesaService.gastosDespesaTotalAnual();
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<DespesaResponseDTO> create(@RequestBody @Valid DespesaCreateRequestDTO despesaCreateRequestDTO){
